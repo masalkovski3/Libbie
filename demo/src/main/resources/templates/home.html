@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Libbie - Your personal library</title>
+    <link href="style3.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="layout">
+    <!-- Hamburgarikon för att öppna menyn -->
+    <div class="menu-toggle" id="menuToggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Sidebar med 'sidebar-hidden' klass som default -->
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+        <div class="container">
+            <header id="sidebar-header">
+                <img id="logo" src="/images/logo.png" alt="Libbie Logo">
+                <h2>Menu</h2>
+                <nav>
+                    <ul>
+                        <li class="button">
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="button">
+                            <a href="/search">Search</a>
+                        </li>
+                        <li class="button">
+                            <a href="/profile">Profile</a>
+                        </li>
+                        <li class="button">
+                            <a href="/about">About Libbie</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    </aside>
+
+    <main class="content">
+        <!-- Ny header för Libbie -->
+        <header class="main-header">
+            <h1>Libbie</h1>
+        </header>
+
+        <!-- Ny navigationsrad för genrer -->
+        <nav class="genre-nav">
+            <ul class="genre-list">
+                <li class="genre-item"><button class="genre-button">Fantasy</button></li>
+                <li class="genre-item"><button class="genre-button">Science Fiction</button></li>
+                <li class="genre-item"><button class="genre-button">Mystery</button></li>
+                <li class="genre-item"><button class="genre-button">Romance</button></li>
+                <li class="genre-item"><button class="genre-button">Biography</button></li>
+                <li class="genre-item"><button class="genre-button">History</button></li>
+                <li class="genre-item"><button class="genre-button">Self-Help</button></li>
+                <li class="genre-item"><button class="genre-button">Poetry</button></li>
+            </ul>
+        </nav>
+
+        <div class="page-content">
+            <h1 id="h1">Welcome to your digital library</h1>
+
+            <div class="img-flex">
+                <div class="img-container">
+                    <img src="/images/bookshelf.jpg" alt="Bookshelf">
+                    <p class="caption">Create your own personal bookshelves</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="bottom-section">
+                <img src="/images/library.jpg" alt="Picture">
+                <p class="text">Libbie is your personal digital book shelf where you can organize, explore and share your reading experiences. Create themed shelves, discover new authors, and connect with other book lovers..</p>
+                <p class="text" id="text">With Libbie, you can keep track of what you've read, what you want to read, and get recommendations based on your interests. Start your digital reading journey today.</p>
+            </div>
+
+            <hr>
+
+            <footer>
+                <h5>Latest Update: 2025-03-27</h5>
+            </footer>
+        </div>
+    </main>
+</div>
+
+<!-- JavaScript för att hantera menyväxling -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-hidden');
+            menuToggle.classList.toggle('active');
+        });
+    });
+</script>
+</body>
+</html>

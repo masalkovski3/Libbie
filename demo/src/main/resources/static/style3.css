@@ -1,0 +1,351 @@
+body {
+    background-color: #deacdf5d;
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #0d1f43;
+    min-height: 100vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
+    display: flex; /*skapar flexbox för hela sidan*/
+}
+
+/* HAMBURGAREMENY STILAR */
+/* Hamburgarikon position och styling */
+.menu-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000; /* Högre z-index så att den visas över andra element */
+    cursor: pointer;
+    background-color: #8EACBF;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* De tre strecken i hamburgarikonen */
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    background-color: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Animation för hamburgarikonen när menyn är öppen */
+.menu-toggle.active .hamburger span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-toggle.active .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active .hamburger span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Styla sidofältet för att stödja visning/döljande */
+.sidebar {
+    min-width: 250px;
+    background-color: hsl(203, 48%, 82%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    position: fixed; /* Gör sidofältet fast positionerat */
+    left: 0;
+    top: 0;
+    height: 100vh; /* Full höjd */
+    z-index: 999; /* Hög z-index så att det visas över andra element */
+    transition: transform 0.3s ease; /* Mjuk övergång för animationen */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Dölj sidofältet genom att flytta det utanför synfältet */
+.sidebar-hidden {
+    transform: translateX(-100%);
+}
+
+/* Justera innehållsområdet för att hantera både synligt och dolt sidofält */
+.content {
+    flex-grow: 3;
+    display: flex;
+    flex-direction: column;
+    margin-left: 0; /* Ingen marginal när menyn är dold */
+    transition: margin-left 0.3s ease; /* Mjuk övergång */
+    width: 100%; /* Full bredd när menyn är dold */
+}
+
+/* När sidofältet är synligt, justerar vi innehållets marginal */
+.sidebar:not(.sidebar-hidden) + .content {
+    margin-left: 250px; /* Samma bredd som sidebar */
+    width: calc(100% - 250px); /* Minska bredden för att ge plats åt menyn */
+}
+
+/* URSPRUNGLIGA STILAR */
+#logo {
+    width: 80%;
+    max-width: 230px;
+    margin-top: 20px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /*flex-grow, flex-shrink, flex-basis*/
+}
+
+.layout{
+    display: flex;
+    min-height: 100vh;
+}
+
+#sidebar-header {
+    flex: 0 0 200px;
+    font-size: small;
+    text-align: center;
+    color: #192640;
+}
+
+.button {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.button a {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: rgb(250, 245, 245);
+    border: 7px solid rgb(250, 245, 245);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px;
+    color: #192640;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.button a:hover {
+    color: #8EACBF;
+    text-decoration: underline;
+}
+
+#h1 {
+    font-size: 45px;
+    margin-bottom: 30px;
+    padding-left: 50px;
+    margin-top: 30px; /* Lägg till detta för att ge utrymme efter genre-navigationsfältet */
+}
+
+.img-flex { /*flexbox för bilderna, en flex på row, ej angivett här eftersom det är the default*/
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px; /*avstånden mellan objekten i flexet*/
+    margin: 60px 30px 30px;
+}
+
+.img-container { /*flexbox för vänstra delen på sidan*/
+    width: 270px;
+    height: 270px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.caption {
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#dida {
+    font-size: 40px;
+    padding: 30px 30px 50px 50px;
+    float: left;
+}
+
+footer {
+    margin-top: auto;
+    text-align: center;
+}
+
+hr {
+    margin: 100px 30px 0;
+}
+
+.bottom-section img {
+    width: 40%;
+    float: right;
+    padding: 20px 10px 20px 0;
+    border-radius: 15px;
+    margin: 30px;
+}
+
+.text {
+    padding: 40px;
+    line-height: 1.5;
+}
+
+#text {
+    padding-bottom: 120px;
+}
+
+/* Stilar för page-content container */
+.page-content {
+    padding: 20px 50px;
+    flex-grow: 1;
+}
+
+/* NYA STILAR FÖR HEADER OCH GENRE-KNAPPAR */
+.main-header {
+    background-color: #8EACBF;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 48px;
+    color: white;
+}
+
+.genre-nav {
+    background-color: #e9f1f5;
+    width: 100%;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.genre-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.genre-item {
+    margin: 0 3px;
+    flex-shrink: 0;
+}
+
+.genre-button {
+    background-color: #eccee6;
+    color: #192640;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.genre-button:hover {
+    background-color: #d9b5d2;
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVA STILAR */
+@media (max-width:768px) {
+    .sidebar:not(.sidebar-hidden) + .content {
+        margin-left: 0; /* Inget sidofält i mobilvy */
+        width: 100%;
+    }
+
+    .sidebar {
+        width: 100%; /* Fullbredd i mobilvy */
+        max-width: 300px; /* Men begränsa max-bredden */
+    }
+}
+
+@media (max-width:600px) {
+    /*ett problem som jag stött på är att när skärmen är mellan original storleken och
+    600px så rör bilderna och texterna till sig, vilket jag inte kunnat lösa */
+    body {
+        flex-direction: column;
+        margin: 0px;
+        padding: 0px;
+        overflow-x: hidden;
+    }
+
+    #logo {
+        display: none;
+    }
+
+    .content {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .img-flex {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .img-container {
+        width: 50%;
+        max-width: 50%;
+        height: auto;
+    }
+
+    .caption {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    #h1 {
+        font-size: 34px;
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .bottom-section img {
+        width: 50%;
+        padding: 70px;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        align-items: center;
+    }
+
+    .text {
+        padding: 20px;
+        font-size: 14px;
+    }
+
+    footer {
+        padding: 10px;
+    }
+
+    /* För att bättre visa hamburgarikonen på små skärmar */
+    .menu-toggle {
+        top: 10px;
+        left: 10px;
+        padding: 8px;
+    }
+}
+
+

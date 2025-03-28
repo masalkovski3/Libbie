@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About Libbie - Ditt personliga digitala bibliotek</title>
+    <link href="/style3.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="layout">
+    <!-- Hamburgarikon för att öppna menyn -->
+    <div class="menu-toggle" id="menuToggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Sidebar med 'sidebar-hidden' klass som default -->
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+        <div class="container">
+            <header id="sidebar-header">
+                <img id="logo" src="/images/logo.png" alt="Libbie Logo">
+                <h2>Menu</h2>
+                <nav>
+                    <ul>
+                        <li class="button">
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="button">
+                            <a href="/search">Search</a>
+                        </li>
+                        <li class="button">
+                            <a href="/profile">Profile</a>
+                        </li>
+                        <li class="button">
+                            <a href="/about">About Libbie</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    </aside>
+
+    <main class="content">
+        <!-- Ny header för Libbie -->
+        <header class="main-header">
+            <h1>Libbie</h1>
+        </header>
+
+        <!-- Ny navigationsrad för genrer -->
+        <nav class="genre-nav">
+            <ul class="genre-list">
+                <li class="genre-item"><button class="genre-button">Fantasy</button></li>
+                <li class="genre-item"><button class="genre-button">Science Fiction</button></li>
+                <li class="genre-item"><button class="genre-button">Mystery</button></li>
+                <li class="genre-item"><button class="genre-button">Romance</button></li>
+                <li class="genre-item"><button class="genre-button">Biography</button></li>
+                <li class="genre-item"><button class="genre-button">History</button></li>
+                <li class="genre-item"><button class="genre-button">Self-Help</button></li>
+                <li class="genre-item"><button class="genre-button">Poetry</button></li>
+            </ul>
+        </nav>
+
+        <div class="page-content">
+            <h1 id="h1">Om Libbie</h1>
+
+            <div class="text">
+                <h2>Vår Vision</h2>
+                <p>
+                    Libbie föddes ur en passion för litteratur och ett behov av att organisera och dela läsupplevelser.
+                    Vi skapade Libbie för att ge bokälskare ett digitalt hem för sina litterära samlingar, där de kan hålla
+                    ordning på böcker de läst, vill läsa, och dela med andra.
+                </p>
+
+                <h2>Funktioner</h2>
+                <p>
+                    Med Libbie kan du:
+                </p>
+                <ul>
+                    <li>Skapa personliga bokhyllor organiserade efter dina egna teman och genrer</li>
+                    <li>Lägga till böcker du läst eller vill läsa</li>
+                    <li>Skriva recensioner och läsa andras åsikter</li>
+                    <li>Hitta nya böcker baserat på dina läsvanor</li>
+                    <li>Ansluta med andra bokälskare och se deras bokhyllor</li>
+                    <li>Delta i bokdiskussioner</li>
+                </ul>
+
+                <h2>Hur det började</h2>
+                <p>
+                    Libbie startade som ett studentprojekt på [Din skola/universitet] med målet att skapa en
+                    användarvänlig plattform för litteraturentusiaster. Det vi upptäckte var att många bokälskare
+                    saknade ett enkelt sätt att organisera sina läsupplevelser digitalt och att dela dem med likasinnade.
+                </p>
+
+                <h2>Teamet bakom Libbie</h2>
+                <p>
+                    Vi är en grupp passionerade studenter som älskar både böcker och teknik. Vårt mål är att bygga en
+                    community där litteratur står i centrum och där alla kan hitta sin plats.
+                </p>
+
+                <h2>Kontakta oss</h2>
+                <p>
+                    Har du frågor, förslag eller feedback? Vi vill gärna höra från dig!
+                    Skicka oss ett mail på: <a href="mailto:contact@libbie.example.com">contact@libbie.example.com</a>
+                </p>
+            </div>
+
+            <hr>
+
+            <footer>
+                <h5>Latest Update: 2025-03-27</h5>
+            </footer>
+        </div>
+    </main>
+</div>
+
+<!-- JavaScript för att hantera menyväxling -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-hidden');
+            menuToggle.classList.toggle('active');
+        });
+    });
+</script>
+</body>
+</html>
