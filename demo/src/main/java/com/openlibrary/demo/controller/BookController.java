@@ -55,4 +55,7 @@ public class BookController {
     public String about() {
         return "about";
     }
+
+    @GetMapping("/profile")
+    public String profile() { return "profile"; }
 }
