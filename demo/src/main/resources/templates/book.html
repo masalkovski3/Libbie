@@ -38,29 +38,37 @@
         </header>
 
         <div class="page-content">
-            <h1 id="h1" th:text="${title}">Book Title</h1>
+            <div class="book-layout">
 
-            <h3>
-                Author:
-                <a th:href="@{'https://openlibrary.org' + ${authorKey}}" th:text="${author}">Author Name</a>
-            </h3>
-
-            <!-- Bokomslag -->
-            <div class="img-flex">
-                <div class="img-container">
+                <!-- Vänster kolumn: bokomslag -->
+                <div class="left-column">
                     <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
                     <img th:if="${coverUrl == ''}" src="/images/no_cover.jpeg" alt="No cover available"/>
                 </div>
+
+                <!-- Höger kolumn: bokinformation -->
+                <div class="right-column">
+                    <h1 th:text="${title}">Book Title</h1>
+
+                    <h3>
+                        Author:
+                        <a th:href="@{'https://openlibrary.org' + ${authorKey}}" th:text="${author}">Author Name</a>
+                    </h3>
+
+                    <h3>Description</h3>
+                    <p th:text="${description}">No description available.</p>
+
+                    <!-- Recensioner -->
+                    <div class="reviews-section">
+                        <h3>Reviews</h3>
+                        <div class="review-stars">★★★★☆</div>
+                        <div class="review-text">"Really compelling narrative and complex characters."</div>
+                    </div>
+
+                    <br>
+                    <a href="/search">← Back to search</a>
+                </div>
             </div>
-
-            <!-- Beskrivning -->
-            <div class="text">
-                <h3>Description</h3>
-                <p th:text="${description}">No description available.</p>
-            </div>
-
-
-            <a href="/search">← Back to search</a>
         </div>
 
         <footer>
