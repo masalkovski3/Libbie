@@ -59,14 +59,15 @@
         <div class="page-content">
             <h1 id="h1">Search for Books</h1>
 
-            <form action="/search" method="get" style="padding-left: 50px;">
+            <form action="/search" method="get" style="text-align: center; margin: 20px 0;">
                 <input type="text" name="query" placeholder="Enter book title or author" />
                 <button type="submit">Search</button>
             </form>
 
-            <div th:if="${books}" style="padding-left: 50px;">
+            <!-- Flytta upp resultatet direkt efter formuläret -->
+            <div th:if="${books}" style="text-align: center; margin-bottom: 30px;">
                 <h2>Results for "<span th:text="${query}"></span>":</h2>
-                <ul>
+                <ul style="list-style: none; padding: 0;">
                     <li th:each="book : ${books}">
                         <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}">
                             <b th:text="${book.title}">Book Title</b>
@@ -74,6 +75,14 @@
                         by <i th:text="${book.author}">Author</i>
                     </li>
                 </ul>
+            </div>
+
+            <!-- Nu visas bilden efteråt -->
+            <div class="img-flex">
+                <div class="img-container">
+                    <img src="/images/bookshelf.jpg" alt="Bookshelf">
+                    <p class="caption">Find your next read</p>
+                </div>
             </div>
 
             <hr>
@@ -97,5 +106,17 @@
         });
     });
 </script>
+<!-- Fixa så att detta är i css filen istället -->
+<style>
+    body {
+        display: block !important;
+    }
+
+    .layout {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+    }
+</style>
 </body>
 </html>
