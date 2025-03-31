@@ -102,17 +102,20 @@ public class BookController {
 
         // === 5. Omslagsbild (hämtas via editioner – om någon finns)
         String coverUrl = "";
-        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=1";
+        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
         String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
         JsonNode editionRoot = mapper.readTree(editionResponse);
         JsonNode editionDocs = editionRoot.path("entries");
 
-        if (editionDocs.isArray() && editionDocs.size() > 0) {
-            JsonNode firstEdition = editionDocs.get(0);
-            JsonNode covers = firstEdition.path("covers");
-            if (covers.isArray() && covers.size() > 0) {
-                int coverId = covers.get(0).asInt();
-                coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+        if (editionDocs.isArray()) {
+            for (JsonNode edition : editionDocs) {
+                JsonNode covers = edition.path("covers");
+                if (covers.isArray() && covers.size() > 0) {
+                    int coverId = covers.get(0).asInt();
+                    coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+                    System.out.println("✅ Cover found: " + coverUrl);
+                    break;
+                }
             }
         }
 
@@ -122,8 +125,6 @@ public class BookController {
         model.addAttribute("coverUrl", coverUrl);
         model.addAttribute("author", author);
         model.addAttribute("authorKey", authorKey);
-
-        System.out.println("Cover URL: " + coverUrl);
 
         return "book";
     }
