@@ -1,12 +1,85 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="utf-8">
     <title th:text="${title}">Book Details</title>
+    <link href="/style3.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<h1 th:text="${title}">Title</h1>
-<p><strong>Description:</strong></p>
-<p th:text="${description}">No description available</p>
-<a href="/search">← Back to search</a>
+<div class="layout">
+
+    <!-- Hamburgarikon -->
+    <div class="menu-toggle" id="menuToggle">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+        <div class="container">
+            <header id="sidebar-header">
+                <img id="logo" src="/images/logo.png" alt="Libbie Logo">
+                <h2>Menu</h2>
+                <nav>
+                    <ul>
+                        <li class="button"><a href="/">Home</a></li>
+                        <li class="button"><a href="/search">Search</a></li>
+                        <li class="button"><a href="/profile">Profile</a></li>
+                        <li class="button"><a href="/about">About Libbie</a></li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="content">
+        <header class="main-header">
+            <h1>Libbie</h1>
+        </header>
+
+        <div class="page-content">
+            <h1 id="h1" th:text="${title}">Book Title</h1>
+
+            <h3>
+                Author:
+                <a th:href="@{'https://openlibrary.org' + ${authorKey}}" th:text="${author}">Author Name</a>
+            </h3>
+
+            <!-- Bokomslag -->
+            <div class="img-flex">
+                <div class="img-container">
+                    <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
+                    <img th:if="${coverUrl == ''}" src="/images/no_cover.jpeg" alt="No cover available"/>
+                </div>
+            </div>
+
+            <!-- Beskrivning -->
+            <div class="text">
+                <h3>Description</h3>
+                <p th:text="${description}">No description available.</p>
+            </div>
+
+
+            <a href="/search">← Back to search</a>
+        </div>
+
+        <footer>
+            <h5>Latest Update: 2025-03-31</h5>
+        </footer>
+    </main>
+</div>
+
+<!-- JavaScript för att hantera hamburgermenyn -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('sidebar-hidden');
+            menuToggle.classList.toggle('active');
+        });
+    });
+</script>
 </body>
 </html>

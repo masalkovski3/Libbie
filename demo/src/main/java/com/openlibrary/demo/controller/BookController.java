@@ -63,26 +63,69 @@ public class BookController {
 
     @GetMapping("/books/{workId}")
     public String books(@PathVariable String workId, Model model) throws JsonProcessingException {
+
         String cleanId = workId.replace("/works/", "");
-        String url = "https://openlibrary.org/works/" + cleanId + ".json";
-
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(url, String.class);
-
         ObjectMapper mapper = new ObjectMapper();
+
+        // === 1. Hämta grundläggande bokdata från "works"
+        String workUrl = "https://openlibrary.org/works/" + cleanId + ".json";
+        String response = restTemplate.getForObject(workUrl, String.class);
         JsonNode root = mapper.readTree(response);
 
+        // === 2. Titel
         String title = root.path("title").asText();
+
+        // === 3. Beskrivning (kan vara text eller objekt)
         String description = "";
         JsonNode descNode = root.path("description");
-        if (descNode != null) {
+        if (descNode.isTextual()) {
             description = descNode.asText();
         } else if (descNode.has("value")) {
-            description = descNode.get("value").asText();
+            description = descNode.path("value").asText();
         }
 
+        // === 4. Författare (hämta via separat /authors/{id}-anrop)
+        String author = "Unknown";
+        String authorKey = "";
+        JsonNode authorsNode = root.path("authors");
+
+        if (authorsNode.isArray() && authorsNode.size() > 0) {
+            authorKey = authorsNode.get(0).path("author").path("key").asText(); // t.ex. /authors/OL1234A
+            if (!authorKey.isEmpty()) {
+                String authorUrl = "https://openlibrary.org" + authorKey + ".json";
+                String authorResponse = restTemplate.getForObject(authorUrl, String.class);
+                JsonNode authorRoot = mapper.readTree(authorResponse);
+                author = authorRoot.path("name").asText("Unknown");
+            }
+        }
+
+        // === 5. Omslagsbild (hämtas via editioner – om någon finns)
+        String coverUrl = "";
+        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=1";
+        String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+        JsonNode editionRoot = mapper.readTree(editionResponse);
+        JsonNode editionDocs = editionRoot.path("entries");
+
+        if (editionDocs.isArray() && editionDocs.size() > 0) {
+            JsonNode firstEdition = editionDocs.get(0);
+            JsonNode covers = firstEdition.path("covers");
+            if (covers.isArray() && covers.size() > 0) {
+                int coverId = covers.get(0).asInt();
+                coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+            }
+        }
+
+        // === 6. Skicka data till vy
         model.addAttribute("title", title);
-        model.addAttribute("description", description);
+        model.addAttribute("description", description.isEmpty() ? "No description available." : description);
+        model.addAttribute("coverUrl", coverUrl);
+        model.addAttribute("author", author);
+        model.addAttribute("authorKey", authorKey);
+
+        System.out.println("Cover URL: " + coverUrl);
+
         return "book";
     }
+
 }
