@@ -68,7 +68,10 @@
                 <h2>Results for "<span th:text="${query}"></span>":</h2>
                 <ul>
                     <li th:each="book : ${books}">
-                        <b th:text="${book.title}"></b> by <i th:text="${book.author}"></i>
+                        <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}">
+                            <b th:text="${book.title}">Book Title</b>
+                        </a>
+                        by <i th:text="${book.author}">Author</i>
                     </li>
                 </ul>
             </div>
