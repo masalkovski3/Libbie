@@ -213,7 +213,6 @@ hr {
 /* Stilar för page-content container */
 .page-content {
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
     padding: 20px 50px;
     flex-grow: 1;
