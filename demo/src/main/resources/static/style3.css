@@ -121,7 +121,8 @@ nav ul {
 .layout{
     display: flex;
     min-height: 100vh;
-    width: 100%; //lade till detta för att sidan inte ska bli avklippt när vi sätter upp hemsidan i fullskärm.
+    width: 100%;
+    position: relative;
 }
 
 #sidebar-header {
@@ -239,7 +240,7 @@ hr {
 /* Stilar för page-content container */
 .page-content {
     width: 100%;
-    margin: 0 auto;
+    box-sizing: border-box; /* Inkluderar padding i breddberäkningen */
     padding: 20px 50px;
     flex-grow: 1;
 }
