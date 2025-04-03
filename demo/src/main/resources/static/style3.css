@@ -1,10 +1,11 @@
 body {
+    overflow: visible;
     background-color: #deacdf5d;
     margin: 0;
     padding: 0;
     font-family: Georgia, 'Times New Roman', Times, serif;
     color: #0d1f43;
-    min-height: 100vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
+    min-height: 300vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
     display: flex; /*skapar flexbox för hela sidan*/
 }
 
@@ -50,7 +51,7 @@ body {
 /* Styla sidofältet för att stödja visning/döljande */
 .sidebar {
     min-width: 250px;
-    background-color: hsl(203, 48%, 82%);
+    background-color: #b5c9d8;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -71,7 +72,7 @@ body {
 
 /* Justera innehållsområdet för att hantera både synligt och dolt sidofält */
 .content {
-    flex-grow: 3;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     margin-left: 0; /* Ingen marginal när menyn är dold */
@@ -86,10 +87,23 @@ body {
 }
 
 /* URSPRUNGLIGA STILAR */
-#logo {
-    width: 80%;
+.logo {
+    width: 50%;
     max-width: 230px;
     margin-top: 20px;
+    border-radius: 50%;
+}
+
+.main-logo {
+    width: 10%;
+    height: auto;
+    margin-right: 0px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 nav ul {
@@ -147,6 +161,17 @@ nav ul {
     margin-bottom: 30px;
     padding-left: 50px;
     margin-top: 30px; /* Lägg till detta för att ge utrymme efter genre-navigationsfältet */
+}
+
+#h2 {
+    font-size: 30px;
+    padding-left: 50px;
+}
+
+#h3 {
+    margin-top: 80px;
+    font-size: 30px;
+    padding-left: 50px;
 }
 
 .img-flex { /*flexbox för bilderna, en flex på row, ej angivett här eftersom det är the default*/
@@ -263,6 +288,7 @@ hr {
     border-radius: 15px;
     padding: 5px 10px;
     font-size: 12px;
+    font-family: Georgia;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     white-space: nowrap;
@@ -433,6 +459,167 @@ hr {
     margin-top: 10px;
     font-style: italic;
     line-height: 1.5;
+}
+
+.library-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 10px;
+    margin-left: 12px;
+}
+
+.library-container {
+    overflow-x: hidden; //added
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #d9b5d2;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    width: 100%;
+    margin-left: 50px;
+    height: 100px;
+}
+
+.collection-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #eccee6;
+    color: #0d1f43;
+    border: none;
+    font-size: 16px;
+    font-family: Georgia;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 100%;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: background 0.3s;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.collection-button:hover {
+    background-color: #deb8d6;
+}
+
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    padding: 10px;
+    transition: 0.5s;
+    z-index: 10;
+}
+
+.scroll-button:hover {
+    background: none;
+    color: #4f6082;
+    text-shadow: 1px 1px 10px black;
+    transition: 0.5s;
+}
+
+.left {
+    left: 45px;
+}
+
+.right {
+    right: -5px;
+}
+
+.recommendation-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #eccee6;
+    color: #0d1f43;
+    border: none;
+    font-size: 16px;
+    font-family: Georgia;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 300px;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: background 0.3s;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.recommmendation-container {
+    overflow-x: hidden; //added
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #d9b5d2;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    width: 100%;
+    margin-left: 50px;
+    height: 300px;
+}
+
+.profile{
+    border-radius: 50%;
+    width: 200px;
+    margin-left: 50px;
+    border: 4px solid #0d1f43;
+    margin-bottom: 30px;
+}
+
+.profile-name{
+    color: #0d1f43;
+    font-family: Georgia;
+    font-size: 30px;
+    margin-left: 50px;
+    margin-bottom: 10px;
+}
+
+.profile-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.edit-profile {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-profile-button {
+    width: 120px;
+    height: 20px;
+    margin-left: 50px;
+    border: none;
+    font-family: Georgia;
+    background-color: #8EACBF;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.edit-profile-button:hover {
+    cursor: pointer;
+    transition: 0.3s;
+    background-color: #6B8FA8;
+    box-shadow: 1px 1px 5px black;
 }
 
 
