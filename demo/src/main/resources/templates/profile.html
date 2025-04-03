@@ -1,10 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="style3.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+<div class="layout">
+
+    <div class="menu-toggle" id="menuToggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+        <div class="container">
+            <header id="sidebar-header">
+                <img class="logo" src="images/pink-logo.jpeg" alt="Libie Logo">
+                <h2>Menu</h2>
+                <nav>
+                    <ul>
+                        <li class="button">
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="button">
+                            <a href="/search">Search</a>
+                        </li>
+                        <li class="button">
+                            <a href="/profile">Profile</a>
+                        </li>
+                        <li class="button">
+                            <a href="/about">About Libbie</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    </aside>
+
+    <main class="content">
+        <!-- Ny header för Libbie -->
+        <header class="main-header">
+            <div class="logo-container">
+                <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
+                <h1>Libbie</h1>
+            </div>
+        </header>
+
+        <nav class="genre-nav">
+            <ul class="genre-list">
+                <li class="genre-item"><button class="genre-button">Fantasy</button></li>
+                <li class="genre-item"><button class="genre-button">Science Fiction</button></li>
+                <li class="genre-item"><button class="genre-button">Mystery</button></li>
+                <li class="genre-item"><button class="genre-button">Romance</button></li>
+                <li class="genre-item"><button class="genre-button">Drama</button></li>
+                <li class="genre-item"><button class="genre-button">Period drama</button></li>
+                <li class="genre-item"><button class="genre-button">Thriller</button></li>
+                <li class="genre-item"><button class="genre-button">Horror</button></li>
+                <li class="genre-item"><button class="genre-button">Detective</button></li>
+                <li class="genre-item"><button class="genre-button">Biography</button></li>
+                <li class="genre-item"><button class="genre-button">History</button></li>
+                <li class="genre-item"><button class="genre-button">Self-Help</button></li>
+                <li class="genre-item"><button class="genre-button">Poetry</button></li>
+            </ul>
+        </nav>
+
+
+        <h1 id="h1">Din profil</h1>
+
+        <div class="profile-container">
+            <img class="profile" src="images/profilepicture.webp" alt="profilbild">
+            <div class="edit-profile">
+                <h4 class="profile-name">Libbie Libbson</h4>
+                <button class="edit-profile-button">Redigera profil</button>
+            </div>
+        </div>
+
+        <h2 id="h2">Dina bokhyllor</h2>
+
+        <div class="library-wrapper">
+            <button class="scroll-button left" onclick="scrollLibrary(-200)">&#9664;</button>
+            <div class="library-container" id="libraryContainer">
+                <button class="collection-button">Fantasy</button>
+                <button class="collection-button">Sci-Fi</button>
+                <button class="collection-button">Deckare</button>
+                <button class="collection-button">Historia</button>
+                <button class="collection-button">Biografier</button>
+                <button class="collection-button">Romantik</button>
+                <button class="collection-button">Barnböcker</button>
+                <button class="collection-button">Klassiker</button>
+                <button class="collection-button">Thriller</button>
+            </div>
+            <button class="scroll-button right" onclick="scrollLibrary(200)">&#9654;</button>
+        </div>
+
+
+        <h3 id="h3">Rekommenderat för dig</h3>
+
+        <div class="library-wrapper">
+            <button class="scroll-button left" onclick="scrollRecommendations(-200)">&#9664;</button>
+            <div class="recommmendation-container" id="recommendation-container">
+                <button class="recommendation-button">Harry Potter</button>
+                <button class="recommendation-button">Fourht Wing</button>
+                <button class="recommendation-button">Wallflower</button>
+                <button class="recommendation-button">Yellow Face</button>
+                <button class="recommendation-button">Bok</button>
+                <button class="recommendation-button">Bok</button>
+                <button class="recommendation-button">Bok</button>
+                <button class="recommendation-button">Bok</button>
+                <button class="recommendation-button">Bok</button>
+            </div>
+            <button class="scroll-button right" onclick="scrollRecommendations(200)">&#9654;</button>
+        </div>
+
+        <script>
+            function scrollLibrary(amount) {
+                document.getElementById("libraryContainer").scrollBy({
+                    left: amount,
+                    behavior: "smooth"
+                });
+            }
+
+            function scrollRecommendations(amount) {
+                document.getElementById("recommendation-container").scrollBy({
+                    left: amount,
+                    behavior: "smooth"
+                })
+            }
+        </script>
+    </main>
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-hidden');
+                menuToggle.classList.toggle('active');
+            });
+        });
+    </script>
 
 </body>
 </html>
