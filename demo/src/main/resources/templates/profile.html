@@ -100,21 +100,40 @@
 
         <h3 id="h3">Rekommenderat för dig</h3>
 
-        <div class="library-wrapper">
+        <div class="recommendation-wrapper">
             <button class="scroll-button left" onclick="scrollRecommendations(-200)">&#9664;</button>
-            <div class="recommmendation-container" id="recommendation-container">
-                <button class="recommendation-button">Harry Potter</button>
-                <button class="recommendation-button">Fourht Wing</button>
-                <button class="recommendation-button">Wallflower</button>
-                <button class="recommendation-button">Yellow Face</button>
-                <button class="recommendation-button">Bok</button>
-                <button class="recommendation-button">Bok</button>
-                <button class="recommendation-button">Bok</button>
-                <button class="recommendation-button">Bok</button>
-                <button class="recommendation-button">Bok</button>
+            <div class="recommendation-container" id="recommendation-container">
+                <a href="/books/OL1234567W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/1234567-L.jpg" alt="Harry Potter" />
+                </a>
+                <a href="/books/OL2345678W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/2345678-L.jpg" alt="Fourth Wing" />
+                </a>
+                <a href="/books/OL3456789W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/3456789-L.jpg" alt="Wallflower" />
+                </a>
+                <a href="/books/OL4567890W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/4567890-L.jpg" alt="Yellow Face" />
+                </a>
+                <a href="/books/OL5678901W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/5678901-L.jpg" alt="Book" />
+                </a>
+                <a href="/books/OL6789012W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/6789012-L.jpg" alt="Book" />
+                </a>
+                <a href="/books/OL7890123W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/7890123-L.jpg" alt="Book" />
+                </a>
+                <a href="/books/OL8901234W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/8901234-L.jpg" alt="Book" />
+                </a>
+                <a href="/books/OL9012345W" class="recommendation-button">
+                    <img src="https://covers.openlibrary.org/b/id/9012345-L.jpg" alt="Book" />
+                </a>
             </div>
             <button class="scroll-button right" onclick="scrollRecommendations(200)">&#9654;</button>
         </div>
+
 
         <script>
             function scrollLibrary(amount) {

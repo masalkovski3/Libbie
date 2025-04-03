@@ -59,9 +59,7 @@ public class BookController {
     }
 
     @GetMapping("/profile")
-    public String profile() {
-        return "profile";
-    }
+    public String profile() { return "profile"; }
 
     @GetMapping("/books/{workId}")
     public String books(@PathVariable String workId, Model model) throws JsonProcessingException {

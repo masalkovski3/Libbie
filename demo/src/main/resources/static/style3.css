@@ -472,6 +472,14 @@ hr {
     margin-left: 12px;
 }
 
+.recommendation-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+}
+
 .library-container {
     overflow-x: hidden; //added
     display: flex;
@@ -553,8 +561,8 @@ hr {
     font-family: Georgia;
     border-radius: 8px;
     cursor: pointer;
-    height: 300px;
-    width: 200px;
+    height: 120px;
+    width: 80px;
     white-space: nowrap;
     overflow: hidden;
     transition: background 0.3s;
@@ -566,16 +574,15 @@ hr {
     overflow-x: hidden; //added
     display: flex;
     gap: 10px;
-    padding: 10px;
     border: none;
     border-radius: 5px;
-    background: #d9b5d2;
     white-space: nowrap;
     scroll-behavior: smooth;
-    width: 100%;
     margin-left: 50px;
     height: 300px;
 }
+
+
 
 .profile{
     border-radius: 50%;
@@ -621,5 +628,3 @@ hr {
     background-color: #6B8FA8;
     box-shadow: 1px 1px 5px black;
 }
-
-
