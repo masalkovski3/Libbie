@@ -103,7 +103,7 @@ body {
 .logo-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 nav ul {
@@ -250,7 +250,9 @@ hr {
     background-color: #8EACBF;
     color: white;
     padding: 20px 0;
-    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    align-content: center;
     width: 100%;
 }
 
@@ -258,6 +260,34 @@ hr {
     margin: 0;
     font-size: 48px;
     color: white;
+}
+
+.button-header {
+    display: flex;
+    padding: 10px 20px;
+    width: min-content;
+    background-color: rgb(250, 245, 245);
+    border: none;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px;
+    color: #192640;
+    text-decoration: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    white-space: nowrap;
+    width: auto;
+    max-width: 200px;
+    height: 40px;
+    margin-right: 20px;
+
+}
+
+.button-header:hover {
+    background-color: #d9b5d2;
+    transform: translateY(-2px);
+    cursor: pointer; 
 }
 
 .genre-nav {

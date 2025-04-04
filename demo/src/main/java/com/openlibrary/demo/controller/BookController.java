@@ -129,4 +129,8 @@ public class BookController {
         return "book";
     }
 
+    @GetMapping("/logIn-signUp")
+    public String logIn_signUp(){
+        return "logIn-signUp";
+    }
 }
