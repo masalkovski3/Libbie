@@ -310,7 +310,6 @@ hr {
     margin: 0 3px;
     flex-shrink: 0;
 }
-
 .genre-button {
     background-color: #eccee6;
     color: #192640;
@@ -318,15 +317,17 @@ hr {
     border-radius: 15px;
     padding: 5px 10px;
     font-size: 12px;
-    font-family: Georgia;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     white-space: nowrap;
+    display: inline-block;
+    text-decoration: none; /* Ta bort understrykningar från länkar */
 }
 
 .genre-button:hover {
     background-color: #d9b5d2;
     transform: translateY(-2px);
+    text-decoration: none; /* Behåll ingen understrykning även vid hover */
 }
 
 /* RESPONSIVA STILAR */
