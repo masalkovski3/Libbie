@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Libbie - Your personal library</title>
+    <link href="style3.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="layout">
+    <!-- Hamburgarikon för att öppna menyn -->
+    <div class="menu-toggle" id="menuToggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Sidebar med 'sidebar-hidden' klass som default -->
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+        <div class="container">
+            <header id="sidebar-header">
+                <img class="logo" src="images/pink-logo.jpeg" alt="Libie Logo">
+                <h2>Menu</h2>
+                <nav>
+                    <ul>
+                        <li class="button">
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="button">
+                            <a href="/search">Search</a>
+                        </li>
+                        <li class="button">
+                            <a href="/profile">Profile</a>
+                        </li>
+                        <li class="button">
+                            <a href="/about">About Libbie</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    </aside>
+
+    <main class="content">
+        <!-- Ny header för Libbie -->
+        <header class="main-header">
+            <div class="logo-container">
+                <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
+                <h1>Libbie</h1>
+            </div>
+            <a href="/logIn-signUp" class="button-header">Login / Sign Up</a>
+
+        </header>
+
+        <!-- Ny navigationsrad för genrer -->
+        <nav class="genre-nav">
+            <ul class="genre-list">
+                <li class="genre-item"><button class="genre-button">Fantasy</button></li>
+                <li class="genre-item"><button class="genre-button">Science Fiction</button></li>
+                <li class="genre-item"><button class="genre-button">Mystery</button></li>
+                <li class="genre-item"><button class="genre-button">Romance</button></li>
+                <li class="genre-item"><button class="genre-button">Drama</button></li>
+                <li class="genre-item"><button class="genre-button">Period drama</button></li>
+                <li class="genre-item"><button class="genre-button">Thriller</button></li>
+                <li class="genre-item"><button class="genre-button">Horror</button></li>
+                <li class="genre-item"><button class="genre-button">Detective</button></li>
+                <li class="genre-item"><button class="genre-button">Biography</button></li>
+                <li class="genre-item"><button class="genre-button">History</button></li>
+                <li class="genre-item"><button class="genre-button">Self-Help</button></li>
+                <li class="genre-item"><button class="genre-button">Poetry</button></li>
+            </ul>
+        </nav>
+
+        <div class="page-content">
+            <h1 id="h1">Login or Sign Up</h1>
+
+            <div class="img-flex">
+                <div class="img-container">
+                    <img src="/images/bookshelf.jpg" alt="Bookshelf">
+                    <p class="caption"></p>
+                </div>
+            </div>
+
+            <hr>
+
+
+            <hr>
+
+            <footer>
+                <h5>Last Update: 2025-04-03</h5>
+            </footer>
+        </div>
+    </main>
+</div>
+
+<!-- JavaScript för att hantera menyväxling -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-hidden');
+            menuToggle.classList.toggle('active');
+        });
+    });
+</script>
+</body>
+</html>
