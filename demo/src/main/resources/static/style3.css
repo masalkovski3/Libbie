@@ -659,3 +659,36 @@ hr {
     background-color: #6B8FA8;
     box-shadow: 1px 1px 5px black;
 }
+
+.wrapper{
+        width: 300px;
+        margin: 0 auto;
+        padding: 10px;
+        background-color: #fff4bb;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.wrapper h1{
+    text-transform: uppercase;
+}
+.wrapper form{
+    width: min(400px, 100%);
+    margin-top: 20px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.wrapper form > div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.wrapper form label{
+    flex-shrink: 0;
+    height: 40px;
+    width: 40px;
+    background-color: #cccccc;
+    fill: #8EACBF;
+}
