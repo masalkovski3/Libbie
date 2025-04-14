@@ -201,23 +201,7 @@
 <!-- JavaScript för att hantera menyväxling -->
 <script src="script.js"></script>
 
-<script>
-    // För att uppdatera årtalsvisningen när filtret ändras
-    document.addEventListener('DOMContentLoaded', function() {
-        const yearFilter = document.getElementById('yearFilter');
-        const yearValue = document.getElementById('yearValue');
-
-        if (yearFilter && yearValue) {
-            // Initial värde
-            yearValue.textContent = yearFilter.value;
-
-            // Uppdatera när användaren ändrar skjutreglaget
-            yearFilter.addEventListener('input', function() {
-                yearValue.textContent = yearFilter.value;
-            });
-        }
-    });
-</script>
+<script> src = "filters.js "</script>
 
 </body>
 </html>
