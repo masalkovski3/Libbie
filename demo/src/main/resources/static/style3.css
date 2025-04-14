@@ -280,7 +280,7 @@ hr {
     width: auto;
     max-width: 200px;
     height: 40px;
-    margin-right: 20px;
+    margin-right: 10px;
 
 }
 
@@ -289,6 +289,13 @@ hr {
     transform: translateY(-2px);
     cursor: pointer; 
 }
+
+.auth-buttons {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
 
 .genre-nav {
     background-color: #e9f1f5;

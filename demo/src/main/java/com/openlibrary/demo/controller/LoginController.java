@@ -1,28 +1,31 @@
 package com.openlibrary.demo.controller;
 
-import com.openlibrary.demo.model.Member;
-import com.openlibrary.demo.repository.MemberRepository;
-import jakarta.servlet.http.HttpSession;
+//import com.openlibrary.demo.repository.MemberRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Optional;
 
 @Controller
 public class LoginController {
 
-    private final MemberRepository memberRepository;
+   // private final MemberRepository memberRepository;
 
-    public LoginController(MemberRepository memberRepository) {
+   /* public LoginController(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
-    @GetMapping("/logIn-signUp")
-    public String logIn_signUp() {
-        return "logIn-signUp";
+    */
+
+    @GetMapping("/signUp")
+    public String signUp() {
+        return "signUp";
     }
 
+    @GetMapping("/logIn")
+    public String logIn() {
+        return "logIn";
+    }
+
+    /*
     @PostMapping("/signup")
     public String signup(@RequestParam String firstname,
                          @RequestParam String email,
@@ -31,14 +34,14 @@ public class LoginController {
 
         if (memberRepository.findByEmail(email).isPresent()) {
             redirectAttributes.addFlashAttribute("error", "Email already in use.");
-            return "redirect:/logIn-signUp";
+            return "/signup";
         }
 
         Member newMember = new Member(firstname, email, password); // Obs: lösenord i klartext, fixas senare
         memberRepository.save(newMember);
 
         redirectAttributes.addFlashAttribute("message", "Signup successful! You can now log in.");
-        return "redirect:/logIn-signUp";
+        return "/signup";
     }
 
     @PostMapping("/login")
@@ -55,7 +58,7 @@ public class LoginController {
         }
 
         redirectAttributes.addFlashAttribute("error", "Invalid email or password.");
-        return "redirect:/logIn-signUp";
+        return "redirect:/logIn";
     }
 
     @GetMapping("/logout")
@@ -63,4 +66,6 @@ public class LoginController {
         session.invalidate();
         return "redirect:/";
     }
+
+     */
 }
