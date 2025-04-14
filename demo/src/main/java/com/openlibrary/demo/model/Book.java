@@ -5,13 +5,23 @@ public class Book {
     private String title;
     private String author;
     private String workId;
+    private String coverUrl;
 
     public Book() {}
 
-    public Book(String title, String author, String workId) {
+    public Book(String title, String author, String workId, String coverUrl) {
         this.title = title;
         this.author = author;
         this.workId = workId;
+        this.coverUrl = coverUrl;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
     }
 
     public String getTitle() {
