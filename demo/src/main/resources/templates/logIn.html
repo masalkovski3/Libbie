@@ -65,7 +65,20 @@
             <h1 id="h1">Login</h1>
             <div class="wrapper">
                 <h1>Login</h1>
-                <form>
+                <form action="/logIn" method="post">
+                    <div>
+                        <label for="logemail-input"><span>@</span></label>
+                        <input type="email" name="username" id="logemail-input" placeholder="Email">
+                    </div>
+                    <div>
+                        <label for="logpassword-input">
+                            <!-- din ikon här -->
+                        </label>
+                        <input type="password" name="password" id="logpassword-input" placeholder="Password">
+                    </div>
+                    <button type="submit">Log In</button>
+                </form>
+                <!--<form>
                     <div>
                         <label for="logemail-input"><span>@</span></label>
                         <input type="email" name="email" id="logemail-input" placeholder="Email">
@@ -78,6 +91,7 @@
                     </div>
                     <button type="submit">Log In</button>
                 </form>
+                -->
                 <p>Don't have an account? <a href="/signUp">Signup</a></p>
             </div>
 

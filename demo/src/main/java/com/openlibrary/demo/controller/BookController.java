@@ -85,7 +85,4 @@ public class BookController {
         return "book";
     }
 
-    public void testSignupLogIn(String username, String password) {
-        System.out.println("logIn/signUp " + username + " " + password);
-    }
 }
