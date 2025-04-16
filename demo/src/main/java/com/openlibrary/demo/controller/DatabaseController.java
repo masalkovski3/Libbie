@@ -26,7 +26,7 @@ public class DatabaseController {
             //Class.forName("org.postgresql.Driver");
             this.connection = DriverManager.getConnection(dbURL,user,password);
             statement = connection.createStatement();
-            System.out.println("Connected to database " + user);
+            System.out.println("Connected to database ");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
