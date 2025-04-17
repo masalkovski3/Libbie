@@ -43,12 +43,13 @@ public class BookApiController {
             // Försök hämta ett omslag
             String coverUrl = "";
             JsonNode covers = doc.path("cover_i");
+            int coverId = 0;
             if (!covers.isMissingNode() && !covers.isNull()) {
-                int coverId = covers.asInt();
+                coverId = covers.asInt();
                 coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
             }
 
-            books.add(new Book(title, author, workID, coverUrl));
+            books.add(new Book(title, author, workID, coverUrl, coverId));
         }
 
         return books;
