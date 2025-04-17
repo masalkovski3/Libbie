@@ -18,6 +18,10 @@ public class Book {
         this.coverId = coverId;
     }
 
+    public Book(String title, String author, String workId, String coverUrl) {
+        this(title, author, workId, coverUrl, 0); // 0 som default för coverId tills det är löst
+    }
+
     public String getCoverUrl() {
         return coverUrl;
     }
