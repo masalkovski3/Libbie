@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -26,8 +27,16 @@ public class BookController {
 
         // === 1. Hämta grundläggande bokdata från "works"
         String workUrl = "https://openlibrary.org/works/" + cleanId + ".json";
-        String response = restTemplate.getForObject(workUrl, String.class);
-        JsonNode root = mapper.readTree(response);
+        //String response = restTemplate.getForObject(workUrl, String.class);
+        //JsonNode root = mapper.readTree(response);
+        JsonNode root;
+        try {
+            String response = restTemplate.getForObject(workUrl, String.class);
+            root = mapper.readTree(response);
+        }catch (HttpClientErrorException.NotFound e){
+            model.addAttribute("error", "The book was not found");
+            return "error";
+        }
 
         // === 2. Titel
         String title = root.path("title").asText();
