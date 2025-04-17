@@ -68,9 +68,10 @@ public class SearchController {
             if (!covers.isMissingNode() && !covers.isNull()) {
                 int coverId = covers.asInt();
                 coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
+                books.add(new Book(title, author, workID, coverUrl, coverId));
             }
 
-            books.add(new Book(title, author, workID, coverUrl));
+            //books.add(new Book(title, author, workID, coverUrl));
         }
 
         model.addAttribute("books", books);

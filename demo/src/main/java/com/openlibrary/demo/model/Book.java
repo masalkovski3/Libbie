@@ -6,14 +6,16 @@ public class Book {
     private String author;
     private String workId;
     private String coverUrl;
+    private int coverId;
 
     public Book() {}
 
-    public Book(String title, String author, String workId, String coverUrl) {
+    public Book(String title, String author, String workId, String coverUrl, int coverId) {
         this.title = title;
         this.author = author;
         this.workId = workId;
         this.coverUrl = coverUrl;
+        this.coverId = coverId;
     }
 
     public String getCoverUrl() {

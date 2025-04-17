@@ -19,7 +19,7 @@ import java.util.List;
 public class BookController {
 
     @GetMapping("/books/{workId}")
-    public String books(@PathVariable String workId, Model model) throws JsonProcessingException {
+    public String books(@PathVariable String workId, @RequestParam(required = false) Integer coverId, Model model) throws JsonProcessingException {
 
         String cleanId = workId.replace("/works/", "");
         RestTemplate restTemplate = new RestTemplate();
@@ -67,6 +67,9 @@ public class BookController {
 
         // === 5. Omslagsbild (hämtas via editioner – om någon finns)
         String coverUrl = "";
+        if (coverId !=null){
+            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+        }
         String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
         String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
         JsonNode editionRoot = mapper.readTree(editionResponse);
@@ -76,7 +79,7 @@ public class BookController {
             for (JsonNode edition : editionDocs) {
                 JsonNode covers = edition.path("covers");
                 if (covers.isArray() && covers.size() > 0) {
-                    int coverId = covers.get(0).asInt();
+                    coverId = covers.get(0).asInt();
                     coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
                     System.out.println("✅ Cover found: " + coverUrl);
                     break;
