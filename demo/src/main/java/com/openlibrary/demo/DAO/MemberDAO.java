@@ -1,0 +1,123 @@
+package com.openlibrary.demo.DAO;
+
+import com.openlibrary.demo.controller.DatabaseController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Component
+public class MemberDAO {
+
+    @Autowired
+    private DatabaseController databaseController;
+
+    /**
+     * Sparar en ny medlem i databasen
+     */
+    public Long saveMember(String email, String displayName, String passwordHash) throws SQLException {
+        String sql = "INSERT INTO member (email, display_name, password_hash) VALUES (?, ?, ?) RETURNING member_id";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, email.toLowerCase());
+            preparedStatement.setString(2, displayName);
+            preparedStatement.setString(3, passwordHash);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            } else {
+                throw new SQLException("Kunde inte skapa medlem, ingen ID returnerades");
+            }
+        }
+    }
+
+    /**
+     * Uppdaterar en existerande medlem
+     */
+    public boolean updateMember(Long memberId, String displayName, String passwordHash) throws SQLException {
+        String sql = "UPDATE member SET display_name = ?, password_hash = ? WHERE member_id = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, displayName);
+            preparedStatement.setString(2, passwordHash);
+            preparedStatement.setLong(3, memberId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
+    /**
+     * Hittar en medlem baserat på ID
+     */
+    public Optional<Map<String, Object>> findById(Long memberId) throws SQLException {
+        String sql = "SELECT member_id, email, display_name, created_at FROM member WHERE member_id = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, memberId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Map<String, Object> member = new HashMap<>();
+                member.put("id", resultSet.getLong("member_id"));
+                member.put("email", resultSet.getString("email"));
+                member.put("displayName", resultSet.getString("display_name"));
+                member.put("createdAt", resultSet.getTimestamp("created_at"));
+                return Optional.of(member);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Hittar en medlem baserat på e-post
+     */
+    public Optional<Map<String, Object>> findByEmail(String email) throws SQLException {
+        String sql = "SELECT member_id, email, display_name, password_hash, created_at FROM member WHERE email = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, email.toLowerCase());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Map<String, Object> member = new HashMap<>();
+                member.put("id", resultSet.getLong("member_id"));
+                member.put("email", resultSet.getString("email"));
+                member.put("displayName", resultSet.getString("display_name"));
+                member.put("passwordHash", resultSet.getString("password_hash"));
+                member.put("createdAt", resultSet.getTimestamp("created_at"));
+                return Optional.of(member);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Kontrollerar om en medlem med en viss e-post redan finns
+     */
+    public boolean existsByEmail(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM member WHERE email = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, email.toLowerCase());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        }
+
+        return false;
+    }
+}

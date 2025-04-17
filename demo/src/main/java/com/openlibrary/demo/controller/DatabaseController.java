@@ -12,7 +12,7 @@ import java.sql.Statement;
 
 @Controller
 public class DatabaseController {
-    public String dbURL = "jdbc:postgresql://pgserver.mau.se/";
+    public String dbURL = "jdbc:postgresql://pgserver.mau.se:5432/libbie";
     @Value("${spring.datasource.username}")
     public String user;
     @Value("${spring.datasource.password}")

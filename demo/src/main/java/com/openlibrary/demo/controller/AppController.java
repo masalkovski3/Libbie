@@ -16,12 +16,11 @@ public class AppController {
         return "about";
     }
 
+    /*
     @GetMapping("/profile")
     public String profile() {
         return "profile";
     }
-
-
-
+     */
 
 }

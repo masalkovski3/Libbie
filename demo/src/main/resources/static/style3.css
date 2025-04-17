@@ -747,3 +747,169 @@ input[type="range"]:focus::-webkit-slider-thumb {
     box-shadow: 0 0 0 4px #f4d9e980;
 }
 
+/* Bokhylle-container */
+.bookshelf-container {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.bookshelf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.bookshelf-title {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Böcker och scrollning */
+.books-wrapper {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.books-container {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.books-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
+.book-item {
+    min-width: 120px;
+    max-width: 120px;
+    margin-right: 15px;
+    text-align: center;
+}
+
+.book-cover {
+    height: 160px;
+    width: 120px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 5px;
+    background-color: #f0f0f0;
+}
+
+.book-title {
+    font-size: 0.8rem;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Bokhylla-image */
+.bookshelf-image {
+    width: 100%;
+    height: 25px;
+    background-image: url('/images/shelf.png');
+    background-repeat: repeat-x;
+    background-size: contain;
+}
+
+/* Scrollknappar */
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.scroll-left {
+    left: 5px;
+}
+
+.scroll-right {
+    right: 5px;
+}
+
+/* Tomma bokhylle-meddelanden */
+.empty-shelf-message {
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    color: #777;
+}
+
+/* Knapp för att lägga till bokhylla */
+.add-shelf-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.add-shelf-button svg {
+    margin-right: 5px;
+}
+
+/* Sökresultat för böcker i modaler */
+.search-book-results {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+
+.book-result-item {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.book-result-item:hover {
+    background-color: #f5f5f5;
+}
+
+.book-result-cover {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.book-result-info {
+    flex: 1;
+}
+
+.book-result-title {
+    font-weight: bold;
+    margin: 0 0 5px 0;
+}
+
+.book-result-author {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
