@@ -25,7 +25,6 @@ public class LoginController {
     }
 
     @PostMapping("/logIn")
-    @ResponseBody
     public String handleLogin(@RequestParam String username,
                               @RequestParam String password,
                               HttpSession session) throws SQLException {
@@ -36,17 +35,11 @@ public class LoginController {
                 session.setAttribute("currentMember", optionalMember.get());
                 return "redirect:/profile"; //går till profilsidan
             } else {
-                return "redirect:/login"; //felaktigt lösenord/email
+                return "redirect:/logIn"; //felaktigt lösenord/email
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return "error"; //Eller annan sida
         }
-        /*
-        System.out.println("username = " + username);
-        System.out.println("password = " + password);
-        return "OK";
-
-         */
     }
 }
