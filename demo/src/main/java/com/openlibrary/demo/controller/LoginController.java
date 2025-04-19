@@ -2,15 +2,24 @@ package com.openlibrary.demo.controller;
 
 //import com.openlibrary.demo.repository.MemberRepository;
 import com.openlibrary.demo.DAO.MemberDAO;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.openlibrary.demo.model.Member;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 @Controller
 public class LoginController {
+
+    private MemberDAO memberDAO;
+
+    public LoginController(MemberDAO memberDAO) {
+        this.memberDAO = memberDAO;
+    }
 
     @GetMapping("/logIn")
     public String logIn() {
@@ -21,31 +30,22 @@ public class LoginController {
     private MemberDAO memberDAO;
 
     @PostMapping("/logIn")
-    public String handleLogin(@RequestParam String email, @RequestParam String password, Model model) throws SQLException {
-        System.out.println("E-post: " + email);
-        System.out.println("Lösenord: " + password);
 
-        try {
-            if (memberDAO.existsByEmail(email)) {
-                System.out.println("Email exists");
+    public String handleLogin(@RequestParam String username,
+                              @RequestParam String password,
+                              HttpSession session) throws SQLException {
+        try{
+            Optional<Member> optionalMember = memberDAO.authenticate(username, password);
 
-                if (memberDAO.verifyPasswordByEmail(email, password)) {
-                    System.out.println("Password verified");
-                    return "redirect:/profile";
-
-                } else {
-                    System.out.println("Password doesn't match");
-                    model.addAttribute("felmeddelande");
-                }
+            if(optionalMember.isPresent()){
+                session.setAttribute("currentMember", optionalMember.get());
+                return "redirect:/profile"; //går till profilsidan
             } else {
-                System.out.println("Email doesn't exist");
-                model.addAttribute("felmeddelande");
+                return "redirect:/logIn"; //felaktigt lösenord/email
             }
         } catch (SQLException e) {
-            System.out.println("Databasfel: " + e.getMessage());
-            model.addAttribute("felmeddelande");
+            e.printStackTrace();
+            return "error"; //Eller annan sida
         }
-
-        return "logIn";
     }
 }

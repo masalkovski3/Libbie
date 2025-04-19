@@ -1,19 +1,15 @@
 package com.openlibrary.demo.DAO;
 
 import com.openlibrary.demo.controller.DatabaseController;
+import com.openlibrary.demo.model.Member;
+import com.openlibrary.demo.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.lang.reflect.Member;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,18 +26,14 @@ public class MemberDAO {
      * Sparar en ny medlem i databasen
      */
     public Long saveMember(String email, String displayName, String password) throws SQLException {
-        System.out.println("Running saveMember");
-
-        if (!passwordIsStrong(password)) {
-            throw new IllegalArgumentException("ERROR: The password is too weak");
-
-        }
         String sql = "INSERT INTO member (email, display_name, password_hash) VALUES (?, ?, ?) RETURNING member_id";
+
+        String hashedPassword = PasswordUtils.hashPassword(password);
 
         try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
             preparedStatement.setString(2, displayName);
-            preparedStatement.setString(3, password);
+            preparedStatement.setString(3, hashedPassword);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -137,70 +129,26 @@ public class MemberDAO {
         return false;
     }
 
-    public boolean existsByUsername(String username) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM member WHERE display_name = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, username.toLowerCase());
+    public Optional<Member> authenticate(String email, String plainPassword) throws SQLException {
+        Optional<Map<String, Object>> optionalData = findByEmail(email);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1) > 0;
-            }
+        if (optionalData.isEmpty()) {
+            return Optional.empty();
         }
 
-        return false;
-    }
+        Map<String, Object> data = optionalData.get();
+        String storedHash = (String) data.get("passwordHash");
 
-    public boolean verifyPasswordByEmail(String email, String password) throws SQLException {
-        String sql = "SELECT password_hash FROM member WHERE email = ?";
+        if (PasswordUtils.verifyPassword(plainPassword, storedHash)) { // Antag att du har en sådan klass
+            Member member = new Member();
+            member.setId(((Number) data.get("id")).longValue());
+            member.setUsername((String) data.get("email"));
+            member.setName((String) data.get("displayName"));
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, email.toLowerCase());
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                System.out.println("RAW password: " + password);
-                String passwordHashFromDB = resultSet.getString("password_hash");
-                if (password.equals(passwordHashFromDB)) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            return Optional.of(member);
         }
 
-        return false;
-    }
-
-//    public String hashPassword(String password) throws NoSuchAlgorithmException {
-//        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-//        byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-//        StringBuilder hexString = new StringBuilder();
-//        for (byte b : hash) {
-//            hexString.append(String.format("%02x", b));
-//        }
-//        return hexString.toString();
-//    }
-
-    private boolean passwordIsStrong(String password) {
-        if (password.length() < 12) {
-            return false;
-        }
-
-        if (!password.matches(".*[A-Z].*")) {
-            return false;
-        }
-
-        if (!password.matches(".*[a-z].*")) {
-            return false;
-        }
-
-        if (!password.matches(".*\\d.*")) {
-            return false;
-        }
-
-        return true;
+        return Optional.empty(); // Lösenordet stämde inte
     }
 }
