@@ -2,6 +2,7 @@ package com.openlibrary.demo.controller;
 
 //import com.openlibrary.demo.repository.MemberRepository;
 import com.openlibrary.demo.DAO.MemberDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.openlibrary.demo.model.Member;
 import jakarta.servlet.http.HttpSession;
@@ -17,6 +18,7 @@ public class LoginController {
 
     private MemberDAO memberDAO;
 
+    @Autowired
     public LoginController(MemberDAO memberDAO) {
         this.memberDAO = memberDAO;
     }
@@ -26,17 +28,14 @@ public class LoginController {
         return "logIn";
     }
 
-    @Autowired
-    private MemberDAO memberDAO;
-
     @PostMapping("/logIn")
 
-    public String handleLogin(@RequestParam String username,
+    public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
-                              HttpSession session) throws SQLException {
+                              HttpSession session,
+                              Model model) throws SQLException {
         try{
-            Optional<Member> optionalMember = memberDAO.authenticate(username, password);
-
+            Optional<Member> optionalMember = memberDAO.authenticate(email, password);
             if(optionalMember.isPresent()){
                 session.setAttribute("currentMember", optionalMember.get());
                 return "redirect:/profile"; //går till profilsidan
@@ -45,7 +44,7 @@ public class LoginController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return "error"; //Eller annan sida
+            return "redirect:/logIn"; //Eller annan sida
         }
     }
 }

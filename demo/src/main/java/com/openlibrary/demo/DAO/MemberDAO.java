@@ -8,7 +8,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 
-
+//import java.lang.reflect.Member;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +34,11 @@ public class MemberDAO {
      */
     public Long saveMember(String email, String displayName, String password) throws SQLException {
         String sql = "INSERT INTO member (email, display_name, password_hash) VALUES (?, ?, ?) RETURNING member_id";
+
+        if (!passwordIsStrong(password)) {
+            throw new IllegalArgumentException("ERROR: The password is too weak");
+
+        }
 
         String hashedPassword = PasswordUtils.hashPassword(password);
 
@@ -151,4 +163,63 @@ public class MemberDAO {
 
         return Optional.empty(); // Lösenordet stämde inte
     }
+
+    public boolean existsByUsername(String username) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM member WHERE display_name = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username.toLowerCase());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        }
+
+        return false;
+    }
+
+
+    public boolean verifyPasswordByEmail(String email, String password) throws SQLException {
+        String sql = "SELECT password_hash FROM member WHERE email = ?";
+
+        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, email.toLowerCase());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                System.out.println("RAW password: " + password);
+                String passwordHashFromDB = resultSet.getString("password_hash");
+                if (password.equals(passwordHashFromDB)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private boolean passwordIsStrong(String password) {
+        if (password.length() < 12) {
+            return false;
+        }
+
+        if (!password.matches(".*[A-Z].*")) {
+            return false;
+        }
+
+        if (!password.matches(".*[a-z].*")) {
+            return false;
+        }
+
+        if (!password.matches(".*\\d.*")) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
