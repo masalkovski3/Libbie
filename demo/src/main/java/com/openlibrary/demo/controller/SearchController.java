@@ -54,6 +54,7 @@ public class SearchController {
         JsonNode root = mapper.readTree(response);
         JsonNode docs = root.path("docs");
 
+
         List<Book> books = new ArrayList<>();
         for (int i = 0; i < Math.min(10, docs.size()); i++) {
             JsonNode doc = docs.get(i);
@@ -61,17 +62,38 @@ public class SearchController {
             JsonNode authors = doc.path("author_name");
             String author = (authors.isArray() && authors.size() > 0) ? authors.get(0).asText() : "Unknown";
             String workID = doc.path("key").asText();
+            String cleanId = workID.replace("/works/", "");
 
             // Försök hämta ett omslag
-            String coverUrl = "";
-            JsonNode covers = doc.path("cover_i");
+
+            /*JsonNode covers = doc.path("cover_i");
             if (!covers.isMissingNode() && !covers.isNull()) {
                 int coverId = covers.asInt();
                 coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
                 books.add(new Book(title, author, workID, coverUrl, coverId));
+            }*/
+
+            String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
+            String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+            JsonNode editionRoot = mapper.readTree(editionResponse);
+            JsonNode editionDocs = editionRoot.path("entries");
+            Integer coverId;
+            String coverUrl;
+
+            if (editionDocs.isArray()) {
+                for (JsonNode edition : editionDocs) {
+                    JsonNode covers = edition.path("covers");
+                    if (covers.isArray() && covers.size() > 0) {
+                        coverId = covers.get(0).asInt();
+                        coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+                        System.out.println("✅ Cover found: " + coverUrl);
+                        books.add(new Book(title, author, workID, coverUrl));
+                        break;
+
+                    }
+                }
             }
 
-            //books.add(new Book(title, author, workID, coverUrl));
         }
 
         model.addAttribute("books", books);

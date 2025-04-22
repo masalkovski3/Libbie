@@ -33,7 +33,7 @@ public class BookController {
         try {
             String response = restTemplate.getForObject(workUrl, String.class);
             root = mapper.readTree(response);
-        }catch (HttpClientErrorException.NotFound e){
+        } catch (HttpClientErrorException.NotFound e){
             model.addAttribute("error", "The book was not found");
             return "error";
         }
