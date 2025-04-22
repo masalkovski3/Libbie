@@ -35,6 +35,9 @@ public class MemberDAO {
     public Long saveMember(String email, String displayName, String password) throws SQLException {
         String sql = "INSERT INTO member (email, display_name, password_hash) VALUES (?, ?, ?) RETURNING member_id";
 
+        if (existsByEmail(email)) {
+            throw new IllegalArgumentException("ERROR: A member with this email already exists.");
+        }
         if (!passwordIsStrong(password)) {
             throw new IllegalArgumentException("ERROR: The password is too weak");
 
