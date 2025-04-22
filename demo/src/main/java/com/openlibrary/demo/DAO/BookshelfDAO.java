@@ -260,26 +260,31 @@ public class BookshelfDAO {
         }
     }
 
-    //Tar bort en bok från en bokhylla
+    // Tar bort en bok från en bokhylla
     public boolean removeBookFromShelf(Long bookshelfId, String openLibraryId) throws SQLException {
+        // SQL-sats för att ta bort boken från bookshelf_book-tabellen
         String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND book_id = ?";
 
         try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+            // Sätt parametrar för bookshelfId och openLibraryId
             preparedStatement.setLong(1, bookshelfId);
             preparedStatement.setString(2, openLibraryId);
 
+            // Utför uppdateringen
             int rowsAffected = preparedStatement.executeUpdate();
 
-            // Uppdatera positioner för återstående böcker
+            // Om en bok tas bort, uppdatera positionerna för de återstående böckerna
             if (rowsAffected > 0) {
-                reorderBooks(bookshelfId);
+                reorderBooks(bookshelfId); // Uppdatera böckernas positioner
             }
 
+            // Returnera true om boken togs bort (dvs. minst en rad påverkades)
             return rowsAffected > 0;
         }
     }
 
-    //Uppdaterar positioner för böcker efter borttagning
+
+    // Uppdaterar positioner för böcker efter borttagning
     private void reorderBooks(Long bookshelfId) throws SQLException {
         String sql = "WITH numbered AS (" +
                 "  SELECT book_id, ROW_NUMBER() OVER (ORDER BY position) - 1 AS new_pos " +
@@ -297,6 +302,7 @@ public class BookshelfDAO {
             preparedStatement.executeUpdate();
         }
     }
+
 
     //Hämtar alla böcker på en bokhylla
     public List<Map<String, Object>> findBooksByBookshelfId(Long bookshelfId) throws SQLException {

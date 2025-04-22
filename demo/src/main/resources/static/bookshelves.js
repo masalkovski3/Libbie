@@ -143,34 +143,42 @@ function addBookToShelf(bookshelfId, workId) {
 // Function to remove a book from a bookshelf
 function removeBookFromShelf(bookshelfId, workId) {
     if (confirm('Are you sure you want to remove this book from the bookshelf?')) {
-        fetch(`/profile/bookshelves/${bookshelfId}/books/${encodeURIComponent(workId)}`, {
+        fetch('/profile/bookshelves/1/books/OL12345W', {
             method: 'DELETE'
         })
-            .then(response => response.json())
+
+
+            .then(response => {
+                if (!response.ok) {
+                    // Om det inte är ett lyckat svar (status 200–299), kasta fel
+                    return response.text().then(text => {
+                        throw new Error(`Server responded with status ${response.status}: ${text}`);
+                    });
+                }
+                return response.json(); // Endast om det verkligen är JSON
+            })
             .then(data => {
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
-                    // Remove the book from the DOM
                     const bookElement = document.getElementById(`book-${bookshelfId}-${workId.replace(/\//g, '-')}`);
                     if (bookElement) {
                         bookElement.remove();
                     }
 
-                    // If the bookshelf is now empty, show message
                     const booksContainer = document.getElementById(`books-${bookshelfId}`);
                     if (booksContainer.querySelectorAll('.book-item').length === 0) {
                         booksContainer.innerHTML = `
-                        <div class="empty-shelf-message">
-                            <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
-                        </div>
-                    `;
+                    <div class="empty-shelf-message">
+                        <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
+                    </div>
+                `;
                     }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error);
+                alert('An error occurred: ' + error.message);
             });
     }
 }
