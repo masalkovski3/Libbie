@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -29,17 +30,19 @@ public class LoginController {
     }
 
     @PostMapping("/logIn")
-
     public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
                               HttpSession session,
-                              Model model) throws SQLException {
+                              Model model,
+                              RedirectAttributes redirectAttributes) throws SQLException {
         try{
             Optional<Member> optionalMember = memberDAO.authenticate(email, password);
             if(optionalMember.isPresent()){
                 session.setAttribute("currentMember", optionalMember.get());
+                redirectAttributes.addFlashAttribute("loginSuccess", "You have successfully logged in!");
                 return "redirect:/profile"; //går till profilsidan
             } else {
+                //redirectAttributes.addFlashAttribute("loginError", "Invalid email or password!");
                 return "redirect:/logIn"; //felaktigt lösenord/email
             }
         } catch (SQLException e) {

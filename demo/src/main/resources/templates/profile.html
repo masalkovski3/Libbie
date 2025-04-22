@@ -80,6 +80,10 @@
 
         <div class="page-content">
             <h1 id="h1">My Profile</h1>
+            <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${loginSuccess}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
             <div class="profile-container">
                 <img class="profile" src="images/profilepicture.webp" alt="profile picture">
