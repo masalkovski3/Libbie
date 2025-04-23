@@ -102,8 +102,11 @@
     </main>
 </div>
 
-<!-- JavaScript för att hantera menyväxling -->
-<script th:src="@{/script.js}"></script>
+<!-- JavaScript-koppling -->
+<script th:src="@{/script.js}" defer></script>
+
+<!--fragment för felmeddelande-->
+<div th:replace="fragments/modal :: errorModal"></div>
 
 </body>
 </html>
