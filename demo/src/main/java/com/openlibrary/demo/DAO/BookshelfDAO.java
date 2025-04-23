@@ -1,6 +1,5 @@
 package com.openlibrary.demo.DAO;
 
-import com.openlibrary.demo.controller.DatabaseController;
 import com.openlibrary.demo.controller.SqlHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

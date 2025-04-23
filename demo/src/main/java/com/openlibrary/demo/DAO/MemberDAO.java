@@ -1,26 +1,17 @@
 package com.openlibrary.demo.DAO;
 
-import com.openlibrary.demo.controller.DatabaseController;
 import com.openlibrary.demo.controller.SqlHandler;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
 
 //import java.lang.reflect.Member;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
