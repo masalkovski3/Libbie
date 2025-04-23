@@ -20,6 +20,8 @@ public class SearchController {
             @RequestParam(required = false) String query,
             @RequestParam(required = false, defaultValue = "1900") Integer year,
             @RequestParam(required = false) String language,
+            @RequestParam(required = false, defaultValue = "30")  int limit,
+            @RequestParam(required = false, defaultValue = "relevance") String sort,
             Model model) throws JsonProcessingException {
 
         // Om sökning är tom, visa tom sida
@@ -47,6 +49,12 @@ public class SearchController {
             urlBuilder.append(language);
         }
 
+        if((sort != null && !sort.isEmpty()) && "new".equals(sort) || "editions".equals(sort)) {
+            urlBuilder.append("&sort=").append(sort);
+        }
+
+        urlBuilder.append("&limit=").append(limit);
+
         String url = urlBuilder.toString();
         String response = restTemplate.getForObject(url, String.class);
 
@@ -56,7 +64,7 @@ public class SearchController {
 
 
         List<Book> books = new ArrayList<>();
-        for (int i = 0; i < Math.min(10, docs.size()); i++) {
+        for (int i = 0; i < Math.min(limit, docs.size()); i++) {
             JsonNode doc = docs.get(i);
             String title = doc.path("title").asText();
             JsonNode authors = doc.path("author_name");
@@ -100,6 +108,7 @@ public class SearchController {
         model.addAttribute("query", query);
         model.addAttribute("selectedYear", year);
         model.addAttribute("selectedLanguage", language);
+        model.addAttribute("selectedSort", sort);
 
         return "search";
     }

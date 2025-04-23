@@ -86,6 +86,7 @@
                                 <input type="text" name="query" class="form-control form-control-lg"
                                        placeholder="Enter book title or author"
                                        th:value="${query}" aria-label="Search query">
+                                <input type="hidden" name="limit" value="30" />
                                 <button class="btn search-button" type="submit">
                                     <i class="bi bi-search me-1"></i> Search
                                 </button>
@@ -128,6 +129,16 @@
                                                 <option value="ger" th:selected="${selectedLanguage == 'ger'}">German</option>
                                             </select>
                                         </div>
+                                        <!-- Sorteringsval -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="sortFilter" class="form-label">Sort by:</label>
+                                            <select class="form-select" id="sortFilter" name="sort">
+                                                <option value="" th:selected="${selectedSort == null}">Default (relevance)</option>
+                                                <option value="new" th:selected="${selectedSort == 'new'}">Newest first</option>
+                                                <option value="editions" th:selected="${selectedSort == 'editions'}">Most editions</option>
+                                            </select>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
