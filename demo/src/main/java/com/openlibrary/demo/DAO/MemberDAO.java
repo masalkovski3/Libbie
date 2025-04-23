@@ -1,6 +1,7 @@
 package com.openlibrary.demo.DAO;
 
 import com.openlibrary.demo.controller.DatabaseController;
+import com.openlibrary.demo.controller.SqlHandler;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.util.Optional;
 public class MemberDAO {
 
     @Autowired
-    private DatabaseController databaseController;
+    private SqlHandler sqlHandler;
 
     /**
      * Sparar en ny medlem i databasen
@@ -45,7 +46,8 @@ public class MemberDAO {
 
         String hashedPassword = PasswordUtils.hashPassword(password);
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
             preparedStatement.setString(2, displayName);
             preparedStatement.setString(3, hashedPassword);
@@ -69,7 +71,8 @@ public class MemberDAO {
     public boolean updateMember(Long memberId, String displayName, String passwordHash) throws SQLException {
         String sql = "UPDATE member SET display_name = ?, password_hash = ? WHERE member_id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, displayName);
             preparedStatement.setString(2, passwordHash);
             preparedStatement.setLong(3, memberId);
@@ -85,7 +88,8 @@ public class MemberDAO {
     public Optional<Map<String, Object>> findById(Long memberId) throws SQLException {
         String sql = "SELECT member_id, email, display_name, created_at FROM member WHERE member_id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -108,7 +112,8 @@ public class MemberDAO {
     public Optional<Map<String, Object>> findByEmail(String email) throws SQLException {
         String sql = "SELECT member_id, email, display_name, password_hash, created_at FROM member WHERE email = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -132,7 +137,8 @@ public class MemberDAO {
     public boolean existsByEmail(String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM member WHERE email = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -170,7 +176,8 @@ public class MemberDAO {
     public boolean existsByUsername(String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM member WHERE display_name = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, username.toLowerCase());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -186,7 +193,8 @@ public class MemberDAO {
     public boolean verifyPasswordByEmail(String email, String password) throws SQLException {
         String sql = "SELECT password_hash FROM member WHERE email = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
             ResultSet resultSet = preparedStatement.executeQuery();
