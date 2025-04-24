@@ -1,4 +1,8 @@
 # Libbie
 Repo for Project 1 at MAU
 https://github.com/masalkovski3/Libbie.git
-Skriv in i webbläsaren: localhost:8080
+
+ladda ner filen
+öppna projektet på IntelliJ
+tryck på run
+sök på localhost:8080 på webbläsaren 
