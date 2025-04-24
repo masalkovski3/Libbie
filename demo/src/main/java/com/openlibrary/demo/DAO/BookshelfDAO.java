@@ -1,12 +1,14 @@
 package com.openlibrary.demo.DAO;
 
-import com.openlibrary.demo.controller.DatabaseController;
+import com.openlibrary.demo.controller.SqlHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.PreparedStatement;
@@ -20,7 +22,7 @@ import java.util.Optional;
 public class BookshelfDAO {
 
     @Autowired
-    private DatabaseController databaseController;
+    private SqlHandler sqlHandler;
 
     /**
      * Sparar en ny bokhylla och returnerar dess ID
@@ -28,7 +30,8 @@ public class BookshelfDAO {
     public Long saveBookshelf(Long memberId, String name, String description, boolean isPublic) throws SQLException {
         String sql = "INSERT INTO bookshelf (name, member_id, description, is_public) VALUES (?, ?, ?, ?) RETURNING id";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, name);
             preparedStatement.setLong(2, memberId);
             preparedStatement.setString(3, description != null ? description : "");
@@ -49,7 +52,8 @@ public class BookshelfDAO {
     public boolean existsByNameAndMemberId(String name, Long memberId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookshelf WHERE name = ? AND member_id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, name);
             preparedStatement.setLong(2, memberId);
 
@@ -69,7 +73,8 @@ public class BookshelfDAO {
         List<Map<String, Object>> bookshelves = new ArrayList<>();
         String sql = "SELECT id, name, description, is_public, position FROM bookshelf WHERE member_id = ? ORDER BY position";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -93,7 +98,8 @@ public class BookshelfDAO {
     public Optional<Map<String, Object>> findById(Long id) throws SQLException {
         String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -122,9 +128,10 @@ public class BookshelfDAO {
         // Räkna antal böcker på hyllan för att bestämma positionen
         int position = 0;
         String countSql = "SELECT COUNT(*) FROM bookshelf_book WHERE bookshelf_id = ?";
-        try (PreparedStatement countStatement = databaseController.connection.prepareStatement(countSql)) {
-            countStatement.setLong(1, bookshelfId);
-            ResultSet countResult = countStatement.executeQuery();
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(countSql)) {
+            preparedStatement.setLong(1, bookshelfId);
+            ResultSet countResult = preparedStatement.executeQuery();
             if (countResult.next()) {
                 position = countResult.getInt(1);
             }
@@ -134,7 +141,8 @@ public class BookshelfDAO {
         String sql = "INSERT INTO bookshelf_book (bookshelf_id, book_id, position) VALUES (?, ?, ?) " +
                 "ON CONFLICT (bookshelf_id, book_id) DO NOTHING";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, bookshelfId);
             preparedStatement.setString(2, openLibraryId);
             preparedStatement.setInt(3, position);
@@ -149,9 +157,10 @@ public class BookshelfDAO {
     private void ensureBookExists(String openLibraryId) throws SQLException {
         // Kontrollera om boken redan finns i databasen
         String checkSql = "SELECT COUNT(*) FROM book WHERE open_library_id = ?";
-        try (PreparedStatement checkStatement = databaseController.connection.prepareStatement(checkSql)) {
-            checkStatement.setString(1, openLibraryId);
-            ResultSet checkResult = checkStatement.executeQuery();
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(checkSql)) {
+            preparedStatement.setString(1, openLibraryId);
+            ResultSet checkResult = preparedStatement.executeQuery();
 
             if (checkResult.next() && checkResult.getInt(1) == 0) {
                 // Boken finns inte, hämta information från Open Library API
@@ -228,12 +237,13 @@ public class BookshelfDAO {
 
                     // Skapa SQL för att lägga till boken i databasen
                     String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description, cover_url) VALUES (?, ?, ?, ?, ?, ?)";
-                    try (PreparedStatement insertStatement = databaseController.connection.prepareStatement(insertSql)) {
+                    try (Connection conn1 = sqlHandler.getConnection();
+                         PreparedStatement insertStatement = conn1.prepareStatement(insertSql)) {
                         insertStatement.setString(1, openLibraryId);
                         insertStatement.setString(2, title);
 
                         // Konvertera författarlistan till PostgreSQL array
-                        java.sql.Array sqlAuthors = databaseController.connection.createArrayOf("text", authors.toArray());
+                        java.sql.Array sqlAuthors = conn1.createArrayOf("text", authors.toArray());
                         insertStatement.setArray(3, sqlAuthors);
 
                         insertStatement.setInt(4, publishedYear);
@@ -250,7 +260,8 @@ public class BookshelfDAO {
                     // Om API-anropet misslyckas, lägg till en minimal bokpost så att vi kan fortsätta
                     String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description) " +
                             "VALUES (?, ?, ARRAY['Okänd författare'], 2000, 'Beskrivning saknas')";
-                    try (PreparedStatement insertStatement = databaseController.connection.prepareStatement(insertSql)) {
+                    try (Connection conn2 = sqlHandler.getConnection();
+                         PreparedStatement insertStatement = conn2.prepareStatement(insertSql)) {
                         insertStatement.setString(1, openLibraryId);
                         insertStatement.setString(2, "Bok " + openLibraryId);
                         insertStatement.executeUpdate();
@@ -265,7 +276,8 @@ public class BookshelfDAO {
         // SQL-sats för att ta bort boken från bookshelf_book-tabellen
         String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND book_id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             // Sätt parametrar för bookshelfId och openLibraryId
             preparedStatement.setLong(1, bookshelfId);
             preparedStatement.setString(2, openLibraryId);
@@ -296,7 +308,8 @@ public class BookshelfDAO {
                 "WHERE bookshelf_book.bookshelf_id = ? " +
                 "  AND bookshelf_book.book_id = numbered.book_id";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, bookshelfId);
             preparedStatement.setLong(2, bookshelfId);
             preparedStatement.executeUpdate();
@@ -313,7 +326,8 @@ public class BookshelfDAO {
                 "WHERE bb.bookshelf_id = ? " +
                 "ORDER BY bb.position";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, bookshelfId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -336,7 +350,8 @@ public class BookshelfDAO {
     public boolean deleteBookshelf(Long bookshelfId) throws SQLException {
         String sql = "DELETE FROM bookshelf WHERE id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, bookshelfId);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -361,7 +376,8 @@ public class BookshelfDAO {
 
         String sql = "UPDATE bookshelf SET name = ? WHERE id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, newName);
             preparedStatement.setLong(2, bookshelfId);
 
@@ -376,7 +392,8 @@ public class BookshelfDAO {
     public boolean updateBookshelfDescription(Long bookshelfId, String description) throws SQLException {
         String sql = "UPDATE bookshelf SET description = ? WHERE id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, description);
             preparedStatement.setLong(2, bookshelfId);
 
@@ -391,7 +408,8 @@ public class BookshelfDAO {
     public boolean updateBookshelfVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
         String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
 
-        try (PreparedStatement preparedStatement = databaseController.connection.prepareStatement(sql)) {
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setBoolean(1, isPublic);
             preparedStatement.setLong(2, bookshelfId);
 
