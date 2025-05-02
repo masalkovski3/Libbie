@@ -64,7 +64,6 @@ public class BookApiController {
             String coverUrl = getCoverUrl(doc, coverId);
             books.add(new Book(title, author, workId, coverUrl, coverId));
         }
-
         return books;
     }
 
