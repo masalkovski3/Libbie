@@ -20,11 +20,11 @@ Klona projektet
 git clone https://github.com/masalkovski3/Libbie.git
 cd LibbieÖppna i IntelliJ IDEA
 
-**Öppna IntelliJ**
+Öppna IntelliJ
 Välj "Open" och navigera till den nedladdade mappen Libbie.
 IntelliJ kommer automatiskt att importera projektet som ett Maven-projekt.
-**Skapa Member-klassen
-**Navigera till src/main/java/com/openlibrary/demo/model/ och skapa filen:
+Skapa Member-klassen
+Navigera till src/main/java/com/openlibrary/demo/model/ och skapa filen:
 
 Member.java:
 
@@ -73,16 +73,18 @@ public class Member {
     public void setName(String name) { this.name = name; }
 }
 
-**Kör applikationen
-**Högerklicka på huvudklassen (DemoApplication.java eller liknande).
+Kör applikationen
+Högerklicka på huvudklassen (DemoApplication.java eller liknande).
 Välj Run.
-🌐 Testa i webbläsaren
+
+Testa i webbläsaren
 Öppna din webbläsare och gå till:
 
 http://localhost:8080
 Du bör se startsidan för applikationen om allt fungerar korrekt.
 
-📚 Struktur
+
+Struktur
 
 Libbie/
 ├── src/
@@ -96,11 +98,15 @@ Libbie/
 │               └── DemoApplication.java
 ├── pom.xml
 └── README.md
-🧪 Tips
+
+
+Tips
 
 Om något inte fungerar, kontrollera application.properties eller application.yml i src/main/resources/.
 Använd Postman eller curl för att testa API-endpoints.
-✍️ Utveckling
+
+
+Utveckling
 
 Projektet utvecklas som del av kursen i systemutveckling vid MAU.
 Team: Grupp 21
