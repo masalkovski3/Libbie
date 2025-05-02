@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Controller som hanterar användarprofilsidan och tillhörande API-funktioner
+ * såsom hantering av bokhyllor och sökning av böcker via OpenLibrary API.
+ *
+ * @author Linn Otendal, Emmi Masalkovski
+ */
+//TODO: Ändra så att demo-användare inte används vid inlogg
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
@@ -35,7 +43,14 @@ public class ProfileController {
     // Temporär inloggad användare för demo (ersätt med riktig sessionshantering senare)
     private static final long DEMO_USER_ID = 1;
 
-    // Visa profilsidan
+    /**
+     * Visar profilsidan med användarens information, bokhyllor och tillhörande böcker.
+     *
+     * @param model Model-objekt som används för att skicka data till vyn.
+     * @return Namnet på HTML-vyn ("profile").
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @GetMapping
     public String profile(Model model) {
         try {
@@ -93,7 +108,13 @@ public class ProfileController {
         return "profile";
     }
 
-    // Säkerställer att demo-användaren finns för testning
+    /**
+     * Säkerställer att demo-användaren existerar i databasen.
+     *
+     * @throws SQLException om databasåtkomst misslyckas.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     private void ensureDemoUserExists() throws SQLException {
         if (!memberDAO.findById(DEMO_USER_ID).isPresent()) {
             // Skapa en stark demo-lösenordshash som uppfyller kraven
@@ -110,7 +131,16 @@ public class ProfileController {
         }
     }
 
-    // API för att skapa en ny bokhylla
+    /**
+     * Skapar en ny bokhylla för den inloggade användaren.
+     *
+     * @param name Namn på bokhyllan.
+     * @param description (Valfritt) Beskrivning av bokhyllan.
+     * @param isPublic Anger om bokhyllan ska vara publik.
+     * @return ResponseEntity med ny bokhyllas information eller felmeddelande.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @PostMapping("/bookshelves")
     @ResponseBody
     public ResponseEntity<?> createBookshelf(
@@ -138,7 +168,15 @@ public class ProfileController {
         }
     }
 
-    // API för att lägga till en bok i en bokhylla
+    /**
+     * Lägger till en bok i en specifik bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan.
+     * @param workId OpenLibrary work ID för boken.
+     * @return ResponseEntity som indikerar om operationen lyckades.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @PostMapping("/bookshelves/{bookshelfId}/books")
     @ResponseBody
     public ResponseEntity<?> addBookToShelf(
@@ -167,7 +205,15 @@ public class ProfileController {
         }
     }
 
-    // API för att ta bort en bok från en bokhylla
+    /**
+     * Tar bort en bok från en bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan.
+     * @param workId OpenLibrary work ID för boken.
+     * @return ResponseEntity som indikerar om borttagningen lyckades.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @DeleteMapping("/bookshelves/{bookshelfId}/books/{workId}")
     @ResponseBody
     public ResponseEntity<?> removeBookFromShelf(
@@ -201,7 +247,14 @@ public class ProfileController {
         }
     }
 
-    // API för att ta bort en bokhylla
+    /**
+     * Tar bort en bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan som ska tas bort.
+     * @return ResponseEntity som indikerar resultatet av borttagningen.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @DeleteMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
     public ResponseEntity<?> deleteBookshelf(@PathVariable Long bookshelfId) {
@@ -233,7 +286,15 @@ public class ProfileController {
         }
     }
 
-    // API för att byta namn på en bokhylla
+    /**
+     * Byter namn på en befintlig bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan.
+     * @param name Det nya namnet.
+     * @return ResponseEntity med resultatet av uppdateringen.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @PutMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
     public ResponseEntity<?> renameBookshelf(
@@ -267,7 +328,15 @@ public class ProfileController {
         }
     }
 
-    // API för att uppdatera en bokhyllas beskrivning
+    /**
+     * Uppdaterar beskrivningen för en bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan.
+     * @param description Ny beskrivning.
+     * @return ResponseEntity med resultatet av uppdateringen.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @PutMapping("/bookshelves/{bookshelfId}/description")
     @ResponseBody
     public ResponseEntity<?> updateBookshelfDescription(
@@ -301,7 +370,15 @@ public class ProfileController {
         }
     }
 
-    // API för att uppdatera en bokhyllas synlighet (publik/privat)
+    /**
+     * Uppdaterar synligheten (publik/privat) för en bokhylla.
+     *
+     * @param bookshelfId ID för bokhyllan.
+     * @param isPublic Ny synlighetsstatus.
+     * @return ResponseEntity med resultatet av uppdateringen.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
     @PutMapping("/bookshelves/{bookshelfId}/visibility")
     @ResponseBody
     public ResponseEntity<?> updateBookshelfVisibility(
@@ -335,7 +412,16 @@ public class ProfileController {
         }
     }
 
-    // Endpoint för att hämta JSON-format av sökresultat för JS-användning i klienten
+
+    /**
+     * Söker efter böcker via OpenLibrary API och returnerar resultat i JSON-format.
+     *
+     * @param query Sökterm för boktitlar/författare.
+     * @return ResponseEntity med lista över matchande böcker.
+     *
+     * @author Linn Otendal, Emmi Masalkovski
+     */
+    /*
     @GetMapping("/search")
     @ResponseBody
     public ResponseEntity<?> searchBooks(@RequestParam String query) {
@@ -381,4 +467,88 @@ public class ProfileController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+     */
+
+    /**
+     * Handles GET requests to "/search" and queries the OpenLibrary API with the given search string.
+     *
+     * @param query the search query string
+     * @return ResponseEntity with list of books or error message
+     *
+     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
+     */
+    @GetMapping("/search")
+    @ResponseBody
+    public ResponseEntity<?> searchBooks(@RequestParam String query) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://openlibrary.org/search.json?q=" + query + "&limit=10";
+            String response = restTemplate.getForObject(url, String.class);
+
+            List<Map<String, Object>> books = parseBookResults(response);
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Parses the full JSON response string into a list of book maps.
+     *
+     * @param response JSON string from the OpenLibrary API
+     * @return list of book maps
+     * @throws IOException if JSON parsing fails
+     *
+     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
+     */
+    private List<Map<String, Object>> parseBookResults(String response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root;
+        try {
+            root = mapper.readTree(response);
+        } catch (IOException e) {
+            throw new IOException("Failed to parse response", e);
+        }
+
+        JsonNode docs = root.path("docs");
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        for (JsonNode doc : docs) {
+            results.add(extractBookInfo(doc));
+        }
+
+        return results;
+    }
+
+    /**
+     * Extracts relevant book information from a single JSON node.
+     *
+     * @param doc a JSON node representing one book
+     * @return a map with title, author, workId, and coverUrl
+     *
+     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
+     */
+    private Map<String, Object> extractBookInfo(JsonNode doc) {
+        Map<String, Object> book = new HashMap<>();
+        book.put("title", doc.path("title").asText("Unknown title"));
+
+        JsonNode authors = doc.path("author_name");
+        String author = (authors.isArray() && authors.size() > 0) ?
+                authors.get(0).asText() : "Unknown author";
+        book.put("author", author);
+
+        book.put("workId", doc.path("key").asText());
+
+        String coverUrl = "";
+        if (doc.has("cover_i")) {
+            int coverId = doc.path("cover_i").asInt();
+            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
+        }
+        book.put("coverUrl", coverUrl);
+
+        return book;
+    }
+
+
 }
