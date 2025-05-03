@@ -46,6 +46,7 @@
         </div>
     </aside>
 
+    <!-- PROFILINFORMATION -->
     <main class="content">
         <!-- Header -->
         <header class="main-header">
@@ -54,8 +55,14 @@
                 <h1>Libbie</h1>
             </div>
             <div class="auth-buttons">
-                <a href="/logIn" class="button-header">Login</a>
-                <a href="/signUp" class="button-header">Sign Up</a>
+                <th:block th:if="${session.currentMember != null}">
+                    <a href="/profile" class="button-header">Profile</a>
+                    <a href="/logout" class="button-header">Logout</a>
+                </th:block>
+                <th:block th:unless="${session.currentMember != null}">
+                    <a href="/logIn" class="button-header">Login</a>
+                    <a href="/signUp" class="button-header">Sign Up</a>
+                </th:block>
             </div>
         </header>
 
@@ -88,7 +95,9 @@
             <div class="profile-container">
                 <img class="profile" src="images/profilepicture.webp" alt="profile picture">
                 <div class="edit-profile">
-                    <h4 class="profile-name" th:text="${member != null ? member.displayName : 'Libbie Libbson'}">Libbie Libbson</h4>
+                    <h4 class="profile-name" th:text="${member.displayName}">Libbie Libbson</h4>
+                    <p class="profile-email">Email: <span th:text="${member.email}">libbie@example.com</span></p> <!-- 🆕 -->
+                    <p class="profile-since">Member since: <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p> <!-- 🆕 -->
                     <button class="edit-profile-button">Edit Profile</button>
                 </div>
             </div>
