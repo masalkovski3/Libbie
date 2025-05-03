@@ -56,6 +56,7 @@ public class ProfileController {
     @GetMapping
     public String profile(Model model, HttpSession session) {
         Member currentMember = (Member) session.getAttribute("currentMember");
+        System.out.println("Current member: " + currentMember);
 
         if (currentMember == null) {
             return "redirect:/logIn";

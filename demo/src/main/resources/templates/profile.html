@@ -319,11 +319,13 @@
 </div>
 
 <!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" defer></script>
+<script th:src="@{/script.js}" ></script>
 <script src="bookshelves.js"></script>
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
+<!-- fragment för session-timeout-warning-->
+<div th:replace="fragments/modal :: sessionWarningModal"></div>
 
 </body>
 </html>

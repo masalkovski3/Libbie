@@ -102,7 +102,50 @@ function closeModal() {
     }
 }
 
+function setupSessionWarning(timeoutMinutes = 2, warningOffsetMinutes = 1) {
+    const warningDelay = (timeoutMinutes - warningOffsetMinutes) * 60 * 1000;
 
+    console.log("🕒 Starting timer for session warning after", warningDelay / 1000, "seconds");
 
+    setTimeout(() => {
+        const modal = document.getElementById("sessionModal");
+        const stayBtn = document.getElementById("stayLoggedInBtn");
+        const logoutBtn = document.getElementById("logOutNowBtn");
 
+        if (!modal || !stayBtn || !logoutBtn) {
+            console.warn("❌ Modal or buttons not found in DOM.");
+            return;
+        }
 
+        modal.style.display = "flex";
+
+        // Ta bort tidigare event handlers om de finns
+        stayBtn.replaceWith(stayBtn.cloneNode(true));
+        logoutBtn.replaceWith(logoutBtn.cloneNode(true));
+
+        const newStayBtn = document.getElementById("stayLoggedInBtn");
+        const newLogoutBtn = document.getElementById("logOutNowBtn");
+
+        newStayBtn.addEventListener("click", () => {
+            fetch("/ping", { method: "GET" })
+                .then(() => {
+                    console.log("🔁 Session extended");
+                    modal.style.display = "none";
+                    setupSessionWarning(timeoutMinutes, warningOffsetMinutes); // Starta om
+                })
+                .catch(error => {
+                    console.error("⚠️ Failed to ping server:", error);
+                });
+        });
+
+        newLogoutBtn.addEventListener("click", () => {
+            console.log("🚪 User chose to log out");
+            window.location.href = "/logout";
+        });
+
+    }, warningDelay);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    setupSessionWarning(2, 1);
+});
