@@ -66,14 +66,16 @@
             <div class="wrapper">
                 <h1>Login</h1>
 
+                <!-- Bortkommenterad för att bara använda popup-modalen showError("Message");
                 <div th:if="${loginError != null}" class="error-message">
                     <p th:text="${errorMessage}"></p>
                 </div>
+                -->
 
-                <form action="/logIn" method="post">
+                <form action="/logIn" method="post" novalidate> <!-- Novalidate använder inte webbläsarens validering-->
                     <div>
                         <label for="logemail-input"><span>@</span></label>
-                        <input type="email" name="email" id="logemail-input" placeholder="Email">
+                        <input type="email" name="email" id="logemail-input" placeholder="Email" th:value="${email != null ? email : ''}">
                     </div>
                     <div>
                         <label for="logpassword-input">
@@ -112,6 +114,23 @@
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
+
+
+<script th:if="${showError}" th:inline="javascript">
+    function tryShowError() {
+        if (typeof showError === 'function') {
+            showError([[${errorMessage}]]);
+        } else {
+            // Om vi fortfarande inte har showError, försök igen om 100ms
+            setTimeout(tryShowError, 100);
+        }
+    }
+
+    window.addEventListener('load', function() {
+        // Starta försöken att visa felmeddelandet
+        tryShowError();
+    });
+</script>
 
 </body>
 </html>
