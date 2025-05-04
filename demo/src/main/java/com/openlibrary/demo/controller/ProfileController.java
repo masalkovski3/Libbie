@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -654,12 +655,12 @@ public class ProfileController {
 
         if(profileImage != null && !profileImage.isEmpty()) {
             try{
-               String imageUrl = saveProfileImage(profileImage, currentMember.getId());
-               currentMember.setProfileImage(imageUrl);
-               memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
+                String imageUrl = saveProfileImage(profileImage, currentMember.getId());
+                currentMember.setProfileImage(imageUrl);
+                memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
             } catch (IOException e){
-               redirectAttributes.addFlashAttribute("error", "Could not save profile image");
-               return "redirect:/profile";
+                redirectAttributes.addFlashAttribute("error", "Could not save profile image");
+                return "redirect:/profile";
             }
         }
 
@@ -706,15 +707,17 @@ public class ProfileController {
     }
 
      private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
-         String uploadDirectory = "src/main/resources/static/profileImages/";
-         Files.createDirectories(Paths.get(uploadDirectory));
+         Path uploadPath = Paths.get("profileImages");
 
-         String originalName = image.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
-         String fileName = memberId + "_" + originalName;
-         
-         Path path = Paths.get(uploadDirectory + fileName);
-         image.transferTo(path);
+         if(!Files.exists(uploadPath)) {
+             Files.createDirectory(uploadPath);
+         }
 
-         return "profileImages/" + fileName;
+         String filename = memberId + "_" + image.getOriginalFilename();
+         Path filePath = uploadPath.resolve(filename);
+
+         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+         return filename;
      }
 }

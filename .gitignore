@@ -222,8 +222,8 @@ $RECYCLE.BIN/
 .idea/*
 
 # Ignore contets of the profileImages folder
-/demo/profileImages/*
-!/demo/profileImages/.gitkeep
+profileImages/*
+!profileImages/.gitkeep
 
 demo/src/main/java/com/openlibrary/demo/model/Member.java
 
