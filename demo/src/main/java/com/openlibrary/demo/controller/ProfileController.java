@@ -623,7 +623,7 @@ public class ProfileController {
         return book;
     }
 
-    @PostMapping("/profile/update")
+    @PostMapping("/update")
     public String updateProfile(@RequestParam String displayName,
                                 @RequestParam(required = false) String bio,
                                 HttpSession session,
@@ -631,6 +631,7 @@ public class ProfileController {
 
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
+            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
             return "redirect:/logIn";
         }
 
