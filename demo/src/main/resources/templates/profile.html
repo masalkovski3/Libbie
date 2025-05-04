@@ -86,23 +86,28 @@
         </nav>
 
         <div class="page-content">
-            <h1 id="h1">My Profile</h1>
-            <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show mt-3 mx-auto text-center" style="max-width: 500px;" role="alert">
                 <span th:text="${loginSuccess}">Success message</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+            
+            <div class="profile-card d-flex flex-column flex-md-row align-items-center justify-content-center p-4 rounded shadow bg-white" style="gap: 2rem; margin-bottom: 2rem;">
+            <img class="rounded-circle" src="images/profilepicture.webp" alt="Profile Picture" width="140" height="140">
 
-            <div class="profile-container">
-                <img class="profile" src="images/profilepicture.webp" alt="profile picture">
-                <div class="edit-profile">
-                    <h4 class="profile-name" th:text="${member.displayName}">Libbie Libbson</h4>
-                    <p class="profile-email">Email: <span th:text="${member.email}">libbie@example.com</span></p> <!-- 🆕 -->
-                    <p class="profile-since">Member since: <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p> <!-- 🆕 -->
-                    <button class="edit-profile-button">Edit Profile</button>
-                </div>
+            <div>
+                <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
+                <p><strong>Email:</strong> <span th:text="${member.email}">email@example.com</span></p>
+                <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
+                <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
+
+                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    ✏️ Edit Profile
+                </button>
             </div>
+        </div>
 
-            <h2 id="h2">My Bookshelves</h2>
+
+        <h2 id="h2">My Bookshelves</h2>
 
             <!-- Error message if any -->
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
@@ -326,6 +331,42 @@
 <div th:replace="fragments/modal :: errorModal"></div>
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
+
+<!-- Modal for editing profile -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post" action="/profile/update">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="displayName" class="form-label">Display name:</label>
+                        <input type="text" class="form-control" id="displayName" name="displayName"
+                               th:value="${member.displayName}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio:</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="3"
+                                  th:text="${member.bio}"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 
 </body>
 </html>

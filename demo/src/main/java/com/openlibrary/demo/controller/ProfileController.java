@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -622,5 +623,24 @@ public class ProfileController {
         return book;
     }
 
+    @PostMapping("/profile/update")
+    public String updateProfile(@RequestParam String displayName,
+                                @RequestParam(required = false) String bio,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return "redirect:/logIn";
+        }
+
+        currentMember.setName(displayName);
+        currentMember.setBio(bio);
+
+        memberDAO.updateProfileInfo(currentMember); // Skapa denna metod i DAO
+
+        redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
+        return "redirect:/profile";
+    }
 
 }

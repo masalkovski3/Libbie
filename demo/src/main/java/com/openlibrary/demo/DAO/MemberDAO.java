@@ -4,6 +4,7 @@ import com.openlibrary.demo.controller.SqlHandler;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 //import java.lang.reflect.Member;
@@ -21,11 +22,14 @@ public class MemberDAO {
     @Autowired
     private SqlHandler sqlHandler;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     /**
      * Sparar en ny medlem i databasen
      */
     public Long saveMember(String email, String displayName, String password) throws SQLException {
-        String sql = "INSERT INTO member (email, display_name, password_hash) VALUES (?, ?, ?) RETURNING member_id";
+        String sql = "INSERT INTO member (email, display_name, password_hash, bio) VALUES (?, ?, ?, ?) RETURNING member_id";
 
         if (existsByEmail(email)) {
             throw new IllegalArgumentException("ERROR: A member with this email already exists.");
@@ -37,11 +41,24 @@ public class MemberDAO {
 
         String hashedPassword = PasswordUtils.hashPassword(password);
 
+        String[] bios = {
+                "Welcome to my Libbie 🦉",
+                "Books. Tea. Silence. Repeat.",
+                "Page-turner in progress...",
+                "Librarian of my own world.",
+                "Warning: May cause book envy.",
+                "I read. Therefore I am",
+                "Level 42 Bookmage - Class: Librarian",
+                "Discovering one book at a time"
+        };
+        String defaultBio = bios[(int) (Math.random() * bios.length)];
+
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
             preparedStatement.setString(2, displayName);
             preparedStatement.setString(3, hashedPassword);
+            preparedStatement.setString(4, defaultBio);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -77,7 +94,7 @@ public class MemberDAO {
      * Hittar en medlem baserat på ID
      */
     public Optional<Map<String, Object>> findById(Long memberId) throws SQLException {
-        String sql = "SELECT member_id, email, display_name, created_at FROM member WHERE member_id = ?";
+        String sql = "SELECT member_id, email, display_name, created_at, bio FROM member WHERE member_id = ?";
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -90,6 +107,7 @@ public class MemberDAO {
                 member.put("email", resultSet.getString("email"));
                 member.put("displayName", resultSet.getString("display_name"));
                 member.put("createdAt", resultSet.getTimestamp("created_at"));
+                member.put("bio", resultSet.getString("bio"));
                 return Optional.of(member);
             }
         }
@@ -101,7 +119,7 @@ public class MemberDAO {
      * Hittar en medlem baserat på e-post
      */
     public Optional<Map<String, Object>> findByEmail(String email) throws SQLException {
-        String sql = "SELECT member_id, email, display_name, password_hash, created_at FROM member WHERE email = ?";
+        String sql = "SELECT member_id, email, display_name, password_hash, created_at, bio FROM member WHERE email = ?";
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -115,6 +133,7 @@ public class MemberDAO {
                 member.put("displayName", resultSet.getString("display_name"));
                 member.put("passwordHash", resultSet.getString("password_hash"));
                 member.put("createdAt", resultSet.getTimestamp("created_at"));
+                member.put("bio", resultSet.getString("bio"));
                 return Optional.of(member);
             }
         }
@@ -157,6 +176,7 @@ public class MemberDAO {
             member.setId(((Number) data.get("id")).longValue());
             member.setUsername((String) data.get("email"));
             member.setName((String) data.get("displayName"));
+            member.setBio((String) data.get("bio"));
 
             return Optional.of(member);
         }
@@ -223,5 +243,11 @@ public class MemberDAO {
 
         return true;
     }
+
+    public void updateProfileInfo(Member member) {
+        String sql = "UPDATE member SET display_name = ?, bio = ?, updated_at = now() WHERE email = ?";
+        jdbcTemplate.update(sql, member.getName(), member.getBio(), member.getUsername());
+    }
+
 
 }
