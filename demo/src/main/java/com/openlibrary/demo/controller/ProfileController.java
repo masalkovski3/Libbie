@@ -74,7 +74,11 @@ public class ProfileController {
             if (memberOpt.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }
-            model.addAttribute("member", memberOpt.get());
+
+            Map<String, Object> memberData = memberOpt.get();
+            int friendCount = memberDAO.countFriends(memberId);
+            memberData.put("friendCount", friendCount);model.addAttribute("member", memberOpt.get());
+            model.addAttribute("member", memberData);
 
             // Hämta användarens bokhyllor
             List<Map<String, Object>> bookshelves = bookshelfDAO.findByMemberId(memberId);

@@ -249,5 +249,22 @@ public class MemberDAO {
         jdbcTemplate.update(sql, member.getName(), member.getBio(), member.getUsername());
     }
 
+    public int countFriends(Long memberId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM friendship WHERE member_1_id = ? OR member_2_id = ?";
+        try (Connection conn = sqlHandler.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, memberId);
+            stmt.setLong(2, memberId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    return 0;
+                }
+            }
+        }
+    }
 
 }
