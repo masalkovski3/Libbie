@@ -925,7 +925,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #eccee6;
     margin: 15% auto;
     padding: 20px;
     border-radius: 10px;
