@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -630,6 +631,7 @@ public class ProfileController {
     @PostMapping("/update")
     public String updateProfile(@RequestParam String displayName,
                                 @RequestParam(required = false) String bio,
+                                @RequestParam(required = false) MultipartFile profileImage,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
 
@@ -639,8 +641,14 @@ public class ProfileController {
             return "redirect:/logIn";
         }
 
-        currentMember.setName(displayName);
-        currentMember.setBio(bio);
+        if(displayName == null) {
+            redirectAttributes.addFlashAttribute("error", "Display name is required");
+            return "redirect:/profile";
+        }
+
+        currentMember.setName(displayName.trim());
+
+        currentMember.setBio(bio != null ? bio.trim() : "");
 
         memberDAO.updateProfileInfo(currentMember); // Skapa denna metod i DAO
 

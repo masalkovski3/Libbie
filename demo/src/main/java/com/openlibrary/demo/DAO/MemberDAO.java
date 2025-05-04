@@ -25,6 +25,17 @@ public class MemberDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private String[] bios = {
+            "Welcome to my Libbie 🦉",
+            "Books. Tea. Silence. Repeat.",
+            "Page-turner in progress...",
+            "Librarian of my own world.",
+            "Warning: May cause book envy.",
+            "I read. Therefore I am",
+            "Level 42 Bookmage - Class: Librarian",
+            "Discovering one book at a time"
+    };
+
     /**
      * Sparar en ny medlem i databasen
      */
@@ -41,17 +52,7 @@ public class MemberDAO {
 
         String hashedPassword = PasswordUtils.hashPassword(password);
 
-        String[] bios = {
-                "Welcome to my Libbie 🦉",
-                "Books. Tea. Silence. Repeat.",
-                "Page-turner in progress...",
-                "Librarian of my own world.",
-                "Warning: May cause book envy.",
-                "I read. Therefore I am",
-                "Level 42 Bookmage - Class: Librarian",
-                "Discovering one book at a time"
-        };
-        String defaultBio = bios[(int) (Math.random() * bios.length)];
+        String defaultBio = this.bios[(int) (Math.random() * bios.length)];
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -246,6 +247,12 @@ public class MemberDAO {
 
     public void updateProfileInfo(Member member) {
         String sql = "UPDATE member SET display_name = ?, bio = ?, updated_at = now() WHERE email = ?";
+        String bio = member.getBio();
+
+        if(bio == null || bio.trim().isEmpty()){
+            member.setBio(this.bios[(int) (Math.random() * bios.length)]);
+        }
+
         jdbcTemplate.update(sql, member.getName(), member.getBio(), member.getUsername());
     }
 
