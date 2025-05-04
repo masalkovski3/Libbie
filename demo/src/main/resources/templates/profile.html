@@ -93,15 +93,18 @@
 
             <div class="profile-card d-flex flex-column flex-md-row align-items-center justify-content-center p-4 rounded shadow bg-white" style="gap: 2rem; margin-bottom: 2rem;">
                 <img class="rounded-circle"
-                     th:src="@{/${member.profileImage}}"
+                     th:if="${member['pictureImage'] != null}"
+                     th:src="@{'/profileImages/' + ${member['pictureImage']}}"
                      alt="Profile Picture"
-                     width="140" height="140"
-                     th:if="${member.profileImage != null}">
+                     width="140" height="140">
+
                 <img class="rounded-circle"
-                     src="/images/profilepicture.webp"
+                     th:unless="${member['pictureImage'] != null}"
+                     th:src="@{/images/profilepicture.webp}"
                      alt="Default Profile Picture"
-                     width="140" height="140"
-                     th:if="${member.profileImage == null}">
+                     width="140" height="140">
+
+
                 <div>
                 <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
                 <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
