@@ -221,6 +221,10 @@ $RECYCLE.BIN/
 # Ignore all .idea folder files
 .idea/*
 
+# Ignore contets of the profileImages folder
+/demo/profileImages/*
+!/demo/profileImages/.gitkeep
+
 demo/src/main/java/com/openlibrary/demo/model/Member.java
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,macos,windows,maven

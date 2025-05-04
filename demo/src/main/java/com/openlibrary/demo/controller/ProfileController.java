@@ -20,6 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -633,7 +636,7 @@ public class ProfileController {
                                 @RequestParam(required = false) String bio,
                                 @RequestParam(required = false) MultipartFile profileImage,
                                 HttpSession session,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) throws IOException {
 
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
@@ -647,13 +650,71 @@ public class ProfileController {
         }
 
         currentMember.setName(displayName.trim());
-
         currentMember.setBio(bio != null ? bio.trim() : "");
 
+        if(profileImage != null && !profileImage.isEmpty()) {
+            try{
+               String imageUrl = saveProfileImage(profileImage, currentMember.getId());
+               currentMember.setProfileImage(imageUrl);
+               memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
+            } catch (IOException e){
+               redirectAttributes.addFlashAttribute("error", "Could not save profile image");
+               return "redirect:/profile";
+            }
+        }
+
+        System.out.println("PROFILE IMAGE PATH TO SAVE: " + currentMember.getProfileImage());
         memberDAO.updateProfileInfo(currentMember); // Skapa denna metod i DAO
 
         redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
         return "redirect:/profile";
     }
 
+    @PostMapping("/upload-picture")
+    public String uploadProfileImage(@RequestParam("image") MultipartFile image,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
+            return "redirect:/logIn";
+        }
+
+        if(image.isEmpty()){
+            redirectAttributes.addFlashAttribute("error", "Image is required");
+            return "redirect:/profile";
+        }
+
+        try{
+            String uploadDirectory = "uploads/";
+            Files.createDirectories(Paths.get(uploadDirectory));
+
+            String fileName = currentMember.getId() + "_" + image.getOriginalFilename();
+            Path path = Paths.get(uploadDirectory + fileName);
+            image.transferTo(path);
+
+            memberDAO.updateProfilePicture(currentMember.getId(), "/" + uploadDirectory + fileName );
+
+            redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
+
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload image");
+        }
+        
+        return "redirect:/profile";
+    }
+
+     private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
+         String uploadDirectory = "src/main/resources/static/profileImages/";
+         Files.createDirectories(Paths.get(uploadDirectory));
+
+         String originalName = image.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
+         String fileName = memberId + "_" + originalName;
+         
+         Path path = Paths.get(uploadDirectory + fileName);
+         image.transferTo(path);
+
+         return "profileImages/" + fileName;
+     }
 }

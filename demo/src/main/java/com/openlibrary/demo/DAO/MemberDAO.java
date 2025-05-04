@@ -95,7 +95,7 @@ public class MemberDAO {
      * Hittar en medlem baserat på ID
      */
     public Optional<Map<String, Object>> findById(Long memberId) throws SQLException {
-        String sql = "SELECT member_id, email, display_name, created_at, bio FROM member WHERE member_id = ?";
+        String sql = "SELECT member_id, email, display_name, created_at, bio, profile_image FROM member WHERE member_id = ?";
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -109,6 +109,7 @@ public class MemberDAO {
                 member.put("displayName", resultSet.getString("display_name"));
                 member.put("createdAt", resultSet.getTimestamp("created_at"));
                 member.put("bio", resultSet.getString("bio"));
+                member.put("profileImage", resultSet.getString("profile_image"));
                 return Optional.of(member);
             }
         }
@@ -120,7 +121,7 @@ public class MemberDAO {
      * Hittar en medlem baserat på e-post
      */
     public Optional<Map<String, Object>> findByEmail(String email) throws SQLException {
-        String sql = "SELECT member_id, email, display_name, password_hash, created_at, bio FROM member WHERE email = ?";
+        String sql = "SELECT member_id, email, display_name, password_hash, created_at, bio, profile_image FROM member WHERE email = ?";
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -135,6 +136,7 @@ public class MemberDAO {
                 member.put("passwordHash", resultSet.getString("password_hash"));
                 member.put("createdAt", resultSet.getTimestamp("created_at"));
                 member.put("bio", resultSet.getString("bio"));
+                member.put("profileImage", resultSet.getString("profile_image"));
                 return Optional.of(member);
             }
         }
@@ -273,5 +275,11 @@ public class MemberDAO {
             }
         }
     }
+
+    public void updateProfilePicture(Long memberId, String filePath) {
+        String sql = "UPDATE member SET profile_image = ? WHERE member_id = ?";
+        jdbcTemplate.update(sql, filePath, memberId);
+    }
+
 
 }

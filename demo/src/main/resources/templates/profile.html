@@ -92,9 +92,17 @@
             </div>
 
             <div class="profile-card d-flex flex-column flex-md-row align-items-center justify-content-center p-4 rounded shadow bg-white" style="gap: 2rem; margin-bottom: 2rem;">
-            <img class="rounded-circle" src="images/profilepicture.webp" alt="Profile Picture" width="140" height="140">
-
-            <div>
+                <img class="rounded-circle"
+                     th:src="@{/${member.profileImage}}"
+                     alt="Profile Picture"
+                     width="140" height="140"
+                     th:if="${member.profileImage != null}">
+                <img class="rounded-circle"
+                     src="/images/profilepicture.webp"
+                     alt="Default Profile Picture"
+                     width="140" height="140"
+                     th:if="${member.profileImage == null}">
+                <div>
                 <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
                 <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
                 <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
@@ -337,13 +345,20 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form method="post" action="/profile/update">
-                <div class="modal-header">
+            <!-- Makes sure that files can be uploaded -->
+            <form method="post" action="/profile/update" enctype="multipart/form-data">
+
+            <div class="modal-header">
                     <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label">Profile Image</label>
+                        <input type="file" class="form-control" id="profileImage" name="profileImage" accept="image/*">
+                    </div>
+
                     <div class="mb-3">
                         <label for="displayName" class="form-label">Display name:</label>
                         <input type="text" class="form-control" id="displayName" name="displayName"
