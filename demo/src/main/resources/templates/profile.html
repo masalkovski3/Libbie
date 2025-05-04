@@ -117,7 +117,7 @@
 
         <h2 id="h2">My Bookshelves</h2>
 
-            <!-- Error message if any -->
+            <!-- Error message if any, KOMMENTERA BORT NÄR SHOWERROR ANVÄNDS!!!!! -->
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
                 Error message
             </div>
@@ -382,6 +382,22 @@
     </div>
 </div>
 
+
+<script th:if="${showError}" th:inline="javascript">
+    function tryShowError() {
+        if (typeof showError === 'function') {
+            showError([[${errorMessage}]]);
+        } else {
+            // Om vi fortfarande inte har showError, försök igen om 100ms
+            setTimeout(tryShowError, 100);
+        }
+    }
+
+    window.addEventListener('load', function() {
+        // Starta försöken att visa felmeddelandet
+        tryShowError();
+    });
+</script>
 
 </body>
 </html>

@@ -72,20 +72,54 @@ public class LoginController {
     public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
                               HttpSession session,
-                              RedirectAttributes redirectAttributes) throws SQLException {
+                              RedirectAttributes redirectAttributes,
+                              Model model) throws SQLException {
         try{
+            // Validera email först
+            if (!isValidEmail(email)) {
+                model.addAttribute("errorMessage", "Please enter a valid email address");
+                model.addAttribute("showError", true);
+                model.addAttribute("email", email);
+                return "logIn"; //Returnerar till loginsidan med error
+            }
+
+            //Försök autentisera
             Optional<Member> optionalMember = memberDAO.authenticate(email, password);
+
             if(optionalMember.isPresent()){
+                //Om det lyckas
                 session.setAttribute("currentMember", optionalMember.get());
                 redirectAttributes.addFlashAttribute("loginSuccess", "You have successfully logged in!");
                 return "redirect:/profile"; //går till profilsidan
             } else {
-                // TODO: Lägg till felmeddelande.
-                return "redirect:/logIn"; //felaktigt lösenord/email
+                //Om det inte lyckas
+                //Kolla först om email existerar
+                if (!memberDAO.existsByEmail(email)) {
+                    model.addAttribute("errorMessage", "No account found with this email address");
+                    model.addAttribute("showError", true);
+                    model.addAttribute("email", email);
+                    return "logIn";
+                } else {
+                    // Email existerar men lösenord är fel
+                    model.addAttribute("errorMessage", "Incorrect password. Please try again");
+                    model.addAttribute("showError", true);
+                    model.addAttribute("email", email);
+                    return "logIn";
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return "redirect:/logIn"; //Eller annan sida
+            model.addAttribute("errorMessage", "A database error occurred. Please try again later");
+            model.addAttribute("showError", true);
+            model.addAttribute("email", email);
+            return "logIn";
         }
     }
+
+    //Enkel email-valideringsmetod
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email != null && email.matches(emailRegex);
+    }
+
 }
