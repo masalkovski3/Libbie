@@ -21,10 +21,37 @@ public class SignupController {
     public String handleSignUp(@RequestParam String firstname,
                               @RequestParam String username,
                               @RequestParam String password,
-                              @RequestParam("repeat-password") String repeatPassword, Model model) {
+                              @RequestParam("repeat-password") String repeatPassword,
+                               Model model) {
         System.out.println("Sign-up: " + firstname + "/" + username + "/" + password + "/" + repeatPassword);
 
         try {
+            // Validera email
+            if (!isValidEmail(username)) {
+                model.addAttribute("errorMessage", "Please enter a valid email address");
+                model.addAttribute("showError", true);
+                model.addAttribute("firstname", firstname);
+                model.addAttribute("username", username);
+                return "signUp";
+            }
+
+            // Validera att lösenorden matchar
+            if (!password.equals(repeatPassword)) {
+                model.addAttribute("errorMessage", "Passwords do not match");
+                model.addAttribute("showError", true);
+                model.addAttribute("firstname", firstname);
+                model.addAttribute("username", username);
+                return "signUp";
+            }
+
+            // Kontrollera om email redan existerar
+            if (memberDAO.existsByEmail(username)) {
+                model.addAttribute("errorMessage", "An account with this email address already exists");
+                model.addAttribute("showError", true);
+                model.addAttribute("firstname", firstname);
+                return "signUp";
+            }
+
             memberDAO.saveMember(username, firstname, password);
             return "redirect:/profile";
         } catch (Exception e) {
@@ -32,4 +59,11 @@ public class SignupController {
             return "signUp";
         }
     }
+
+    //Likadan valideringsmetod som i LoginController, kanske kan göras till en gemensam utility-metod
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email != null && email.matches(emailRegex);
+    }
+
 }
