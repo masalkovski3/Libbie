@@ -111,7 +111,7 @@ document.getElementById('searchBookButton').addEventListener('click', function()
                 resultsContainer.innerHTML = '<p>An error occurred during the search. Please try again.</p>';
             });
     } else {
-        alert('Please enter a search term');
+        showError('Please enter a search term');
     }
 });
 
@@ -127,7 +127,7 @@ function addBookToShelf(bookshelfId, workId) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert('Error: ' + data.error);
+                showError('Error: ' + data.error);
             } else {
                 // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addBookModal'));
@@ -139,7 +139,7 @@ function addBookToShelf(bookshelfId, workId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred: ' + error);
+            showError('An error occurred: ' + error.message);
         });
 }
 
@@ -162,7 +162,7 @@ function removeBookFromShelf(bookshelfId, workId) {
             })
             .then(data => {
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    showError('Error: ' + data.error);
                 } else {
                     const bookElement = document.getElementById(`book-${bookshelfId}-${workId.replace(/\//g, '-')}`);
                     if (bookElement) {
@@ -181,7 +181,7 @@ function removeBookFromShelf(bookshelfId, workId) {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
+                showError('An error occurred: ' + error);
             });
     }
 }
@@ -211,7 +211,7 @@ document.getElementById('renameShelfButton').addEventListener('click', function(
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    showError('Error: ' + data.error);
                 } else {
                     // Close the modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('renameShelfModal'));
@@ -226,10 +226,10 @@ document.getElementById('renameShelfButton').addEventListener('click', function(
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error);
+                showError('An error occurred: ' + error);
             });
     } else {
-        alert('Please enter a name for the bookshelf');
+        showError('Please enter a name for the bookshelf');
     }
 });
 
@@ -250,7 +250,7 @@ document.getElementById('confirmDeleteShelfButton').addEventListener('click', fu
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert('Error: ' + data.error);
+                showError('Error: ' + data.error);
             } else {
                 // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('deleteShelfModal'));
@@ -275,6 +275,6 @@ document.getElementById('confirmDeleteShelfButton').addEventListener('click', fu
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred: ' + error);
+            showError('An error occurred: ' + error);
         });
 });

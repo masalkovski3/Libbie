@@ -94,7 +94,7 @@ function showError(message) {
         modal.style.display = "block";
     } else {
         console.error("Could not display error message: modal or modalMessage not found", message);
-        // Fallback: show a regular alert if the modal elements are not found
+        // Fallback endast om DOM-element saknas - vi vill undvika alerts helt
         alert(message);
     }
 }
