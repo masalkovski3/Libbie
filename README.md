@@ -18,7 +18,7 @@ Klona projektet
 
 ```bash
 git clone https://github.com/masalkovski3/Libbie.git
-cd LibbieÖppna i IntelliJ IDEA
+cd Libbie Öppna i IntelliJ IDEA
 
 Öppna IntelliJ
 Välj "Open" och navigera till den nedladdade mappen Libbie.
