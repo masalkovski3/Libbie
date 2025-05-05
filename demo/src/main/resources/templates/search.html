@@ -151,14 +151,9 @@
                         <div class="card h-100 shadow-sm">
                             <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
                                  style="height: 180px;">
-                                <img th:if="${!#strings.isEmpty(book.coverUrl)}"
-                                     th:src="${book.coverUrl}"
+                                <img th:src="${book.coverUrl}"
+                                     onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
                                      alt="Book cover"
-                                     style="max-height: 160px; max-width: 90%;"
-                                     class="my-2">
-                                <img th:if="${#strings.isEmpty(book.coverUrl)}"
-                                     src="/images/blue-logo.jpeg"
-                                     alt="No cover available"
                                      style="max-height: 160px; max-width: 90%;"
                                      class="my-2">
                             </div>
