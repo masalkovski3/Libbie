@@ -21,8 +21,11 @@ import java.util.Optional;
 @Component
 public class BookshelfDAO {
 
-    @Autowired
     private SqlHandler sqlHandler;
+
+    public BookshelfDAO(SqlHandler sqlHandler) {
+        this.sqlHandler = sqlHandler;
+    }
 
     /**
      * Sparar en ny bokhylla och returnerar dess ID

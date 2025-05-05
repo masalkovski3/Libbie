@@ -35,7 +35,6 @@ public class LoginController {
      *
      * @author Emmi Masalkovski
      */
-    @Autowired
     public LoginController(MemberDAO memberDAO) {
         this.memberDAO = memberDAO;
     }

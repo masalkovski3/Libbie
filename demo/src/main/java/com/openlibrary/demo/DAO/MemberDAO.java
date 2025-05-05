@@ -19,11 +19,13 @@ import java.util.Optional;
 @Component
 public class MemberDAO {
 
-    @Autowired
     private SqlHandler sqlHandler;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public MemberDAO(SqlHandler sqlHandler, JdbcTemplate jdbcTemplate) {
+        this.sqlHandler = sqlHandler;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private String[] bios = {
             "Welcome to my Libbie 🦉",

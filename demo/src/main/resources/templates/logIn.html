@@ -73,9 +73,8 @@
         </nav>
 
         <div class="page-content">
-            <h1 id="h1">Login</h1>
+            <h1 id="header">Login</h1>
             <div class="wrapper">
-                <h1>Login</h1>
 
                 <!-- Bortkommenterad för att bara använda popup-modalen showError("Message");
                 <div th:if="${loginError != null}" class="error-message">
@@ -83,7 +82,7 @@
                 </div>
                 -->
 
-                <form action="/logIn" method="post" novalidate> <!-- Novalidate använder inte webbläsarens validering-->
+                <form action="/logIn" method="post" novalidate class="login-form"> <!-- Novalidate använder inte webbläsarens validering-->
                     <div>
                         <label for="logemail-input"><span>@</span></label>
                         <input type="email" name="email" id="logemail-input" placeholder="Email" th:value="${email != null ? email : ''}">

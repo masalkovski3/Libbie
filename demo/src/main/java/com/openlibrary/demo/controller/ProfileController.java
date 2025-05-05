@@ -8,7 +8,6 @@ import com.openlibrary.demo.DAO.MemberDAO;
 import com.openlibrary.demo.model.Book;
 import com.openlibrary.demo.model.Member;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -42,14 +41,16 @@ import java.util.Optional;
 @RequestMapping("/profile")
 public class ProfileController {
 
-    @Autowired
     private MemberDAO memberDAO;
-
-    @Autowired
     private BookshelfDAO bookshelfDAO;
 
     // Temporär inloggad användare för demo (ersätt med riktig sessionshantering senare)
     private static final long DEMO_USER_ID = 1;
+
+    public ProfileController(MemberDAO memberDAO, BookshelfDAO bookshelfDAO) {
+        this.memberDAO = memberDAO;
+        this.bookshelfDAO = bookshelfDAO;
+    }
 
     /**
      * Visar profilsidan med användarens information, bokhyllor och tillhörande böcker.

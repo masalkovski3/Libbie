@@ -11,8 +11,11 @@ import java.sql.SQLException;
 @Component
 public class SqlHandler {
 
-    @Autowired
     private DataSource dataSource;
+
+    public SqlHandler(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @PostConstruct
     public void init() {

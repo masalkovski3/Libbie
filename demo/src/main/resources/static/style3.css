@@ -156,7 +156,7 @@ nav ul {
     text-decoration: underline;
 }
 
-#h1 {
+#header {
     font-size: 45px;
     margin-bottom: 30px;
     padding-left: 50px;
@@ -444,6 +444,7 @@ hr {
         margin-top: 0;
     }
 
+    /* Dubbel klass */
     .reviews-section {
         padding: 20px 50px;
         border-top: 1px solid #ccc;
@@ -487,6 +488,7 @@ hr {
     min-width: 300px;
 }
 
+/* Dubbel klass */
 .reviews-section {
     margin-top: 40px;
     border-top: 1px solid #ccc;

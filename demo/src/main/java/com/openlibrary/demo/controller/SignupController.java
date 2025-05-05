@@ -15,8 +15,11 @@ public class SignupController {
         return "signUp";
     }
 
-    @Autowired
     private MemberDAO memberDAO;
+
+    public SignupController(MemberDAO memberDAO) {
+        this.memberDAO = memberDAO;
+    }
 
     @PostMapping("/signUp")
     public String handleSignUp(@RequestParam String firstname,
