@@ -50,8 +50,14 @@
                 <h1>Libbie</h1>
             </div>
             <div class="auth-buttons">
-                <a href="/logIn" class="button-header">Login</a>
-                <a href="/signUp" class="button-header">Sign Up</a>
+                <th:block th:if="${session.currentMember != null}">
+                    <a href="/profile" class="button-header">Profile</a>
+                    <a href="/logout" class="button-header">Logout</a>
+                </th:block>
+                <th:block th:unless="${session.currentMember != null}">
+                    <a href="/logIn" class="button-header">Login</a>
+                    <a href="/signUp" class="button-header">Sign Up</a>
+                </th:block>
             </div>
         </header>
 
@@ -124,6 +130,9 @@
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
+<!-- fragment för session-timeout-warning-->
+<div th:replace="fragments/modal :: sessionWarningModal"></div>
+
 
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {

@@ -1,5 +1,6 @@
 package com.openlibrary.demo.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import com.openlibrary.demo.DAO.MemberDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,12 @@ public class SignupController {
                               @RequestParam String username,
                               @RequestParam String password,
                               @RequestParam("repeat-password") String repeatPassword,
-                               Model model) {
+                               Model model,
+                               HttpSession session) {
         System.out.println("Sign-up: " + firstname + "/" + username + "/" + password + "/" + repeatPassword);
 
         try {
-            // Validera email
+          // Validera email
             if (!isValidEmail(username)) {
                 model.addAttribute("errorMessage", "Please enter a valid email address");
                 model.addAttribute("showError", true);
@@ -51,11 +53,16 @@ public class SignupController {
                 model.addAttribute("firstname", firstname);
                 return "signUp";
             }
-
-            memberDAO.saveMember(username, firstname, password);
+          
+            Long memberId = memberDAO.saveMember(username, firstname, password);
+            var memberOpt = memberDAO.authenticate(username, password);
+            if (memberOpt.isPresent()) {
+                session.setAttribute("currentMember", memberOpt.get());
+            }
+          
             return "redirect:/profile";
         } catch (Exception e) {
-            model.addAttribute("felmeddelande");
+            model.addAttribute("felmeddelande", "Couldn't create member");
             return "signUp";
         }
     }

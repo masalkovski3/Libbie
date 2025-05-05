@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.BookshelfDAO;
 import com.openlibrary.demo.DAO.MemberDAO;
 import com.openlibrary.demo.model.Book;
+import com.openlibrary.demo.model.Member;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,20 +60,33 @@ public class ProfileController {
      * @author Linn Otendal, Emmi Masalkovski
      */
     @GetMapping
-    public String profile(Model model) {
+    public String profile(Model model, HttpSession session) {
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        System.out.println("Current member: " + currentMember);
+
+        if (currentMember == null) {
+            return "redirect:/logIn";
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Se till att demo-användare finns
-            ensureDemoUserExists();
+            //ensureDemoUserExists();
 
             // Hämta medlemsinformation
-            Optional<Map<String, Object>> memberOpt = memberDAO.findById(DEMO_USER_ID);
+            Optional<Map<String, Object>> memberOpt = memberDAO.findById(memberId);
             if (memberOpt.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }
-            model.addAttribute("member", memberOpt.get());
+
+            Map<String, Object> memberData = memberOpt.get();
+            int friendCount = memberDAO.countFriends(memberId);
+            memberData.put("friendCount", friendCount);model.addAttribute("member", memberOpt.get());
+            model.addAttribute("member", memberData);
 
             // Hämta användarens bokhyllor
-            List<Map<String, Object>> bookshelves = bookshelfDAO.findByMemberId(DEMO_USER_ID);
+            List<Map<String, Object>> bookshelves = bookshelfDAO.findByMemberId(memberId);
             model.addAttribute("bookshelves", bookshelves);
 
             // Hämta böcker för varje bokhylla
@@ -83,7 +104,7 @@ public class ProfileController {
 
                     // Hämta författare från authors-array, om tillgängligt
                     Object authorsObj = bookMap.get("authors");
-                    String author = "Okänd";
+                    String author = "Unknown";
                     if (authorsObj != null && authorsObj instanceof java.sql.Array) {
                         String[] authors = (String[]) ((java.sql.Array) authorsObj).getArray();
                         if (authors.length > 0) {
@@ -99,8 +120,8 @@ public class ProfileController {
 
             model.addAttribute("booksByShelf", booksByShelf);
         } catch (SQLException e) {
-            System.err.println("Databasfel: " + e.getMessage());
-            model.addAttribute("error", "A database error occured: " + e.getMessage());
+            System.err.println("Database Error: " + e.getMessage());
+            model.addAttribute("error", "A database error occurred: " + e.getMessage());
         } catch (ResponseStatusException e) {
             model.addAttribute("error", e.getReason());
         }
@@ -146,15 +167,23 @@ public class ProfileController {
     public ResponseEntity<?> createBookshelf(
             @RequestParam String name,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false, defaultValue = "false") boolean isPublic) {
+            @RequestParam(required = false, defaultValue = "false") boolean isPublic,
+            HttpSession session) {
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera om namn redan används
-            if (bookshelfDAO.existsByNameAndMemberId(name, DEMO_USER_ID)) {
+            if (bookshelfDAO.existsByNameAndMemberId(name, memberId)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("error", "A bookshelf with this name already exists"));
             }
 
-            Long bookshelfId = bookshelfDAO.saveBookshelf(DEMO_USER_ID, name, description, isPublic);
+            Long bookshelfId = bookshelfDAO.saveBookshelf(memberId, name, description, isPublic);
 
             Map<String, Object> response = new HashMap<>();
             response.put("id", bookshelfId);
@@ -181,7 +210,15 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<?> addBookToShelf(
             @PathVariable Long bookshelfId,
-            @RequestParam String workId) {
+            @RequestParam String workId,
+            HttpSession session) {
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -191,9 +228,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "This bookshelf belongs to another user"));
             }
 
@@ -218,7 +255,15 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<?> removeBookFromShelf(
             @PathVariable Long bookshelfId,
-            @PathVariable String workId) {
+            @PathVariable String workId,
+            HttpSession session) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -228,9 +273,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Bookshelf belongs to another user"));
             }
 
@@ -257,7 +302,17 @@ public class ProfileController {
      */
     @DeleteMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
-    public ResponseEntity<?> deleteBookshelf(@PathVariable Long bookshelfId) {
+    public ResponseEntity<?> deleteBookshelf(
+            @PathVariable Long bookshelfId,
+            HttpSession session) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -267,9 +322,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Bookshelf belongs to another user"));
             }
 
@@ -299,7 +354,16 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<?> renameBookshelf(
             @PathVariable Long bookshelfId,
-            @RequestParam String name) {
+            @RequestParam String name,
+            HttpSession session) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -309,9 +373,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Bookshelf belongs to another user"));
             }
 
@@ -341,7 +405,16 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<?> updateBookshelfDescription(
             @PathVariable Long bookshelfId,
-            @RequestParam String description) {
+            @RequestParam String description,
+            HttpSession session) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -351,9 +424,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Bookshelf belongs to another user"));
             }
 
@@ -383,7 +456,16 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<?> updateBookshelfVisibility(
             @PathVariable Long bookshelfId,
-            @RequestParam boolean isPublic) {
+            @RequestParam boolean isPublic,
+            HttpSession session) {
+
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long memberId = currentMember.getId();
+
         try {
             // Kontrollera att bokhyllan tillhör användaren
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
@@ -393,9 +475,9 @@ public class ProfileController {
             }
 
             // Jämför primitiva värden med ==
-            Long memberId = (Long) bookshelfOpt.get().get("memberId");
-            if (DEMO_USER_ID != memberId) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
+            if (!ownerId.equals(memberId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Bookshelf belongs to another user"));
             }
 
@@ -550,5 +632,92 @@ public class ProfileController {
         return book;
     }
 
+    @PostMapping("/update")
+    public String updateProfile(@RequestParam String displayName,
+                                @RequestParam(required = false) String bio,
+                                @RequestParam(required = false) MultipartFile profileImage,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) throws IOException {
 
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
+            return "redirect:/logIn";
+        }
+
+        if(displayName == null) {
+            redirectAttributes.addFlashAttribute("error", "Display name is required");
+            return "redirect:/profile";
+        }
+
+        currentMember.setName(displayName.trim());
+        currentMember.setBio(bio != null ? bio.trim() : "");
+
+        if(profileImage != null && !profileImage.isEmpty()) {
+            try{
+                String imageUrl = saveProfileImage(profileImage, currentMember.getId());
+                currentMember.setProfileImage(imageUrl);
+                memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
+            } catch (IOException e){
+                redirectAttributes.addFlashAttribute("error", "Could not save profile image");
+                return "redirect:/profile";
+            }
+        }
+
+        System.out.println("PROFILE IMAGE PATH TO SAVE: " + currentMember.getProfileImage());
+        memberDAO.updateProfileInfo(currentMember); // Skapa denna metod i DAO
+
+        redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/upload-picture")
+    public String uploadProfileImage(@RequestParam("image") MultipartFile image,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
+            return "redirect:/logIn";
+        }
+
+        if(image.isEmpty()){
+            redirectAttributes.addFlashAttribute("error", "Image is required");
+            return "redirect:/profile";
+        }
+
+        try{
+            String uploadDirectory = "uploads/";
+            Files.createDirectories(Paths.get(uploadDirectory));
+
+            String fileName = currentMember.getId() + "_" + image.getOriginalFilename();
+            Path path = Paths.get(uploadDirectory + fileName);
+            image.transferTo(path);
+
+            memberDAO.updateProfilePicture(currentMember.getId(), "/" + uploadDirectory + fileName );
+
+            redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
+
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload image");
+        }
+        
+        return "redirect:/profile";
+    }
+
+     private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
+         Path uploadPath = Paths.get("profileImages");
+
+         if(!Files.exists(uploadPath)) {
+             Files.createDirectory(uploadPath);
+         }
+
+         String filename = memberId + "_" + image.getOriginalFilename();
+         Path filePath = uploadPath.resolve(filename);
+
+         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+         return filename;
+     }
 }

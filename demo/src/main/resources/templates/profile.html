@@ -46,6 +46,7 @@
         </div>
     </aside>
 
+    <!-- PROFILINFORMATION -->
     <main class="content">
         <!-- Header -->
         <header class="main-header">
@@ -54,8 +55,14 @@
                 <h1>Libbie</h1>
             </div>
             <div class="auth-buttons">
-                <a href="/logIn" class="button-header">Login</a>
-                <a href="/signUp" class="button-header">Sign Up</a>
+                <th:block th:if="${session.currentMember != null}">
+                    <a href="/profile" class="button-header">Profile</a>
+                    <a href="/logout" class="button-header">Logout</a>
+                </th:block>
+                <th:block th:unless="${session.currentMember != null}">
+                    <a href="/logIn" class="button-header">Login</a>
+                    <a href="/signUp" class="button-header">Sign Up</a>
+                </th:block>
             </div>
         </header>
 
@@ -79,21 +86,39 @@
         </nav>
 
         <div class="page-content">
-            <h1 id="h1">My Profile</h1>
-            <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show mt-3 mx-auto text-center" style="max-width: 500px;" role="alert">
                 <span th:text="${loginSuccess}">Success message</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="profile-container">
-                <img class="profile" src="images/profilepicture.webp" alt="profile picture">
-                <div class="edit-profile">
-                    <h4 class="profile-name" th:text="${member != null ? member.displayName : 'Libbie Libbson'}">Libbie Libbson</h4>
-                    <button class="edit-profile-button">Edit Profile</button>
-                </div>
-            </div>
+            <div class="profile-card d-flex flex-column flex-md-row align-items-center justify-content-center p-4 rounded shadow bg-white" style="gap: 2rem; margin-bottom: 2rem;">
+                <img class="rounded-circle"
+                     th:if="${member['pictureImage'] != null}"
+                     th:src="@{'/profileImages/' + ${member['pictureImage']}}"
+                     alt="Profile Picture"
+                     width="140" height="140">
 
-            <h2 id="h2">My Bookshelves</h2>
+                <img class="rounded-circle"
+                     th:unless="${member['pictureImage'] != null}"
+                     th:src="@{/images/profilepicture.webp}"
+                     alt="Default Profile Picture"
+                     width="140" height="140">
+
+
+                <div>
+                <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
+                <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
+                <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
+                <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
+
+                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    ✏️ Edit Profile
+                </button>
+            </div>
+        </div>
+
+
+        <h2 id="h2">My Bookshelves</h2>
 
             <!-- Error message if any, KOMMENTERA BORT NÄR SHOWERROR ANVÄNDS!!!!! -->
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
@@ -310,11 +335,56 @@
 </div>
 
 <!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" defer></script>
+<script th:src="@{/script.js}" ></script>
 <script src="bookshelves.js"></script>
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
+<!-- fragment för session-timeout-warning-->
+<div th:replace="fragments/modal :: sessionWarningModal"></div>
+
+<!-- Modal for editing profile -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Makes sure that files can be uploaded -->
+            <form method="post" action="/profile/update" enctype="multipart/form-data">
+
+            <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label">Profile Image</label>
+                        <input type="file" class="form-control" id="profileImage" name="profileImage" accept="image/*">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="displayName" class="form-label">Display name:</label>
+                        <input type="text" class="form-control" id="displayName" name="displayName"
+                               th:value="${member.displayName}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio:</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="3"
+                                  th:text="${member.bio}"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
