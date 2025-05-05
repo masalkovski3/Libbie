@@ -74,33 +74,39 @@ public class SearchController {
 
             // Försök hämta ett omslag
 
-            /*JsonNode covers = doc.path("cover_i");
-            if (!covers.isMissingNode() && !covers.isNull()) {
-                int coverId = covers.asInt();
-                coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
-                books.add(new Book(title, author, workID, coverUrl, coverId));
-            }*/
-
-            String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
-            String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
-            JsonNode editionRoot = mapper.readTree(editionResponse);
-            JsonNode editionDocs = editionRoot.path("entries");
-            Integer coverId;
             String coverUrl;
+            int coverId;
+            JsonNode covers = doc.path("cover_i");
 
-            if (editionDocs.isArray()) {
-                for (JsonNode edition : editionDocs) {
-                    JsonNode covers = edition.path("covers");
-                    if (covers.isArray() && covers.size() > 0) {
-                        coverId = covers.get(0).asInt();
-                        coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
-                        System.out.println("✅ Cover found: " + coverUrl);
-                        books.add(new Book(title, author, workID, coverUrl));
-                        break;
-
-                    }
-                }
+            if (!covers.isMissingNode() && !covers.isNull()) {
+                coverId = covers.asInt();
+                coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
+            } else {
+                coverId = 0;
+                coverUrl = "/images/blue-logo.jpg";
             }
+            books.add(new Book(title, author, workID, coverUrl, coverId));
+
+//            String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
+//            String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+//            JsonNode editionRoot = mapper.readTree(editionResponse);
+//            JsonNode editionDocs = editionRoot.path("entries");
+//            Integer coverId;
+//            String coverUrl;
+//
+//            if (editionDocs.isArray()) {
+//                for (JsonNode edition : editionDocs) {
+//                    JsonNode covers = edition.path("covers");
+//                    if (covers.isArray() && covers.size() > 0) {
+//                        coverId = covers.get(0).asInt();
+//                        coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+//                        System.out.println("✅ Cover found: " + coverUrl);
+//                        books.add(new Book(title, author, workID, coverUrl));
+//                        break;
+//
+//                    }
+//                }
+//            }
 
         }
 
