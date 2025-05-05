@@ -18,7 +18,7 @@ Klona projektet
 
 ```bash
 git clone https://github.com/masalkovski3/Libbie.git
-cd LibbieÖppna i IntelliJ IDEA
+cd Libbie Öppna i IntelliJ IDEA
 
 Öppna IntelliJ
 Välj "Open" och navigera till den nedladdade mappen Libbie.
@@ -26,8 +26,7 @@ IntelliJ kommer automatiskt att importera projektet som ett Maven-projekt.
 Skapa Member-klassen
 Navigera till src/main/java/com/openlibrary/demo/model/ och skapa filen:
 
-Member.java:
-
+Memeber.java:
 package com.openlibrary.demo.model;
 
 import jakarta.persistence.Entity;
@@ -49,8 +48,14 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
+    // Valfria fält, kan byggas på
     private String name;
 
+    private String bio;
+
+    private String profileImage;
+
+    // Constructors
     public Member() {
     }
 
@@ -60,6 +65,7 @@ public class Member {
         this.name = name;
     }
 
+    // Getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -70,7 +76,13 @@ public class Member {
     public void setPassword(String password) { this.password = password; }
 
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(String fullName) { this.name = fullName; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getProfileImage() { return profileImage; }
+    public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
 }
 
 Kör applikationen
@@ -82,22 +94,6 @@ Testa i webbläsaren
 
 http://localhost:8080
 Du bör se startsidan för applikationen om allt fungerar korrekt.
-
-
-Struktur
-
-Libbie/
-├── src/
-│   └── main/
-│       └── java/
-│           └── com/openlibrary/demo/
-│               ├── model/
-│               │   └── Member.java
-│               ├── controller/
-│               ├── repository/
-│               └── DemoApplication.java
-├── pom.xml
-└── README.md
 
 
 Tips
