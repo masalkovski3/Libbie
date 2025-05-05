@@ -54,8 +54,13 @@ public class BookController {
             String response = restTemplate.getForObject(workUrl, String.class);
             root = mapper.readTree(response);
         } catch (HttpClientErrorException.NotFound e){
-            model.addAttribute("error", "The book was not found");
-            return "error";
+            model.addAttribute("errorMessage", "The book was not found");
+            model.addAttribute("showError", true);
+            return "book"; // Returera boksidan med felmeddelande istället för error-sidan
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "An error occurred when retrieving the book: " + e.getMessage());
+            model.addAttribute("showError", true);
+            return "book";
         }
 
         // === 2. Titel

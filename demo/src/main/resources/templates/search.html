@@ -111,30 +111,6 @@
                             <div class="collapse mb-4" id="filterPanel">
                                 <div class="card card-body shadow-sm">
                                     <div class="row">
-                                        <!-- Year filter -->
-                                        <div class="col-md-6 mb-3">
-                                            <label for="yearFilter" class="form-label">Published after year:</label>
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <!-- Year filter value from controller -->
-                                                <input type="range" class="form-range" id="yearFilter" name="year"
-                                                       min="1900" max="2025" th:value="${selectedYear ?: 1900}">
-                                                <span id="yearValue" class="badge bg-secondary">1900</span>
-                                            </div>
-                                        </div>
-
-                                        <!-- Language filter -->
-                                        <div class="col-md-6 mb-3">
-                                            <label for="languageFilter" class="form-label">Language:</label>
-                                            <!-- Language filter value from controller -->
-                                            <select class="form-select" id="languageFilter" name="language">
-                                                <option value="" th:selected="${selectedLanguage == null}">Any language</option>
-                                                <option value="eng" th:selected="${selectedLanguage == 'eng'}">English</option>
-                                                <option value="swe" th:selected="${selectedLanguage == 'swe'}">Swedish</option>
-                                                <option value="spa" th:selected="${selectedLanguage == 'spa'}">Spanish</option>
-                                                <option value="fra" th:selected="${selectedLanguage == 'fra'}">French</option>
-                                                <option value="ger" th:selected="${selectedLanguage == 'ger'}">German</option>
-                                            </select>
-                                        </div>
                                         <!-- Sorteringsval -->
                                         <div class="col-md-6 mb-3">
                                             <label for="sortFilter" class="form-label">Sort by:</label>
@@ -227,7 +203,7 @@
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
-
+<!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {

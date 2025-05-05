@@ -26,25 +26,28 @@ document.getElementById('saveShelfButton').addEventListener('click', function() 
             },
             body: `name=${encodeURIComponent(shelfName)}`
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                } else {
-                    // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
-                    modal.hide();
-
-                    // Reload the page to show the new bookshelf
-                    location.reload();
+            .then(response => {
+                // First check if the response is OK
+                if (!response.ok) {
+                    // If not, try to parse the JSON error message
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.errorMessage || 'An error occurred');
+                    });
                 }
+                return response.json();
+            })
+            .then(data => {
+                // This code only runs if the response was OK
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
+                modal.hide();
+                location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error);
+                showError(error.message);
             });
     } else {
-        alert('Please enter a name for the bookshelf');
+        showError('Please enter a name for the bookshelf');
     }
 });
 

@@ -92,6 +92,10 @@ function showError(message) {
     if (modal && modalMessage) {
         modalMessage.textContent = message;
         modal.style.display = "block";
+    } else {
+        console.error("Could not display error message: modal or modalMessage not found", message);
+        // Fallback: show a regular alert if the modal elements are not found
+        alert(message);
     }
 }
 

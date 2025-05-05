@@ -110,7 +110,7 @@
                     </div>
 
                     <br>
-                    <a href="/search">← Back to search</a>
+                    <a href="/search">← Back to last search</a>
                 </div>
             </div>
         </div>
@@ -133,7 +133,7 @@
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
-
+<!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {

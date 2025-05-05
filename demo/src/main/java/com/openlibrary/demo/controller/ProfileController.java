@@ -122,9 +122,11 @@ public class ProfileController {
             model.addAttribute("booksByShelf", booksByShelf);
         } catch (SQLException e) {
             System.err.println("Database Error: " + e.getMessage());
-            model.addAttribute("error", "A database error occurred: " + e.getMessage());
+            model.addAttribute("errorMessage", "A database error occurred: " + e.getMessage());
+            model.addAttribute("showError", true);
         } catch (ResponseStatusException e) {
-            model.addAttribute("error", e.getReason());
+            model.addAttribute("errorMessage", e.getReason());
+            model.addAttribute("showError", true);
         }
 
         return "profile";
@@ -181,7 +183,7 @@ public class ProfileController {
             // Kontrollera om namn redan används
             if (bookshelfDAO.existsByNameAndMemberId(name, memberId)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "A bookshelf with this name already exists"));
+                        .body(Map.of("errorMessage", "A bookshelf with this name already exists"));
             }
 
             Long bookshelfId = bookshelfDAO.saveBookshelf(memberId, name, description, isPublic);
@@ -194,7 +196,7 @@ public class ProfileController {
             return ResponseEntity.ok(response);
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -225,21 +227,21 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "This bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "This bookshelf belongs to another user"));
             }
 
             bookshelfDAO.addBookToShelf(bookshelfId, workId);
             return ResponseEntity.ok(Map.of("success", true));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -270,14 +272,14 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
             }
 
             boolean removed = bookshelfDAO.removeBookFromShelf(bookshelfId, workId);
@@ -285,11 +287,11 @@ public class ProfileController {
                 return ResponseEntity.ok(Map.of("success", true));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Coudn't find this book in the bookshelf"));
+                        .body(Map.of("errorMessage", "Couldn't find this book in the bookshelf"));
             }
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -319,14 +321,14 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
             }
 
             boolean deleted = bookshelfDAO.deleteBookshelf(bookshelfId);
@@ -334,11 +336,11 @@ public class ProfileController {
                 return ResponseEntity.ok(Map.of("success", true));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -370,14 +372,14 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
             }
 
             boolean updated = bookshelfDAO.updateBookshelfName(bookshelfId, name);
@@ -385,11 +387,11 @@ public class ProfileController {
                 return ResponseEntity.ok(Map.of("success", true, "name", name));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -421,14 +423,14 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
             }
 
             boolean updated = bookshelfDAO.updateBookshelfDescription(bookshelfId, description);
@@ -436,11 +438,11 @@ public class ProfileController {
                 return ResponseEntity.ok(Map.of("success", true, "description", description));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -472,14 +474,14 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
             if (bookshelfOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
 
             // Jämför primitiva värden med ==
             Long ownerId = (Long) bookshelfOpt.get().get("memberId");
             if (!ownerId.equals(memberId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Bookshelf belongs to another user"));
+                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
             }
 
             boolean updated = bookshelfDAO.updateBookshelfVisibility(bookshelfId, isPublic);
@@ -487,70 +489,13 @@ public class ProfileController {
                 return ResponseEntity.ok(Map.of("success", true, "isPublic", isPublic));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Bookshelf not found"));
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
             }
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
-
-
-    /**
-     * Söker efter böcker via OpenLibrary API och returnerar resultat i JSON-format.
-     *
-     * @param query Sökterm för boktitlar/författare.
-     * @return ResponseEntity med lista över matchande böcker.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
-     */
-    /*
-    @GetMapping("/search")
-    @ResponseBody
-    public ResponseEntity<?> searchBooks(@RequestParam String query) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://openlibrary.org/search.json?q=" + query + "&limit=10";
-
-            String response = restTemplate.getForObject(url, String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response);
-            JsonNode docs = root.path("docs");
-
-            List<Map<String, Object>> results = new ArrayList<>();
-
-            for (JsonNode doc : docs) {
-                Map<String, Object> book = new HashMap<>();
-                book.put("title", doc.path("title").asText("Unknown title"));
-
-                // Hämta författare
-                JsonNode authors = doc.path("author_name");
-                String author = (authors.isArray() && authors.size() > 0) ?
-                        authors.get(0).asText() : "Unknown author";
-                book.put("author", author);
-
-                // Hämta Work ID
-                String key = doc.path("key").asText();
-                book.put("workId", key);
-
-                // Hämta omslag om tillgängligt
-                String coverUrl = "";
-                if (doc.has("cover_i")) {
-                    int coverId = doc.path("cover_i").asInt();
-                    coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
-                }
-                book.put("coverUrl", coverUrl);
-
-                results.add(book);
-            }
-
-            return ResponseEntity.ok(results);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
-     */
 
     /**
      * Handles GET requests to "/search" and queries the OpenLibrary API with the given search string.
@@ -572,7 +517,7 @@ public class ProfileController {
             return ResponseEntity.ok(books);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("errorMessage", e.getMessage()));
         }
     }
 
@@ -642,12 +587,14 @@ public class ProfileController {
 
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
-            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
+            redirectAttributes.addFlashAttribute("errorMessage", "You are not currently logged in");
+            redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/logIn";
         }
 
-        if(displayName == null) {
-            redirectAttributes.addFlashAttribute("error", "Display name is required");
+        if(displayName == null || displayName.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Display name is required");
+            redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/profile";
         }
 
@@ -660,7 +607,8 @@ public class ProfileController {
                 currentMember.setProfileImage(imageUrl);
                 memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
             } catch (IOException e){
-                redirectAttributes.addFlashAttribute("error", "Could not save profile image");
+                redirectAttributes.addFlashAttribute("errorMessage", "Could not save profile image");
+                redirectAttributes.addFlashAttribute("showError", true);
                 return "redirect:/profile";
             }
         }
@@ -679,12 +627,14 @@ public class ProfileController {
         
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
-            redirectAttributes.addFlashAttribute("error", "You are not currently logged in");
+            redirectAttributes.addFlashAttribute("errorMessage", "You are not currently logged in");
+            redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/logIn";
         }
 
         if(image.isEmpty()){
-            redirectAttributes.addFlashAttribute("error", "Image is required");
+            redirectAttributes.addFlashAttribute("errorMessage", "Please select an image to upload");
+            redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/profile";
         }
 
@@ -701,7 +651,8 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
 
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to upload image");
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload image: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("showError", true);
         }
         
         return "redirect:/profile";

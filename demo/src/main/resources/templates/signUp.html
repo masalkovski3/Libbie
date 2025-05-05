@@ -118,7 +118,7 @@
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
-
+<!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
