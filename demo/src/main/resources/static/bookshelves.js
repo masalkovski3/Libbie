@@ -284,3 +284,39 @@ document.getElementById('confirmDeleteShelfButton').addEventListener('click', fu
             showError('An error occurred: ' + error);
         });
 });
+
+// Hantera Enter-tryck för alla relevanta inmatningsfält som inte har det automatiskt
+document.addEventListener('DOMContentLoaded', function() {
+    // För boksökningsfältet i profile
+    const bookSearchInput = document.getElementById('bookSearch');
+    if (bookSearchInput) {
+        bookSearchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('searchBookButton').click();
+            }
+        });
+    }
+
+    // För bokhyllans namnfält vid skapande av bokhylla
+    const shelfNameInput = document.getElementById('shelfName');
+    if (shelfNameInput) {
+        shelfNameInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('saveShelfButton').click();
+            }
+        });
+    }
+
+    // För namnbytesfältet för bokhyllan
+    const newShelfNameInput = document.getElementById('newShelfName');
+    if (newShelfNameInput) {
+        newShelfNameInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('renameShelfButton').click();
+            }
+        });
+    }
+});
