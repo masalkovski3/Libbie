@@ -106,19 +106,19 @@
 
 
                 <div>
-                <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
-                <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
-                <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
-                <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
+                    <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
+                    <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
+                    <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
+                    <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
 
-                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                    ✏️ Edit Profile
-                </button>
+                    <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        ✏️ Edit Profile
+                    </button>
+                </div>
             </div>
-        </div>
 
 
-        <h2 id="h2">My Bookshelves</h2>
+            <h2 id="h2">My Bookshelves</h2>
 
             <!-- Gammal metod för felmeddelanden, avkommentera om tidigare felmeddelanden behövs! -->
             <!--
@@ -183,11 +183,11 @@
 
                             <!-- Iterate over the books on the shelf -->
                             <div th:each="book : ${booksByShelf[shelf.id]}" class="book-item" th:id="'book-' + ${shelf.id} + '-' + ${#strings.replace(book.workId, '/', '-')}">
-                                <img th:src="${book.coverUrl}"
-                                     onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
-                                     alt="Book cover"
-                                     style="max-height: 160px; max-width: 90%;"
-                                     class="my-2">
+                                <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}">
+                                    <img th:if="${!#strings.isEmpty(book.coverUrl)}" th:src="${book.coverUrl}" alt="Book cover" class="book-cover">
+                                    <img th:if="${#strings.isEmpty(book.coverUrl)}" src="/images/blue-logo.jpeg" alt="No cover" class="book-cover">
+                                    <p class="book-title" th:text="${book.title}">Book title</p>
+                                </a>
                                 <button class="btn btn-sm btn-outline-danger mt-1"
                                         th:data-shelf-id="${shelf.id}"
                                         th:data-book-id="${book.workId}"
@@ -353,7 +353,7 @@
             <!-- Makes sure that files can be uploaded -->
             <form method="post" action="/profile/update" enctype="multipart/form-data" novalidate>
 
-            <div class="modal-header">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -391,7 +391,7 @@
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
+            showError([[$,{errorMessage}]]);
         } else {
             // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);
