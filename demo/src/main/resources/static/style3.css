@@ -917,28 +917,45 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 /* Style för felmeddelanden */
-.modal {
+#errorModal.modal {
     display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed !important;
+    z-index: 2000 !important; /* Högre z-index än Bootstrap */
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
-.modal-content {
-    background-color: #fff4bb;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 400px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
+#errorModal .modal-content {
+    background-color: #fff4bb !important;
+    margin: 15% auto !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+    width: 80% !important;
+    max-width: 400px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    text-align: center !important;
 }
+
+/* Knappen i errorModal */
+#errorModal button {
+    background-color: #ffeb82 !important;
+    color: #000000 !important;
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    margin-top: 15px !important;
+}
+
+#errorModal button:hover {
+    background-color: #ffe95a !important;
+}
+
 
 /* SESSION TIMEOUT MODAL */
-
 #sessionModal {
     display: none;
     position: fixed;
