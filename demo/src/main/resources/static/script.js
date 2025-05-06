@@ -106,6 +106,41 @@ function closeModal() {
     }
 }
 
+// Funktioner för bekräftelsedialog
+function showConfirm(message, onConfirm) {
+    const confirmMessage = document.getElementById("confirmMessage");
+    const modal = document.getElementById("confirmModal");
+    const yesButton = document.getElementById("confirmYesButton");
+
+    if (modal && confirmMessage && yesButton) {
+        confirmMessage.textContent = message;
+
+        // Rensa tidigare händelsehanterare
+        const newYesButton = yesButton.cloneNode(true);
+        yesButton.parentNode.replaceChild(newYesButton, yesButton);
+
+        // Lägg till ny händelsehanterare
+        newYesButton.addEventListener('click', function() {
+            closeConfirmModal();
+            onConfirm();
+        });
+
+        modal.style.display = "block";
+    } else {
+        // Fallback till standard confirm
+        if (confirm(message)) {
+            onConfirm();
+        }
+    }
+}
+
+function closeConfirmModal() {
+    const modal = document.getElementById("confirmModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
 function setupSessionWarning(timeoutMinutes = 2, warningOffsetMinutes = 1) {
     const warningDelay = (timeoutMinutes - warningOffsetMinutes) * 60 * 1000;
 

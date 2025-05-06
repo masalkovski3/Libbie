@@ -1,8 +1,20 @@
 <!-- fragments/modal.html (återanvändbar kod i alla html-filer) -->
+<!--felmeddelande modal -->
 <div id="errorModal" class="modal" th:fragment="errorModal">
     <div class="modal-content">
         <p id="modalMessage"></p>
         <button onclick="closeModal()">Close</button>
+    </div>
+</div>
+
+<!-- Bekräftelsedialog modal -->
+<div id="confirmModal" class="modal" th:fragment="confirmModal">
+    <div class="modal-content">
+        <p id="confirmMessage"></p>
+        <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <button id="confirmYesButton">Yes</button>
+            <button id="confirmNoButton" onclick="closeConfirmModal()">No</button>
+        </div>
     </div>
 </div>
 

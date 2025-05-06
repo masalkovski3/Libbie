@@ -916,7 +916,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
     margin: 0;
 }
 
-/* Style för felmeddelanden */
+/* STYLE FÖR FELMEDDELANDEN */
 #errorModal.modal {
     display: none;
     position: fixed !important;
@@ -952,6 +952,58 @@ input[type="range"]:focus::-webkit-slider-thumb {
 
 #errorModal button:hover {
     background-color: #ffe95a !important;
+}
+
+/* STYLE FÖR BEKRÄFTELSEMEDDELANDE-KNAPPAR */
+#confirmYesButton {
+    background-color: #b9e574 !important;
+    color: #000000 !important;
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    margin-top: 0 !important;
+}
+
+#confirmYesButton:hover {
+    background-color: #85b042 !important;
+}
+
+#confirmNoButton {
+    background-color: #ee4444 !important;
+    color: #000000 !important;
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    margin-top: 0 !important;
+}
+
+#confirmNoButton:hover {
+    background-color: #c02222 !important;
+}
+
+/* STYLE FÖR BEKRÄFTELSEMEDDELANDE-RUTOR */
+#confirmModal.modal {
+    display: none;
+    position: fixed !important;
+    z-index: 2000 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+#confirmModal .modal-content {
+    background-color: #fff4bb !important;
+    margin: 15% auto !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+    width: 80% !important;
+    max-width: 400px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    text-align: center !important;
 }
 
 

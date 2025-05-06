@@ -40,7 +40,14 @@ document.getElementById('saveShelfButton').addEventListener('click', function() 
                 // This code only runs if the response was OK
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
                 modal.hide();
-                location.reload();
+
+                // Visa bekräftelsemeddelande (inte en error men använder samma funktion)
+                showError(`Bookshelf created: ${shelfName}`);
+
+                // Fördröj omladdningen så att användaren hinner se meddelandet
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -153,7 +160,8 @@ function addBookToShelf(bookshelfId, workId) {
 // Function to remove a book from a bookshelf
 function removeBookFromShelf(bookshelfId, workId) {
     console.log("Removing book:", workId, "from shelf:", bookshelfId);
-    if (confirm('Are you sure you want to remove this book from the bookshelf?')) {
+
+    showConfirm('Are you sure you want to remove this book from the bookshelf?', function() {
         fetch(`/profile/bookshelves/${bookshelfId}/books/${workId}`, {
             method: 'DELETE'
         })
@@ -169,26 +177,32 @@ function removeBookFromShelf(bookshelfId, workId) {
                 if (data.error) {
                     showError('Error: ' + data.error);
                 } else {
-                    const bookElement = document.getElementById(`book-${bookshelfId}-${workId.replace(/\//g, '-')}`);
-                    if (bookElement) {
-                        bookElement.remove();
-                    }
+                    // Visa bekräftelsemeddelande (inte error men samma funktion)
+                    showError('Book successfully removed from bookshelf');
 
-                    const booksContainer = document.getElementById(`books-${bookshelfId}`);
-                    if (booksContainer.querySelectorAll('.book-item').length === 0) {
-                        booksContainer.innerHTML = `
-                        <div class="empty-shelf-message">
-                            <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
-                        </div>
-                    `;
-                    }
+                    // Efter en kort paus, ta bort boken från DOM
+                    setTimeout(() => {
+                        const bookElement = document.getElementById(`book-${bookshelfId}-${workId.replace(/\//g, '-')}`);
+                        if (bookElement) {
+                            bookElement.remove();
+                        }
+
+                        const booksContainer = document.getElementById(`books-${bookshelfId}`);
+                        if (booksContainer.querySelectorAll('.book-item').length === 0) {
+                            booksContainer.innerHTML = `
+                            <div class="empty-shelf-message">
+                                <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
+                            </div>
+                        `;
+                        }
+                    }, 1000);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showError('An error occurred: ' + error);
             });
-    }
+    });
 }
 
 
@@ -241,9 +255,43 @@ document.getElementById('renameShelfButton').addEventListener('click', function(
 
 // Function to confirm bookshelf deletion
 function confirmDeleteShelf(bookshelfId) {
-    document.getElementById('deleteShelfId').value = bookshelfId;
-    const modal = new bootstrap.Modal(document.getElementById('deleteShelfModal'));
-    modal.show();
+    showConfirm('Are you sure you want to delete this bookshelf and all its books?', function() {
+        fetch(`/profile/bookshelves/${bookshelfId}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError('Error: ' + data.error);
+                } else {
+                    // Visa bekräftelsemeddelande
+                    showError('Bookshelf successfully deleted');
+
+                    // Efter en kort paus, ta bort bokhyllan från DOM
+                    setTimeout(() => {
+                        // Remove the bookshelf from the DOM
+                        const shelfElement = document.getElementById(`bookshelf-${bookshelfId}`);
+                        if (shelfElement) {
+                            shelfElement.remove();
+                        }
+
+                        // If no bookshelves remain, show message
+                        const shelvesContainer = document.getElementById('bookshelves-container');
+                        if (shelvesContainer.querySelectorAll('.bookshelf-container').length === 0) {
+                            shelvesContainer.innerHTML = `
+                            <div class="empty-shelf-message">
+                                <p>You don't have any bookshelves yet. Click "Create New Bookshelf" to get started!</p>
+                            </div>
+                        `;
+                        }
+                    }, 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred: ' + error);
+            });
+    });
 }
 
 // Function to delete a bookshelf
