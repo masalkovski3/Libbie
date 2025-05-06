@@ -67,7 +67,14 @@ document.getElementById('searchBookButton').addEventListener('click', function()
     const resultsContainer = document.getElementById('searchResults');
 
     if (query) {
-        resultsContainer.innerHTML = '<p>Searching...</p>';
+        // Visa laddningsindikator
+        resultsContainer.innerHTML = `
+            <div class="search-loading">
+                <div class="spinner"></div>
+                <p>Searching for books...</p>
+            </div>
+        `;
+        //resultsContainer.innerHTML = '<p>Searching...</p>';
 
         // Use JSON API for book search
         fetch(`/api/books/search?query=${encodeURIComponent(query)}`)

@@ -1042,5 +1042,25 @@ input[type="range"]:focus::-webkit-slider-thumb {
     margin-right: auto;
 }
 
+/* Laddningsanimation för sökning */
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid #d9b5d2;
+    width: 50px;
+    height: 50px;
+    margin: 20px auto;
+    animation: spin 1s linear infinite;
+}
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.search-loading {
+    text-align: center;
+    padding: 20px;
+    color: #0d1f43;
+}
 
