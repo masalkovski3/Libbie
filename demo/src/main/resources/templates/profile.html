@@ -188,10 +188,11 @@
                                     <img th:if="${#strings.isEmpty(book.coverUrl)}" src="/images/blue-logo.jpeg.jpeg" alt="No cover" class="book-cover">
                                     <p class="book-title" th:text="${book.title}">Book title</p>
                                 </a>
-                                <button class="btn btn-sm btn-outline-danger mt-1"
+                                <button
+                                        class="btn btn-sm btn-outline-danger mt-1"
                                         th:data-shelf-id="${shelf.id}"
                                         th:data-book-id="${book.workId}"
-                                        onclick="removeBookFromShelf(this.getAttribute('data-shelf-id'), this.getAttribute('data-book-id'))">
+                                        onclick="removeBookFromShelf(this.dataset.shelfId, this.dataset.bookId)">
                                     Remove
                                 </button>
                             </div>

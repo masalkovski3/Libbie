@@ -99,7 +99,9 @@ public class ProfileController {
                 List<Book> books = new ArrayList<>();
 
                 for (Map<String, Object> bookMap : bookData) {
-                    String workId = (String) bookMap.get("openLibraryId");
+                    String openLibraryId = (String) bookMap.get("openLibraryId");
+                    String cleanId = openLibraryId != null ? openLibraryId.replace("/works/", "") : "";
+
                     String title = (String) bookMap.get("title");
                     String coverUrl = (String) bookMap.get("coverUrl");
 
@@ -113,7 +115,7 @@ public class ProfileController {
                         }
                     }
 
-                    books.add(new Book(title, author, workId, coverUrl));
+                    books.add(new Book(title, author, cleanId, coverUrl));
                 }
 
                 booksByShelf.put(shelfId, books);
@@ -237,7 +239,8 @@ public class ProfileController {
                         .body(Map.of("errorMessage", "This bookshelf belongs to another user"));
             }
 
-            bookshelfDAO.addBookToShelf(bookshelfId, workId);
+            String cleanId = workId.replace("/works/", "");
+            bookshelfDAO.addBookToShelf(bookshelfId, cleanId);
             return ResponseEntity.ok(Map.of("success", true));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -261,6 +264,7 @@ public class ProfileController {
             @PathVariable String workId,
             HttpSession session) {
 
+        System.out.println("Bookshelf ID: " +bookshelfId);
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

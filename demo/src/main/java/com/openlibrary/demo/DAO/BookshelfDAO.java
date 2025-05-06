@@ -159,17 +159,18 @@ public class BookshelfDAO {
      */
     private void ensureBookExists(String openLibraryId) throws SQLException {
         // Kontrollera om boken redan finns i databasen
+        String cleanId = openLibraryId.replace("/works/", "");
         String checkSql = "SELECT COUNT(*) FROM book WHERE open_library_id = ?";
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(checkSql)) {
-            preparedStatement.setString(1, openLibraryId);
+            preparedStatement.setString(1, cleanId);
             ResultSet checkResult = preparedStatement.executeQuery();
 
             if (checkResult.next() && checkResult.getInt(1) == 0) {
                 // Boken finns inte, hämta information från Open Library API
                 try {
                     // Rensa bort eventuella '/works/' prefix
-                    String cleanId = openLibraryId.replace("/works/", "");
+                    //String cleanId = openLibraryId.replace("/works/", "");
 
                     // Skapa RestTemplate för API-anrop
                     RestTemplate restTemplate = new RestTemplate();
@@ -242,7 +243,7 @@ public class BookshelfDAO {
                     String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description, cover_url) VALUES (?, ?, ?, ?, ?, ?)";
                     try (Connection conn1 = sqlHandler.getConnection();
                          PreparedStatement insertStatement = conn1.prepareStatement(insertSql)) {
-                        insertStatement.setString(1, openLibraryId);
+                        insertStatement.setString(1, cleanId);
                         insertStatement.setString(2, title);
 
                         // Konvertera författarlistan till PostgreSQL array
@@ -277,13 +278,14 @@ public class BookshelfDAO {
     // Tar bort en bok från en bokhylla
     public boolean removeBookFromShelf(Long bookshelfId, String openLibraryId) throws SQLException {
         // SQL-sats för att ta bort boken från bookshelf_book-tabellen
-        String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND book_id = ?";
+        String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND (book_id = ? OR book_id = '/works/' || ?)";
 
         try (Connection conn = sqlHandler.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             // Sätt parametrar för bookshelfId och openLibraryId
             preparedStatement.setLong(1, bookshelfId);
             preparedStatement.setString(2, openLibraryId);
+            preparedStatement.setString(3, openLibraryId);
 
             // Utför uppdateringen
             int rowsAffected = preparedStatement.executeUpdate();
