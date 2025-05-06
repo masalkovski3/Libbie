@@ -185,7 +185,7 @@
                             <div th:each="book : ${booksByShelf[shelf.id]}" class="book-item" th:id="'book-' + ${shelf.id} + '-' + ${#strings.replace(book.workId, '/', '-')}">
                                 <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}">
                                     <img th:if="${!#strings.isEmpty(book.coverUrl)}" th:src="${book.coverUrl}" alt="Book cover" class="book-cover">
-                                    <img th:if="${#strings.isEmpty(book.coverUrl)}" src="/images/no_cover.jpeg" alt="No cover" class="book-cover">
+                                    <img th:if="${#strings.isEmpty(book.coverUrl)}" src="/images/blue-logo.jpeg.jpeg" alt="No cover" class="book-cover">
                                     <p class="book-title" th:text="${book.title}">Book title</p>
                                 </a>
                                 <button class="btn btn-sm btn-outline-danger mt-1"
