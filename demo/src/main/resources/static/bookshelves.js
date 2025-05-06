@@ -145,20 +145,18 @@ function addBookToShelf(bookshelfId, workId) {
 
 // Function to remove a book from a bookshelf
 function removeBookFromShelf(bookshelfId, workId) {
+    console.log("Removing book:", workId, "from shelf:", bookshelfId);
     if (confirm('Are you sure you want to remove this book from the bookshelf?')) {
-        fetch('/profile/bookshelves/1/books/OL12345W', {
+        fetch(`/profile/bookshelves/${bookshelfId}/books/${workId}`, {
             method: 'DELETE'
         })
-
-
             .then(response => {
                 if (!response.ok) {
-                    // Om det inte är ett lyckat svar (status 200–299), kasta fel
                     return response.text().then(text => {
                         throw new Error(`Server responded with status ${response.status}: ${text}`);
                     });
                 }
-                return response.json(); // Endast om det verkligen är JSON
+                return response.json();
             })
             .then(data => {
                 if (data.error) {
@@ -172,10 +170,10 @@ function removeBookFromShelf(bookshelfId, workId) {
                     const booksContainer = document.getElementById(`books-${bookshelfId}`);
                     if (booksContainer.querySelectorAll('.book-item').length === 0) {
                         booksContainer.innerHTML = `
-                    <div class="empty-shelf-message">
-                        <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
-                    </div>
-                `;
+                        <div class="empty-shelf-message">
+                            <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
+                        </div>
+                    `;
                     }
                 }
             })
@@ -185,6 +183,7 @@ function removeBookFromShelf(bookshelfId, workId) {
             });
     }
 }
+
 
 // Function to show the modal for renaming a bookshelf
 function showRenameShelfModal(bookshelfId, currentName) {
