@@ -79,9 +79,14 @@ public class BookApiController {
 
         if (!covers.isMissingNode() && !covers.isNull()) {
             coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
-            return coverUrl;
         }
-        return "";
+
+        // Om ingen coverUrl hittades ska vår logga dyka upp
+        if (coverUrl.isEmpty()) {
+            coverUrl = "/images/blue-logo.jpeg"; 
+        }
+
+        return coverUrl;
     }
 
     /**
