@@ -1116,3 +1116,163 @@ input[type="range"]:focus::-webkit-slider-thumb {
     color: #0d1f43;
 }
 
+/* RECENSIONER */
+.reviews-section {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.review-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-content {
+    flex: 1;
+}
+
+.review-stars {
+    color: #ffe02f;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.review-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.review-author {
+    font-weight: bold;
+}
+
+.review-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.review-form {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.star-rating {
+    display: flex;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    color: #ccc;
+}
+
+.star-rating .star {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating .star.selected,
+.star-rating .star:hover,
+.star-rating .star:hover ~ .star.selected {
+    color: #ffde37;
+}
+
+.review-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.review-form button {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.review-form button:hover {
+    background-color: #45a049;
+}
+
+.review-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-delete {
+    padding: 0.25rem 0.5rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+
+.btn-edit {
+    padding: 0.25rem 0.5rem;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-edit:hover {
+    background-color: #0b7dda;
+}
+
+.review-count {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.avg-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.avg-score {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+#noReviewsMessage {
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    margin: 2rem 0;
+}
+

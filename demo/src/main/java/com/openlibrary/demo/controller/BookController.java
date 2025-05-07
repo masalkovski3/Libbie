@@ -3,6 +3,10 @@ package com.openlibrary.demo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openlibrary.demo.DAO.ReviewDAO;
+import com.openlibrary.demo.model.Member;
+import com.openlibrary.demo.model.Review;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,18 +15,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.servlet.http.HttpSession;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Controller class responsible for handling book detail views based on Open Library data.
  * <p>
  * This controller fetches data from Open Library's public APIs using a work ID, and optionally a cover ID.
  * It processes JSON responses to extract book metadata such as title, description, author, and cover image.
+ * It also fetches and displays user reviews for the book.
  * The data is then added to the model and passed to the "book" view for rendering.
  * </p>
  */
 @Controller
 public class BookController {
 
-    //private BookApiController bookApiController; eventuell lösning
+    private final ReviewDAO reviewDAO;
+
+    @Autowired
+    public BookController(ReviewDAO reviewDAO) {
+        this.reviewDAO = reviewDAO;
+    }
 
     /**
      * Handles HTTP GET requests to the `/books/{workId}` endpoint.
@@ -30,25 +45,28 @@ public class BookController {
      * Fetches book metadata (title, description, author, and cover) from Open Library's public API,
      * using the given work ID. If a cover ID is provided, it is used directly; otherwise,
      * the method attempts to extract a cover ID from the book's edition data.
+     * Also retrieves and displays user reviews for the book.
      * </p>
      *
      * @param workId  The Open Library work ID (e.g., OL12345W), typically in the format `/works/{id}`
      * @param coverId (Optional) A specific cover ID to use for the book's cover image
      * @param model   The Spring MVC model used to pass attributes to the Thymeleaf view
+     * @param session The HTTP session containing user information
      * @return The name of the view to render ("book") or "error" if the work was not found
      * @throws JsonProcessingException If parsing the JSON responses fails
      */
     @GetMapping("/books/{workId}")
     public String books(@PathVariable String workId,
                         @RequestParam(required = false) Integer coverId,
-                        Model model) throws JsonProcessingException {
+                        Model model,
+                        HttpSession session) throws JsonProcessingException {
 
         String cleanId = workId.replace("/works/", "");
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper mapper = new ObjectMapper();
 
         String workUrl = getWorkUrl(cleanId);
-        // === 1. Hämta grundläggande bokdata från "works"
+        // === 1. Fetch basic book data from "works"
         JsonNode root;
         try {
             String response = restTemplate.getForObject(workUrl, String.class);
@@ -56,35 +74,61 @@ public class BookController {
         } catch (HttpClientErrorException.NotFound e){
             model.addAttribute("errorMessage", "The book was not found");
             model.addAttribute("showError", true);
-            return "book"; // Returera boksidan med felmeddelande istället för error-sidan
+            return "book"; // Return the book page with error message instead of error page
         } catch (Exception e) {
             model.addAttribute("errorMessage", "An error occurred when retrieving the book: " + e.getMessage());
             model.addAttribute("showError", true);
             return "book";
         }
 
-        // === 2. Titel
+        // === 2. Title
         String title = getTitle(root);
 
-        // === 3. Beskrivning (kan vara text eller objekt)
+        // === 3. Description (can be text or object)
         String description = getDescription(root);
 
-        // === 4. Författare (hämta via separat /authors/{id}-anrop)
+        // === 4. Author (fetch via separate /authors/{id} call)
         String author = "";
         String authorKey = getAuthorKey(root);
         if(!authorKey.isEmpty()) {
             author = getAuthor(root, restTemplate, mapper, authorKey);
         }
 
-        // === 5. Omslagsbild (hämtas via editioner – om någon finns)
-        String coverUrl = getCoverUrl(coverId,cleanId, restTemplate, mapper);
+        // === 5. Cover image (fetched via editions if any exist)
+        String coverUrl = getCoverUrl(coverId, cleanId, restTemplate, mapper);
 
-        // === 6. Skicka data till vy
+        // === 6. Fetch reviews for the book
+        List<Review> reviews = Collections.emptyList();
+        double averageScore = 0.0;
+        Review userReview = null;
+
+        try {
+            reviews = reviewDAO.getReviewsByBookId(workId);
+            averageScore = reviewDAO.getAverageReviewScore(workId);
+
+            // If user is logged in, fetch their review (if it exists)
+            Member currentMember = (Member) session.getAttribute("currentMember");
+            if (currentMember != null) {
+                userReview = reviewDAO.getMemberReview(currentMember.getId(), workId);
+                model.addAttribute("canReview", true);
+            } else {
+                model.addAttribute("canReview", false);
+            }
+        } catch (SQLException e) {
+            // Log the error but continue loading the page
+            System.err.println("Failed to load reviews: " + e.getMessage());
+        }
+
+        // === 7. Send data to view
         model.addAttribute("title", title);
         model.addAttribute("description", description.isEmpty() ? "No description available." : description);
         model.addAttribute("coverUrl", coverUrl);
         model.addAttribute("author", author);
         model.addAttribute("authorKey", authorKey);
+        model.addAttribute("workId", workId);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("averageScore", averageScore);
+        model.addAttribute("userReview", userReview);
 
         return "book";
     }
@@ -157,7 +201,7 @@ public class BookController {
         String authorKey = "";
         JsonNode authorsNode = root.path("authors");
         if (authorsNode.isArray() && authorsNode.size() > 0) {
-            authorKey = authorsNode.get(0).path("author").path("key").asText(); // t.ex. /authors/OL1234A
+            authorKey = authorsNode.get(0).path("author").path("key").asText(); // e.g. /authors/OL1234A
         }
         return authorKey;
     }

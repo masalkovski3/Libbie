@@ -141,7 +141,7 @@ function closeConfirmModal() {
     }
 }
 
-function setupSessionWarning(timeoutMinutes = 2, warningOffsetMinutes = 1) {
+function setupSessionWarning(timeoutMinutes = 10, warningOffsetMinutes = 1) {
     const warningDelay = (timeoutMinutes - warningOffsetMinutes) * 60 * 1000;
 
     console.log("🕒 Starting timer for session warning after", warningDelay / 1000, "seconds");

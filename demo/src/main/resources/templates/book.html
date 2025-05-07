@@ -104,9 +104,46 @@
 
                     <!-- Recensioner -->
                     <div class="reviews-section">
-                        <h3>Reviews</h3>
-                        <div class="review-stars">★★★★☆</div>
-                        <div class="review-text">"Really compelling narrative and complex characters."</div>
+                        <h3>
+                            Reviews
+                            <span class="review-count" id="reviewCount"></span>
+                        </h3>
+
+                        <!-- Genomsnittligt betyg -->
+                        <div class="avg-rating">
+                            <span class="avg-score" id="avgScore"></span>
+                            <div class="review-stars" id="avgStars"></div>
+                        </div>
+
+                        <!-- Formulär för att lägga till recension (visas endast för inloggade) -->
+                        <div th:if="${canReview}" class="review-form" id="reviewForm">
+                            <h4 id="reviewFormTitle">Add Your Review</h4>
+                            <div class="star-rating" id="ratingStars">
+                                <span class="star" data-rating="1">☆</span>
+                                <span class="star" data-rating="2">☆</span>
+                                <span class="star" data-rating="3">☆</span>
+                                <span class="star" data-rating="4">☆</span>
+                                <span class="star" data-rating="5">☆</span>
+                            </div>
+                            <textarea id="reviewText" placeholder="Write your review here..."></textarea>
+                            <div>
+                                <button id="submitReview">Submit Review</button>
+                                <button id="cancelEdit" style="display: none; background-color: #f44336;">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div th:unless="${canReview}" class="login-prompt">
+                            <p><a href="/logIn">Log in</a> to write a review.</p>
+                        </div>
+
+                        <!-- Lista med recensioner (fylls i via JavaScript) -->
+                        <div id="reviewsList">
+                            <!-- Recensioner laddas här dynamiskt -->
+                        </div>
+
+                        <div id="noReviewsMessage" style="display: none;">
+                            No reviews yet. Be the first to review this book!
+                        </div>
                     </div>
 
                     <br>
@@ -130,8 +167,12 @@
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
+
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
+
+<!-- fragment för bekräftelsedialog -->
+<div th:replace="fragments/modal :: confirmModal"></div>
 
 <!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
@@ -149,6 +190,17 @@
         tryShowError();
     });
 </script>
+
+<!-- Script för reviews -->
+<script th:inline="javascript">
+    // Överför Thymeleaf-variabler till globalt JavaScript
+    window.reviewData = {
+        workId: /*[[${workId}]]*/ '',
+        currentMember: /*[[${session.currentMember}]]*/ null,
+        userReview: /*[[${userReview}]]*/ null
+    };
+</script>
+<script src="/reviews.js" defer></script>
 
 </body>
 </html>
