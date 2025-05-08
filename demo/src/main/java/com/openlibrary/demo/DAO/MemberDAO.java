@@ -12,9 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class MemberDAO {
@@ -282,6 +280,5 @@ public class MemberDAO {
         String sql = "UPDATE member SET profile_image = ? WHERE member_id = ?";
         jdbcTemplate.update(sql, filePath, memberId);
     }
-
 
 }

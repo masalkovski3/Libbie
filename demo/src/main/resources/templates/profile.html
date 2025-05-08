@@ -107,16 +107,19 @@
 
                 <div>
                     <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
-                    <p><strong>Friends on Libbie:</strong> <span th:text="${member.friendCount}">0</span></p>
+                    <p><strong>Friends on Libbie:</strong>
+                        <button class="btn-rose" type="button"
+                                data-bs-toggle="modal" data-bs-target="#friendModal"
+                                th:text="${member.friendCount}">0</button>
+                    </p>
                     <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
                     <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
 
-                    <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <button class="btn-rose" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                         ✏️ Edit Profile
                     </button>
                 </div>
             </div>
-
 
             <h2 id="h2">My Bookshelves</h2>
 
@@ -374,6 +377,35 @@
     </div>
 </div>
 
+<!-- Modal for friend-list-->
+<div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="friendModalLabel">My Friends</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div th:if="${#lists.isEmpty(friends)}">
+                    <p>You don't have any friends yet 😢</p>
+                </div>
+
+                <ul th:unless="${#lists.isEmpty(friends)}" class="friend-list">
+                    <li th:each="friend : ${friends}">
+                        <a th:href="@{'/profile/' + ${friend['id']}}"
+                           th:text="${friend['displayName']}">Friend</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
@@ -390,6 +422,5 @@
         tryShowError();
     });
 </script>
-
 </body>
 </html>

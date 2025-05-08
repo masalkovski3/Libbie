@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.BookshelfDAO;
 import com.openlibrary.demo.DAO.MemberDAO;
+import com.openlibrary.demo.DAO.FriendshipDAO;
 import com.openlibrary.demo.model.Book;
 import com.openlibrary.demo.model.Member;
 import jakarta.servlet.http.HttpSession;
@@ -43,13 +44,15 @@ public class ProfileController {
 
     private MemberDAO memberDAO;
     private BookshelfDAO bookshelfDAO;
+    private FriendshipDAO friendshipDAO;
 
     // Temporär inloggad användare för demo (ersätt med riktig sessionshantering senare)
     private static final long DEMO_USER_ID = 1;
 
-    public ProfileController(MemberDAO memberDAO, BookshelfDAO bookshelfDAO) {
+    public ProfileController(MemberDAO memberDAO, BookshelfDAO bookshelfDAO, FriendshipDAO friendshipDAO) {
         this.memberDAO = memberDAO;
         this.bookshelfDAO = bookshelfDAO;
+        this.friendshipDAO = friendshipDAO;
     }
 
     /**
@@ -83,7 +86,17 @@ public class ProfileController {
 
             Map<String, Object> memberData = memberOpt.get();
             int friendCount = memberDAO.countFriends(memberId);
-            memberData.put("friendCount", friendCount);model.addAttribute("member", memberOpt.get());
+            memberData.put("friendCount", friendCount);
+            List<Long> friendIds = friendshipDAO.findFriendIds(memberId);
+            List<Map<String, Object>> friendProfiles = new ArrayList<>();
+
+            for (Long friendId : friendIds) {
+                memberDAO.findById(friendId).ifPresent(friendProfiles::add);
+            }
+
+            model.addAttribute("friends", friendProfiles);
+
+            model.addAttribute("member", memberOpt.get());
             model.addAttribute("member", memberData);
 
             // Hämta användarens bokhyllor
@@ -676,4 +689,85 @@ public class ProfileController {
 
          return filename;
      }
+
+    /**
+     * Displays the profile of another member, if they are a confirmed friend.
+     * Only public bookshelves are shown.
+     *
+     * @param id The member ID of the profile to view.
+     * @param session HTTP session for identifying the current user.
+     * @param model Spring MVC model for passing data to the view.
+     * @return The "profile" view if allowed, or a redirect/error otherwise.
+     */
+    @GetMapping("/{id}")
+    public String viewFriendProfile(@PathVariable Long id, HttpSession session, Model model) {
+        Member currentUser = (Member) session.getAttribute("currentMember");
+
+        if (currentUser == null) {
+            return "redirect:/logIn";
+        }
+
+        if (currentUser.getId().equals(id)) {
+            return "redirect:/profile"; // viewing own profile
+        }
+
+        try {
+            boolean areFriends = friendshipDAO.areFriends(currentUser.getId(), id);
+            if (!areFriends) {
+                model.addAttribute("errorMessage", "You are not friends with this user.");
+                model.addAttribute("showError", true);
+                return "profile"; // Or redirect to /search or home if more appropriate
+            }
+
+            Optional<Map<String, Object>> friendOpt = memberDAO.findById(id);
+            if (friendOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "User not found.");
+                model.addAttribute("showError", true);
+                return "profile";
+            }
+
+            Map<String, Object> friendData = friendOpt.get();
+            int friendCount = memberDAO.countFriends(id);
+            friendData.put("friendCount", friendCount);
+            List<Long> friendIds = friendshipDAO.findFriendIds(id);
+            List<Map<String, Object>> friendProfiles = new ArrayList<>();
+
+            for (Long friendId : friendIds) {
+                memberDAO.findById(friendId).ifPresent(friendProfiles::add);
+            }
+
+            model.addAttribute("friends", friendProfiles);
+
+            model.addAttribute("member", friendData);
+
+            // Only public bookshelves
+            List<Map<String, Object>> bookshelves = bookshelfDAO.findPublicByMemberId(id);
+            model.addAttribute("bookshelves", bookshelves);
+
+            Map<Long, List<Book>> booksByShelf = new HashMap<>();
+            for (Map<String, Object> shelf : bookshelves) {
+                Long shelfId = (Long) shelf.get("id");
+                List<Map<String, Object>> bookData = bookshelfDAO.findBooksByBookshelfId(shelfId);
+                List<Book> books = new ArrayList<>();
+                for (Map<String, Object> bookMap : bookData) {
+                    books.add(new Book(
+                            (String) bookMap.get("title"),
+                            (String) bookMap.getOrDefault("author", "Unknown"),
+                            ((String) bookMap.get("openLibraryId")).replace("/works/", ""),
+                            (String) bookMap.get("coverUrl")
+                    ));
+                }
+                booksByShelf.put(shelfId, books);
+            }
+
+            model.addAttribute("booksByShelf", booksByShelf);
+            return "profile";
+
+        } catch (SQLException e) {
+            model.addAttribute("errorMessage", "Database error: " + e.getMessage());
+            model.addAttribute("showError", true);
+            return "profile";
+        }
+    }
+
 }

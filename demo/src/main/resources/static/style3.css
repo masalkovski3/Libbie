@@ -5,7 +5,7 @@ body {
     padding: 0;
     font-family: Georgia, 'Times New Roman', Times, serif;
     color: #0d1f43;
-    min-height: 300vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
+    min-height: 100vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
     display: flex; /*skapar flexbox för hela sidan*/
 }
 
@@ -1284,4 +1284,75 @@ input[type="range"]:focus::-webkit-slider-thumb {
     text-align: center;
     margin: 2rem 0;
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover {
+    color: #000;
+}
+
+.friend-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.friend-list li {
+    margin-bottom: 0.5rem;
+}
+
+.friend-list a {
+    text-decoration: none;
+    font-weight: 500;
+    color: #5c2d91;
+}
+.friend-list a:hover {
+    text-decoration: underline;
+}
+
+.btn-rose {
+    background-color: #f3c1d6; /* Rosa grundton */
+    color: #5c2d91; /* Mörklila text (matchar resten) */
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-rose:hover {
+    background-color: #eab6cf; /* Lite mörkare vid hover */
+}
+
+
+
 

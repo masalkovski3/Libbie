@@ -2,6 +2,7 @@ package com.openlibrary.demo.DAO;
 
 import com.openlibrary.demo.controller.SqlHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,9 @@ import java.util.Optional;
 public class BookshelfDAO {
 
     private SqlHandler sqlHandler;
+    private JdbcTemplate jdbcTemplate;
 
+    // TODO: Refactor to return List<Bookshelf> once model and DAO are aligned
     public BookshelfDAO(SqlHandler sqlHandler) {
         this.sqlHandler = sqlHandler;
     }
@@ -421,5 +424,20 @@ public class BookshelfDAO {
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;
         }
+    }
+
+    /**
+     * Retrieves all public bookshelves belonging to the specified member.
+     *
+     * Each bookshelf is returned as a Map<String, Object>, where the keys correspond
+     * to column names in the bookshelf table (e.g., {id}, {name}, {is_public}).
+     *
+     * @param memberId the ID of the member whose public bookshelves should be retrieved
+     * @return a list of maps, each representing a public bookshelf and its database fields
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Map<String, Object>> findPublicByMemberId(Long memberId) throws SQLException {
+        String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true";
+        return jdbcTemplate.queryForList(sql, memberId);
     }
 }
