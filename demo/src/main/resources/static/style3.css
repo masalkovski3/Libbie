@@ -254,8 +254,8 @@ hr {
     color: white;
     padding: 20px 0;
     display: flex;
-    justify-content: flex-end;
-    align-content: center;
+    justify-content: flex-end; /* Justera horisontellt till höger */
+    align-items: center; /* Justera vertikalt till mitten */
     width: 100%;
     font-family: Georgia;
 }
@@ -1113,6 +1113,15 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .search-loading {
     text-align: center;
     padding: 20px;
+    color: #0d1f43;
+}
+
+.about-heading {
+    text-align: center;
+    width: 100%;
+    margin-top: 30px;
+    font-size: 48px;
+    font-weight: bold;
     color: #0d1f43;
 }
 
