@@ -186,5 +186,5 @@ function setupSessionWarning(timeoutMinutes = 10, warningOffsetMinutes = 1) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    setupSessionWarning(2, 1);
+    setupSessionWarning(10, 1);
 });
