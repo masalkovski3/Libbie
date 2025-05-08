@@ -90,6 +90,9 @@ public class ProfileController {
             List<Map<String, Object>> bookshelves = bookshelfDAO.findByMemberId(memberId);
             model.addAttribute("bookshelves", bookshelves);
 
+            RestTemplate restTemplate = new RestTemplate();
+            ObjectMapper mapper = new ObjectMapper();
+
             // Hämta böcker för varje bokhylla
             Map<Long, List<Book>> booksByShelf = new HashMap<>();
 
@@ -101,9 +104,9 @@ public class ProfileController {
                 for (Map<String, Object> bookMap : bookData) {
                     String openLibraryId = (String) bookMap.get("openLibraryId");
                     String cleanId = openLibraryId != null ? openLibraryId.replace("/works/", "") : "";
-
                     String title = (String) bookMap.get("title");
-                    String coverUrl = (String) bookMap.get("coverUrl");
+                    Integer coverId = (Integer) bookMap.get("coverId");
+                    String coverUrl = getCoverUrl(coverId, cleanId, restTemplate, mapper);
 
                     // Hämta författare från authors-array, om tillgängligt
                     Object authorsObj = bookMap.get("authors");
@@ -122,12 +125,17 @@ public class ProfileController {
             }
 
             model.addAttribute("booksByShelf", booksByShelf);
+
         } catch (SQLException e) {
             System.err.println("Database Error: " + e.getMessage());
             model.addAttribute("errorMessage", "A database error occurred: " + e.getMessage());
             model.addAttribute("showError", true);
         } catch (ResponseStatusException e) {
             model.addAttribute("errorMessage", e.getReason());
+            model.addAttribute("showError", true);
+        } catch (JsonProcessingException e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            model.addAttribute("errorMessage", "An unexpected error occurred.");
             model.addAttribute("showError", true);
         }
 
@@ -676,4 +684,28 @@ public class ProfileController {
 
          return filename;
      }
+
+    private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        String coverUrl = "";
+        if (coverId !=null){
+            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+        }
+        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
+        String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+        JsonNode editionRoot = mapper.readTree(editionResponse);
+        JsonNode editionDocs = editionRoot.path("entries");
+
+        if (editionDocs.isArray()) {
+            for (JsonNode edition : editionDocs) {
+                JsonNode covers = edition.path("covers");
+                if (covers.isArray() && covers.size() > 0) {
+                    coverId = covers.get(0).asInt();
+                    coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+                    System.out.println("Cover found: " + coverUrl);
+                    break;
+                }
+            }
+        }
+        return coverUrl;
+    }
 }
