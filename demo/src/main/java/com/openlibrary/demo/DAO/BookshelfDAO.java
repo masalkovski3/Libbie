@@ -73,11 +73,11 @@ public class BookshelfDAO {
     }
 
     /**
-     * Hämtar alla bokhyllor för en viss medlem
+     * Hämtar alla bokhyllor för en viss medlem, sorterar så senast tillagda är högst upp
      */
     public List<Map<String, Object>> findByMemberId(Long memberId) throws SQLException {
         List<Map<String, Object>> bookshelves = new ArrayList<>();
-        String sql = "SELECT id, name, description, is_public, position FROM bookshelf WHERE member_id = ? ORDER BY position";
+        String sql = "SELECT id, name, description, is_public, position FROM bookshelf WHERE member_id = ? ORDER BY created_at DESC";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -411,7 +411,7 @@ public class BookshelfDAO {
     }
 
     /**
-     * Uppdaterar en bokhyllas synlighet (publik/privat)
+     * Uppdaterar en bokhyllas synlighet (public/private)
      */
     public boolean updateBookshelfVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
         String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
@@ -437,7 +437,7 @@ public class BookshelfDAO {
      * @throws SQLException if a database access error occurs
      */
     public List<Map<String, Object>> findPublicByMemberId(Long memberId) throws SQLException {
-        String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true";
+        String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
     }
 }

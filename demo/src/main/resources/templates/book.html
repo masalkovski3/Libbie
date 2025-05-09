@@ -5,19 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title}">Book Details</title>
     <link href="/style3.css" rel="stylesheet" type="text/css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
     <div th:fragment="pageContent">
         <div class="book-layout">
-            <!-- Left column: cover -->
-            <div class="left-column">
-                <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
-                <img th:if="${coverUrl == ''}" src="/images/blue-logo.jpeg" alt="No cover available"/>
-            </div>
+
+                <!-- Left column -->
+                <div class="left-column">
+                    <!-- Book cover -->
+                    <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
+                    <img th:if="${coverUrl == ''}" src="/images/blue-logo.jpeg" alt="No cover available"/>
+
+                    <!-- "Add to bookshelf"-button -->
+                    <div th:if="${session.currentMember != null}" class="book-actions">
+                        <button id="addToBookshelfBtn" class="btn-add-to-bookshelf">Add to Bookshelf</button>
+                    </div>
+                </div>
 
             <!-- Right column: book info -->
             <div class="right-column">
@@ -82,23 +92,36 @@
 
 <!-- Fragment includes -->
 <div th:replace="fragments/modal :: errorModal"></div>
+
+<!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
+
+<!-- fragment för bekräftelsedialog -->
 <div th:replace="fragments/modal :: confirmModal"></div>
 
-<!-- JS: error handling -->
+<!-- Script för "Add to bookshelf"-knapp -->
+<script src="/bookshelves.js" defer></script>
+
+    <!-- JS: error handling -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
             showError([[${errorMessage}]]);
         } else {
+            // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);
         }
     }
-    window.addEventListener('load', tryShowError);
+
+    window.addEventListener('load', function() {
+        // Starta försöken att visa felmeddelandet
+        tryShowError();
+    });
 </script>
 
 <!-- JS: review context -->
 <script th:inline="javascript">
+    // Överför Thymeleaf-variabler till globalt JavaScript
     window.reviewData = {
         workId: /*[[${workId}]]*/ '',
         currentMember: /*[[${session.currentMember}]]*/ null,
@@ -106,5 +129,21 @@
     };
 </script>
 <script src="/reviews.js" defer></script>
+
+<!-- Modal för att välja bokhylla att lägga till bok från boksida -->
+<div id="bookshelfModal" class="bookshelf-modal" style="display: none;">
+    <div class="bookshelf-modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Add to Bookshelf</h3>
+        <div class="bookshelf-list" id="bookshelfListContainer">
+            <!-- Bokhyllor laddas här dynamiskt -->
+            <div class="loading-spinner">Loading bookshelves...</div>
+        </div>
+        <div class="modal-actions">
+            <button id="doneBtn" class="btn-done">Done</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

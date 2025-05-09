@@ -15,48 +15,52 @@ function scrollRecommendations(amount) {
 }
 
 // Function to create a new bookshelf
-document.getElementById('saveShelfButton').addEventListener('click', function() {
-    const shelfName = document.getElementById('shelfName').value.trim();
+const saveShelfButton = document.getElementById('saveShelfButton');
+if (saveShelfButton) {
+    saveShelfButton.addEventListener('click', function () {
+        const shelfName = document.getElementById('shelfName').value.trim();
 
-    if (shelfName) {
-        fetch('/profile/bookshelves', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `name=${encodeURIComponent(shelfName)}`
-        })
-            .then(response => {
-                // First check if the response is OK
-                if (!response.ok) {
-                    // If not, try to parse the JSON error message
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.errorMessage || 'An error occurred');
-                    });
-                }
-                return response.json();
+
+        if (shelfName) {
+            fetch('/profile/bookshelves', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `name=${encodeURIComponent(shelfName)}`
             })
-            .then(data => {
-                // This code only runs if the response was OK
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
-                modal.hide();
+                .then(response => {
+                    // First check if the response is OK
+                    if (!response.ok) {
+                        // If not, try to parse the JSON error message
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.errorMessage || 'An error occurred');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // This code only runs if the response was OK
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
+                    modal.hide();
 
-                // Visa bekräftelsemeddelande (inte en error men använder samma funktion)
-                showError(`Bookshelf created: ${shelfName}`);
+                    // Visa bekräftelsemeddelande (inte en error men använder samma funktion)
+                    showError(`Bookshelf created: ${shelfName}`);
 
-                // Fördröj omladdningen så att användaren hinner se meddelandet
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showError(error.message);
-            });
-    } else {
-        showError('Please enter a name for the bookshelf');
-    }
-});
+                    // Fördröj omladdningen så att användaren hinner se meddelandet
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError(error.message);
+                });
+        } else {
+            showError('Please enter a name for the bookshelf');
+        }
+    });
+}
 
 // Function to show the modal for adding a book
 function showAddBookModal(bookshelfId) {
@@ -69,47 +73,49 @@ function showAddBookModal(bookshelfId) {
 }
 
 // Search for books using the API
-document.getElementById('searchBookButton').addEventListener('click', function() {
-    const query = document.getElementById('bookSearch').value.trim();
-    const resultsContainer = document.getElementById('searchResults');
+const searchBookButton = document.getElementById('searchBookButton');
+if (searchBookButton) {
+    searchBookButton.addEventListener('click', function () {
+        const query = document.getElementById('bookSearch').value.trim();
+        const resultsContainer = document.getElementById('searchResults');
 
-    if (query) {
-        // Visa laddningsindikator
-        resultsContainer.innerHTML = `
+        if (query) {
+            // Visa laddningsindikator
+            resultsContainer.innerHTML = `
             <div class="search-loading">
                 <div class="spinner"></div>
                 <p>Searching for books...</p>
             </div>
         `;
-        //resultsContainer.innerHTML = '<p>Searching...</p>';
+            //resultsContainer.innerHTML = '<p>Searching...</p>';
 
-        // Use JSON API for book search
-        fetch(`/api/books/search?query=${encodeURIComponent(query)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Search results:", data); // For debugging
-                resultsContainer.innerHTML = '';
+            // Use JSON API for book search
+            fetch(`/api/books/search?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Search results:", data); // For debugging
+                    resultsContainer.innerHTML = '';
 
-                if (!data || data.length === 0) {
-                    resultsContainer.innerHTML = '<p>No books found</p>';
-                    return;
-                }
+                    if (!data || data.length === 0) {
+                        resultsContainer.innerHTML = '<p>No books found</p>';
+                        return;
+                    }
 
-                data.forEach(book => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'book-result-item';
-                    resultItem.onclick = function() {
-                        addBookToShelf(document.getElementById('selectedBookshelfId').value, book.workId);
-                    };
+                    data.forEach(book => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'book-result-item';
+                        resultItem.onclick = function () {
+                            addBookToShelf(document.getElementById('selectedBookshelfId').value, book.workId);
+                        };
 
-                    const coverUrl = book.coverUrl ? book.coverUrl : '/images/no_cover.jpeg';
+                        const coverUrl = book.coverUrl ? book.coverUrl : '/images/no_cover.jpeg';
 
-                    resultItem.innerHTML = `
+                        resultItem.innerHTML = `
                         <img src="${coverUrl}" alt="Book cover" class="book-result-cover">
                         <div class="book-result-info">
                             <h5 class="book-result-title">${book.title}</h5>
@@ -117,17 +123,18 @@ document.getElementById('searchBookButton').addEventListener('click', function()
                         </div>
                     `;
 
-                    resultsContainer.appendChild(resultItem);
+                        resultsContainer.appendChild(resultItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsContainer.innerHTML = '<p>An error occurred during the search. Please try again.</p>';
                 });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultsContainer.innerHTML = '<p>An error occurred during the search. Please try again.</p>';
-            });
-    } else {
-        showError('Please enter a search term');
-    }
-});
+        } else {
+            showError('Please enter a search term');
+        }
+    });
+}
 
 // Function to add a book to a bookshelf
 function addBookToShelf(bookshelfId, workId) {
@@ -216,42 +223,45 @@ function showRenameShelfModal(bookshelfId, currentName) {
 }
 
 // Function to rename a bookshelf
-document.getElementById('renameShelfButton').addEventListener('click', function() {
-    const bookshelfId = document.getElementById('renameShelfId').value;
-    const newName = document.getElementById('newShelfName').value.trim();
+const renameShelfButton = document.getElementById('renameShelfButton');
+if (renameShelfButton) {
+    renameShelfButton.addEventListener('click', function () {
+        const bookshelfId = document.getElementById('renameShelfId').value;
+        const newName = document.getElementById('newShelfName').value.trim();
 
-    if (newName) {
-        fetch(`/profile/bookshelves/${bookshelfId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `name=${encodeURIComponent(newName)}`
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showError('Error: ' + data.error);
-                } else {
-                    // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('renameShelfModal'));
-                    modal.hide();
-
-                    // Update the name in the DOM
-                    const titleElement = document.querySelector(`#bookshelf-${bookshelfId} .bookshelf-title`);
-                    if (titleElement) {
-                        titleElement.textContent = newName;
-                    }
-                }
+        if (newName) {
+            fetch(`/profile/bookshelves/${bookshelfId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `name=${encodeURIComponent(newName)}`
             })
-            .catch(error => {
-                console.error('Error:', error);
-                showError('An error occurred: ' + error);
-            });
-    } else {
-        showError('Please enter a name for the bookshelf');
-    }
-});
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError('Error: ' + data.error);
+                    } else {
+                        // Close the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('renameShelfModal'));
+                        modal.hide();
+
+                        // Update the name in the DOM
+                        const titleElement = document.querySelector(`#bookshelf-${bookshelfId} .bookshelf-title`);
+                        if (titleElement) {
+                            titleElement.textContent = newName;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred: ' + error);
+                });
+        } else {
+            showError('Please enter a name for the bookshelf');
+        }
+    });
+}
 
 // Function to confirm bookshelf deletion
 function confirmDeleteShelf(bookshelfId) {
@@ -295,43 +305,46 @@ function confirmDeleteShelf(bookshelfId) {
 }
 
 // Function to delete a bookshelf
-document.getElementById('confirmDeleteShelfButton').addEventListener('click', function() {
-    const bookshelfId = document.getElementById('deleteShelfId').value;
+const confirmDeleteShelfButton = document.getElementById('confirmDeleteShelfButton');
+if (confirmDeleteShelfButton) {
+    confirmDeleteShelfButton.addEventListener('click', function () {
+        const bookshelfId = document.getElementById('deleteShelfId').value;
 
-    fetch(`/profile/bookshelves/${bookshelfId}`, {
-        method: 'DELETE'
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                showError('Error: ' + data.error);
-            } else {
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteShelfModal'));
-                modal.hide();
+        fetch(`/profile/bookshelves/${bookshelfId}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError('Error: ' + data.error);
+                } else {
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteShelfModal'));
+                    modal.hide();
 
-                // Remove the bookshelf from the DOM
-                const shelfElement = document.getElementById(`bookshelf-${bookshelfId}`);
-                if (shelfElement) {
-                    shelfElement.remove();
-                }
+                    // Remove the bookshelf from the DOM
+                    const shelfElement = document.getElementById(`bookshelf-${bookshelfId}`);
+                    if (shelfElement) {
+                        shelfElement.remove();
+                    }
 
-                // If no bookshelves remain, show message
-                const shelvesContainer = document.getElementById('bookshelves-container');
-                if (shelvesContainer.querySelectorAll('.bookshelf-container').length === 0) {
-                    shelvesContainer.innerHTML = `
+                    // If no bookshelves remain, show message
+                    const shelvesContainer = document.getElementById('bookshelves-container');
+                    if (shelvesContainer.querySelectorAll('.bookshelf-container').length === 0) {
+                        shelvesContainer.innerHTML = `
                     <div class="empty-shelf-message">
                         <p>You don't have any bookshelves yet. Click "Create New Bookshelf" to get started!</p>
                     </div>
                 `;
+                    }
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('An error occurred: ' + error);
-        });
-});
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred: ' + error);
+            });
+    });
+}
 
 // Hantera Enter-tryck för alla relevanta inmatningsfält som inte har det automatiskt
 document.addEventListener('DOMContentLoaded', function() {
@@ -366,5 +379,172 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('renameShelfButton').click();
             }
         });
+    }
+});
+
+// Funktion för att hantera "Add to Bookshelf" från boksidan
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded - checking for bookshelf functionality");
+
+    // Kontrollera om vi är på boksidan och om relevanta element finns
+    const addToBookshelfBtn = document.getElementById('addToBookshelfBtn');
+    const bookshelfModal = document.getElementById('bookshelfModal');
+
+    console.log("Found addToBookshelfBtn:", !!addToBookshelfBtn);
+    console.log("Found bookshelfModal:", !!bookshelfModal);
+
+    // Om knappen inte finns är vi troligen inte på boksidan, så avsluta tidigt
+    if (!addToBookshelfBtn || !bookshelfModal) return;
+
+    const bookshelfListContainer = document.getElementById('bookshelfListContainer');
+    const doneBtn = document.getElementById('doneBtn');
+    const closeModalBtn = document.querySelector('.close-modal');
+
+    // Bokens ID från URL
+    const workId = window.location.pathname.split('/').pop();
+    const selectedBookshelves = new Set();
+
+    // Öppna modalen när användaren klickar på Add to Bookshelf-knappen
+    addToBookshelfBtn.addEventListener('click', function() {
+        bookshelfModal.style.display = 'block';
+        loadBookshelves();
+    });
+
+    // Stäng modalen
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', function() {
+            bookshelfModal.style.display = 'none';
+        });
+    }
+
+    // Stäng modalen om användaren klickar utanför innehållet
+    window.addEventListener('click', function(event) {
+        if (event.target === bookshelfModal) {
+            bookshelfModal.style.display = 'none';
+        }
+    });
+
+    // Klicka på Done-knappen för att lägga till boken i valda bokhyllor
+    if (doneBtn) {
+        doneBtn.addEventListener('click', function() {
+            if (selectedBookshelves.size === 0) {
+                bookshelfModal.style.display = 'none';
+                return;
+            }
+
+            addBookToBookshelves(Array.from(selectedBookshelves), workId);
+        });
+    }
+
+    // Hämta användarens bokhyllor via AJAX
+    function loadBookshelves() {
+        bookshelfListContainer.innerHTML = '<div class="loading-spinner">Loading bookshelves...</div>';
+
+        fetch('/profile/bookshelves')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load bookshelves');
+                }
+                return response.json();
+            })
+            .then(bookshelves => {
+                displayBookshelves(bookshelves);
+            })
+            .catch(error => {
+                if (typeof showError === 'function') {
+                    showError(error.message);
+                } else {
+                    bookshelfListContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                }
+            });
+    }
+
+    // Visa alla bokhyllor med checkboxar
+    function displayBookshelves(bookshelves) {
+        if (bookshelves.length === 0) {
+            bookshelfListContainer.innerHTML = '<p>You have no bookshelves yet. Create one in your profile first.</p>';
+            return;
+        }
+
+        // Rensa tidigare innehåll
+        bookshelfListContainer.innerHTML = '';
+
+        // Skapa en checkbox för varje bokhylla
+        bookshelves.forEach(shelf => {
+            const shelfItem = document.createElement('div');
+            shelfItem.className = 'bookshelf-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `shelf-${shelf.id}`;
+            checkbox.value = shelf.id;
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedBookshelves.add(this.value);
+                } else {
+                    selectedBookshelves.delete(this.value);
+                }
+            });
+
+            const label = document.createElement('label');
+            label.htmlFor = `shelf-${shelf.id}`;
+            label.className = 'bookshelf-name';
+            label.textContent = shelf.name;
+
+            shelfItem.appendChild(checkbox);
+            shelfItem.appendChild(label);
+            bookshelfListContainer.appendChild(shelfItem);
+        });
+    }
+
+    // Lägg till boken i de valda bokhyllorna
+    function addBookToBookshelves(shelfIds, bookId) {
+        // Visa laddningsindikator
+        doneBtn.disabled = true;
+        doneBtn.textContent = 'Adding...';
+
+        // Skapa en array av promises för varje bokhylla som ska uppdateras
+        const addPromises = shelfIds.map(shelfId => {
+            return fetch(`/profile/bookshelves/${shelfId}/books`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `workId=${bookId}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.errorMessage || 'Failed to add book to bookshelf');
+                        });
+                    }
+                    return response.json();
+                });
+        });
+
+        // Vänta på att alla promises är klara
+        Promise.all(addPromises)
+            .then(() => {
+                // Stäng modalen och visa bekräftelse
+                bookshelfModal.style.display = 'none';
+                if (typeof showConfirm === 'function') {
+                    showError('Book added to selected bookshelves successfully!'); //Ej error men används ändå
+                } else {
+                    alert('Book added to selected bookshelves successfully!');
+                }
+            })
+            .catch(error => {
+                if (typeof showError === 'function') {
+                    showError(error.message);
+                } else {
+                    alert('Error: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // Återställ knappen
+                doneBtn.disabled = false;
+                doneBtn.textContent = 'Done';
+                selectedBookshelves.clear();
+            });
     }
 });

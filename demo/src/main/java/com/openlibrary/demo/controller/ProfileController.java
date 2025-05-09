@@ -770,4 +770,32 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Returns the current user's bookshelves as a JSON response for AJAX requests.
+     * This method is typically used to display bookshelves when adding a book from a book page.
+     *
+     * @param session the current HTTP session, used to identify the logged-in user
+     * @return a ResponseEntity containing the list of bookshelves as JSON if the user is logged in,
+     *         or an error message if the user is not authenticated or a database error occurs
+     */
+    @GetMapping("/bookshelves")
+    @ResponseBody
+    public ResponseEntity<?> getUserBookshelves(HttpSession session) {
+        Member currentMember = (Member) session.getAttribute("currentMember");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("errorMessage", "You must be logged in to view your bookshelves"));
+        }
+
+        Long memberId = currentMember.getId();
+
+        try {
+            List<Map<String, Object>> bookshelves = bookshelfDAO.findByMemberId(memberId);
+            return ResponseEntity.ok(bookshelves);
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("errorMessage", e.getMessage()));
+        }
+    }
+
 }
