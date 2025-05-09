@@ -1,6 +1,6 @@
 package com.openlibrary.demo.DAO;
 
-import com.openlibrary.demo.controller.SqlHandler;
+import com.openlibrary.demo.controller.DatabaseConnection;
 import com.openlibrary.demo.model.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,11 +19,11 @@ import java.util.Map;
 @Component
 public class ReviewDAO {
 
-    private SqlHandler sqlHandler;
+    private DatabaseConnection sqlHandler;
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public ReviewDAO(SqlHandler sqlHandler, JdbcTemplate jdbcTemplate) {
+    public ReviewDAO(DatabaseConnection sqlHandler, JdbcTemplate jdbcTemplate) {
         this.sqlHandler = sqlHandler;
         this.jdbcTemplate = jdbcTemplate;
     }

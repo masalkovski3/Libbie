@@ -1,7 +1,7 @@
 package com.openlibrary.demo.DAO;
 
 import org.springframework.stereotype.Component;
-import com.openlibrary.demo.controller.SqlHandler;
+import com.openlibrary.demo.controller.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ import java.util.List;
 @Component
 public class FriendshipDAO {
 
-    private final SqlHandler sqlHandler;
+    private final DatabaseConnection sqlHandler;
 
-    public FriendshipDAO(SqlHandler sqlHandler) {
+    public FriendshipDAO(DatabaseConnection sqlHandler) {
         this.sqlHandler = sqlHandler;
     }
 

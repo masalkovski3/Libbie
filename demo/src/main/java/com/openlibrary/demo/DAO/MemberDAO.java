@@ -1,6 +1,6 @@
 package com.openlibrary.demo.DAO;
 
-import com.openlibrary.demo.controller.SqlHandler;
+import com.openlibrary.demo.controller.DatabaseConnection;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,10 @@ import java.util.*;
 @Component
 public class MemberDAO {
 
-    private SqlHandler sqlHandler;
+    private DatabaseConnection sqlHandler;
     private JdbcTemplate jdbcTemplate;
 
-    public MemberDAO(SqlHandler sqlHandler, JdbcTemplate jdbcTemplate) {
+    public MemberDAO(DatabaseConnection sqlHandler, JdbcTemplate jdbcTemplate) {
         this.sqlHandler = sqlHandler;
         this.jdbcTemplate = jdbcTemplate;
     }
