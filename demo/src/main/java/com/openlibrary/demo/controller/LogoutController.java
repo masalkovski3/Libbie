@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 /**
  * Controller responsible for handling user logout.
  *
- * <p>When the user accesses the /logout endpoint, the session is invalidated
+ * When the user accesses the /logout endpoint, the session is invalidated
  * and the user is redirected to the login page with a logout flag. This flag
- * can be used to display a confirmation message to the user.</p>
+ * can be used to display a confirmation message to the user.
  *
- * <p>This controller assumes that session-based authentication is used and
- * that the user's identity is stored under the session attribute "currentMember".</p>
+ * This controller assumes that session-based authentication is used and
+ * that the user's identity is stored under the session attribute "currentMember".
  */
 @Controller
 public class LogoutController {

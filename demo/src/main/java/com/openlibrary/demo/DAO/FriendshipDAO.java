@@ -10,11 +10,9 @@ import java.util.List;
 /**
  * Data Access Object (DAO) responsible for handling database operations related to
  * friendships between members in the Libbie application.
- *
  * This class provides low-level JDBC access to the friendship table,
  * which stores mutual friendship relations. Each friendship is stored as a single row
  * where member_1_id & member_2_id to ensure uniqueness and simplify lookups.
- *
  * Friendships are treated as bidirectional: if A is friends with B, then B is also friends with A.
  *
  * @author Emmi Masalkovski

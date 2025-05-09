@@ -15,11 +15,9 @@ import java.util.List;
 
 /**
  * Controller that handles book search requests using the OpenLibrary API.
- * <p>
  * This controller exposes a REST endpoint that takes a search query,
  * fetches matching books from the OpenLibrary public API, parses the result,
  * and returns a list of {@link Book} objects.
- * </p>
  */
 @RestController
 @RequestMapping("/api/books")
@@ -27,11 +25,9 @@ public class BookApiController {
 
     /**
      * Searches for books based on a query string.
-     * <p>
      * The method sends a GET request to the OpenLibrary API with the specified search query.
      * It parses the JSON response and maps up to 10 results to {@link Book} objects.
      *  * Each book includes a title, author name, OpenLibrary work Id, and optionally a cover image URL and Id.
-     * </p>
      *
      * @param query the search string to look for books; must not be null or blank
      * @return a list of up to 10 {@link Book} objects matching the query;

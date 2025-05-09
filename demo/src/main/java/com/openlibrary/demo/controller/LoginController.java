@@ -16,7 +16,6 @@ import java.util.Optional;
 
 /**
  * Controller responsible for handling login-related requests.
- *
  * This class provides endpoints to render the login page and process user authentication.
  * If the login is successful, the authenticated member is stored in the session and redirected to the profile page.
  * If authentication fails, the user is redirected back to the login page.

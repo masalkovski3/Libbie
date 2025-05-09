@@ -22,12 +22,10 @@ import java.util.List;
 
 /**
  * Controller class responsible for handling book detail views based on Open Library data.
- * <p>
  * This controller fetches data from Open Library's public APIs using a work ID, and optionally a cover ID.
  * It processes JSON responses to extract book metadata such as title, description, author, and cover image.
  * It also fetches and displays user reviews for the book.
  * The data is then added to the model and passed to the "book" view for rendering.
- * </p>
  */
 @Controller
 public class BookController {
@@ -41,12 +39,10 @@ public class BookController {
 
     /**
      * Handles HTTP GET requests to the `/books/{workId}` endpoint.
-     * <p>
      * Fetches book metadata (title, description, author, and cover) from Open Library's public API,
      * using the given work ID. If a cover ID is provided, it is used directly; otherwise,
      * the method attempts to extract a cover ID from the book's edition data.
      * Also retrieves and displays user reviews for the book.
-     * </p>
      *
      * @param workId  The Open Library work ID (e.g., OL12345W), typically in the format `/works/{id}`
      * @param coverId (Optional) A specific cover ID to use for the book's cover image
