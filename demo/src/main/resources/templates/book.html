@@ -5,129 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title}">Book Details</title>
     <link href="/style3.css" rel="stylesheet" type="text/css">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
-        <div th:fragment="pageContent">
+<div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+    <div th:fragment="pageContent">
         <div class="book-layout">
+            <!-- Left column: cover -->
+            <div class="left-column">
+                <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
+                <img th:if="${coverUrl == ''}" src="/images/blue-logo.jpeg" alt="No cover available"/>
+            </div>
 
-                <!-- Vänster kolumn: bokomslag -->
-                <div class="left-column">
-                    <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
-                    <img th:if="${coverUrl == ''}" src="/images/blue-logo.jpeg" alt="No cover available"/>
-                </div>
+            <!-- Right column: book info -->
+            <div class="right-column">
+                <h1 th:text="${title}">Book Title</h1>
+                <h3>
+                    Author:
+                    <a th:href="@{'https://openlibrary.org' + ${authorKey}}" th:text="${author}">Author Name</a>
+                </h3>
 
-                <!-- Höger kolumn: bokinformation -->
-                <div class="right-column">
-                    <h1 th:text="${title}">Book Title</h1>
+                <h3>Description</h3>
+                <p th:text="${description}">No description available.</p>
 
+                <!-- Reviews -->
+                <div class="reviews-section">
                     <h3>
-                        Author:
-                        <a th:href="@{'https://openlibrary.org' + ${authorKey}}" th:text="${author}">Author Name</a>
+                        Reviews
+                        <span class="review-count" id="reviewCount"></span>
                     </h3>
+                    <div class="avg-rating">
+                        <span class="avg-score" id="avgScore"></span>
+                        <div class="review-stars" id="avgStars"></div>
+                    </div>
 
-                    <h3>Description</h3>
-                    <p th:text="${description}">No description available.</p>
-
-                    <!-- Recensioner -->
-                    <div class="reviews-section">
-                        <h3>
-                            Reviews
-                            <span class="review-count" id="reviewCount"></span>
-                        </h3>
-
-                        <!-- Genomsnittligt betyg -->
-                        <div class="avg-rating">
-                            <span class="avg-score" id="avgScore"></span>
-                            <div class="review-stars" id="avgStars"></div>
+                    <!-- Review form -->
+                    <div th:if="${canReview}" class="review-form" id="reviewForm">
+                        <h4 id="reviewFormTitle">Add Your Review</h4>
+                        <div class="star-rating" id="ratingStars">
+                            <span class="star" data-rating="1">☆</span>
+                            <span class="star" data-rating="2">☆</span>
+                            <span class="star" data-rating="3">☆</span>
+                            <span class="star" data-rating="4">☆</span>
+                            <span class="star" data-rating="5">☆</span>
                         </div>
-
-                        <!-- Formulär för att lägga till recension (visas endast för inloggade) -->
-                        <div th:if="${canReview}" class="review-form" id="reviewForm">
-                            <h4 id="reviewFormTitle">Add Your Review</h4>
-                            <div class="star-rating" id="ratingStars">
-                                <span class="star" data-rating="1">☆</span>
-                                <span class="star" data-rating="2">☆</span>
-                                <span class="star" data-rating="3">☆</span>
-                                <span class="star" data-rating="4">☆</span>
-                                <span class="star" data-rating="5">☆</span>
-                            </div>
-                            <textarea id="reviewText" placeholder="Write your review here..."></textarea>
-                            <div>
-                                <button id="submitReview">Submit Review</button>
-                                <button id="cancelEdit" style="display: none; background-color: #f44336;">Cancel</button>
-                            </div>
-                        </div>
-
-                        <div th:unless="${canReview}" class="login-prompt">
-                            <p><a href="/logIn">Log in</a> to write a review.</p>
-                        </div>
-
-                        <!-- Lista med recensioner (fylls i via JavaScript) -->
-                        <div id="reviewsList">
-                            <!-- Recensioner laddas här dynamiskt -->
-                        </div>
-
-                        <div id="noReviewsMessage" style="display: none;">
-                            No reviews yet. Be the first to review this book!
+                        <textarea id="reviewText" placeholder="Write your review here..."></textarea>
+                        <div>
+                            <button id="submitReview">Submit Review</button>
+                            <button id="cancelEdit" style="display: none; background-color: #f44336;">Cancel</button>
                         </div>
                     </div>
 
-                    <br>
-                    <a href="/search">← Back to last search</a>
+                    <div th:unless="${canReview}" class="login-prompt">
+                        <p><a href="/logIn">Log in</a> to write a review.</p>
+                    </div>
+
+                    <div id="reviewsList"></div>
+                    <div id="noReviewsMessage" style="display: none;">
+                        No reviews yet. Be the first to review this book!
+                    </div>
                 </div>
+
+                <br>
+                <a href="/search">← Back to last search</a>
             </div>
         </div>
+    </div>
 </div>
 
-        <!-- Footer -->
-        <footer>
-            <h5>Latest Update: 2025-03-31</h5>
-        </footer>
-    </main>
-</div>
+<!-- Footer -->
+<footer>
+    <h5>Latest Update: 2025-03-31</h5>
+</footer>
 
-<!-- JavaScript för att hantera hamburgarmenyn -->
-<!-- <script src="script.js" type="text/javascript"></script> -->
-
-<!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" defer></script>
-
-<!--fragment för felmeddelande-->
+<!-- Fragment includes -->
 <div th:replace="fragments/modal :: errorModal"></div>
-
-<!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
-
-<!-- fragment för bekräftelsedialog -->
 <div th:replace="fragments/modal :: confirmModal"></div>
 
-<!-- Script för felmeddelande, ändra inte -->
+<!-- JS: error handling -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
             showError([[${errorMessage}]]);
         } else {
-            // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);
         }
     }
-
-    window.addEventListener('load', function() {
-        // Starta försöken att visa felmeddelandet
-        tryShowError();
-    });
+    window.addEventListener('load', tryShowError);
 </script>
 
-<!-- Script för reviews -->
+<!-- JS: review context -->
 <script th:inline="javascript">
-    // Överför Thymeleaf-variabler till globalt JavaScript
     window.reviewData = {
         workId: /*[[${workId}]]*/ '',
         currentMember: /*[[${session.currentMember}]]*/ null,
@@ -135,6 +106,5 @@
     };
 </script>
 <script src="/reviews.js" defer></script>
-
 </body>
 </html>

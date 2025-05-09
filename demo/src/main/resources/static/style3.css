@@ -208,12 +208,6 @@ nav ul {
     line-height: 1.5;
 }
 
-#dida {
-    font-size: 40px;
-    padding: 30px 30px 50px 50px;
-    float: left;
-}
-
 footer {
     margin-top: auto;
     text-align: center;
@@ -526,7 +520,7 @@ hr {
 }
 
 .library-container {
-    overflow-x: hidden; //added
+    overflow-x: hidden;
     display: flex;
     gap: 10px;
     padding: 10px;
@@ -616,7 +610,7 @@ hr {
 }
 
 .recommmendation-container {
-    overflow-x: hidden; //added
+    overflow-x: hidden;
     display: flex;
     gap: 10px;
     border: none;
