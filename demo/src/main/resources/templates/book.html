@@ -17,10 +17,16 @@
         <div th:fragment="pageContent">
         <div class="book-layout">
 
-                <!-- Vänster kolumn: bokomslag -->
+                <!-- Vänster kolumn -->
                 <div class="left-column">
+                    <!-- Bokomslag -->
                     <img th:if="${coverUrl != ''}" th:src="${coverUrl}" alt="Book Cover"/>
                     <img th:if="${coverUrl == ''}" src="/images/blue-logo.jpeg" alt="No cover available"/>
+
+                    <!-- "Add to bookshelf"-knapp -->
+                    <div th:if="${session.currentMember != null}" class="book-actions">
+                        <button id="addToBookshelfBtn" class="btn-add-to-bookshelf">Add to Bookshelf</button>
+                    </div>
                 </div>
 
                 <!-- Höger kolumn: bokinformation -->
@@ -108,6 +114,9 @@
 <!-- fragment för bekräftelsedialog -->
 <div th:replace="fragments/modal :: confirmModal"></div>
 
+<!-- Script för "Add to bookshelf"-knapp -->
+<script src="/bookshelves.js" defer></script>
+
 <!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
@@ -135,6 +144,21 @@
     };
 </script>
 <script src="/reviews.js" defer></script>
+
+<!-- Modal för att välja bokhylla att lägga till bok från boksida -->
+<div id="bookshelfModal" class="bookshelf-modal" style="display: none;">
+    <div class="bookshelf-modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Add to Bookshelf</h3>
+        <div class="bookshelf-list" id="bookshelfListContainer">
+            <!-- Bokhyllor laddas här dynamiskt -->
+            <div class="loading-spinner">Loading bookshelves...</div>
+        </div>
+        <div class="modal-actions">
+            <button id="doneBtn" class="btn-done">Done</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
