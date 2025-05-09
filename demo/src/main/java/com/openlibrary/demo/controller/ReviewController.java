@@ -17,10 +17,8 @@ import java.util.Map;
 
 /**
  * Controller for handling book reviews.
- * <p>
  * This controller provides endpoints for creating, retrieving, updating, and deleting book reviews.
  * All endpoints return JSON responses and are designed to be used with AJAX requests from the front-end.
- * </p>
  */
 @Controller
 @RequestMapping("/reviews")
@@ -35,9 +33,7 @@ public class ReviewController {
 
     /**
      * Retrieves all reviews for a specific book via AJAX.
-     * <p>
      * This endpoint is called when loading the book page to display all reviews.
-     * </p>
      *
      * @param workId The Open Library work ID of the book
      * @return JSON response containing reviews and average score
@@ -63,9 +59,7 @@ public class ReviewController {
 
     /**
      * Retrieves the current user's review for a specific book (if exists).
-     * <p>
      * This endpoint is called when a logged-in user views a book to check if they've already reviewed it.
-     * </p>
      *
      * @param workId The Open Library work ID of the book
      * @param session The HTTP session containing the logged-in user information
@@ -73,7 +67,8 @@ public class ReviewController {
      */
     @GetMapping("/user/{workId}")
     @ResponseBody
-    public ResponseEntity<?> getUserReview(@PathVariable String workId, HttpSession session) {
+    public ResponseEntity<?> getUserReview(@PathVariable String workId,
+                                           HttpSession session) {
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             Map<String, String> error = new HashMap<>();
@@ -102,10 +97,8 @@ public class ReviewController {
 
     /**
      * Creates or updates a review for a book.
-     * <p>
      * This endpoint is called when a user submits the review form.
      * If the user has already reviewed the book, their existing review is updated.
-     * </p>
      *
      * @param workId The Open Library work ID of the book
      * @param score The rating score (1-5)
@@ -157,9 +150,7 @@ public class ReviewController {
 
     /**
      * Deletes a user's review for a book.
-     * <p>
      * This endpoint is called when a user wants to remove their review.
-     * </p>
      *
      * @param workId The Open Library work ID of the book
      * @param session The HTTP session containing the logged-in user information
@@ -167,7 +158,8 @@ public class ReviewController {
      */
     @DeleteMapping("/book/{workId}")
     @ResponseBody
-    public ResponseEntity<?> deleteReview(@PathVariable String workId, HttpSession session) {
+    public ResponseEntity<?> deleteReview(@PathVariable String workId,
+                                          HttpSession session) {
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             Map<String, String> error = new HashMap<>();

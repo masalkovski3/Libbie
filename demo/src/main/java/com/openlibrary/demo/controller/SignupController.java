@@ -7,20 +7,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller responsible for handling user sign-up related requests.
+ */
 @Controller
 public class SignupController {
 
+    private MemberDAO memberDAO;
+
+    /**
+     * Constructs a new {@code SignupController} with the specified {@code MemberDAO}.
+     *
+     * @param memberDAO the DAO used for member data access and authentication
+     */
+    public SignupController(MemberDAO memberDAO) {
+        this.memberDAO = memberDAO;
+    }
+
+    /**
+     * Handles GET requests to the sign-up page.
+     *
+     * @return the name of the sign-up view template
+     */
     @GetMapping("/signUp")
     public String signUp() {
         return "signUp";
     }
 
-    private MemberDAO memberDAO;
-
-    public SignupController(MemberDAO memberDAO) {
-        this.memberDAO = memberDAO;
-    }
-
+    /**
+     * Handles POST requests for user sign-up.
+     * Validates the input data, checks for existing email, and performs authentication.
+     * If successful, stores the authenticated member in the session and redirects to the profile page.
+     * Otherwise, returns the sign-up view with an error message.
+     *
+     * @param firstname      the first name of the user
+     * @param username       the email address (used as username)
+     * @param password       the user's chosen password
+     * @param repeatPassword the repeated password for confirmation
+     * @param model          the model used to pass attributes to the view
+     * @param session        the HTTP session used to store user data
+     * @return a redirect to the profile page on success, or the sign-up view on failure
+     */
     @PostMapping("/signUp")
     public String handleSignUp(@RequestParam String firstname,
                               @RequestParam String username,
@@ -69,7 +96,13 @@ public class SignupController {
         }
     }
 
-    //Likadan valideringsmetod som i LoginController, kanske kan göras till en gemensam utility-metod
+    /**
+     * Validates whether the given email address is in a correct format.
+     * Note: This method is duplicated in {@code LoginController} and could be refactored into a shared utility class.
+     *
+     * @param email the email address to validate
+     * @return true if the email format is valid; false otherwise
+     */
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email != null && email.matches(emailRegex);
