@@ -91,7 +91,8 @@ public class SignupController {
           
             return "redirect:/profile";
         } catch (Exception e) {
-            model.addAttribute("felmeddelande", "Couldn't create member");
+            model.addAttribute("errorMessage", "Couldn't create member");
+            model.addAttribute("showError", true);
             return "signUp";
         }
     }
