@@ -57,7 +57,6 @@ public class SignupController {
                 return "signUp";
             }
           
-            Long memberId = memberDAO.saveMember(username, firstname, password);
             var memberOpt = memberDAO.authenticate(username, password);
             if (memberOpt.isPresent()) {
                 session.setAttribute("currentMember", memberOpt.get());

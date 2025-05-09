@@ -1,7 +1,6 @@
 package com.openlibrary.demo.controller;
 
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -9,11 +8,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 @Component
-public class SqlHandler {
+public class DatabaseConnection {
 
     private DataSource dataSource;
 
-    public SqlHandler(DataSource dataSource) {
+    public DatabaseConnection(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

@@ -116,7 +116,7 @@ public class SearchController {
 
     private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String coverUrl = "";
-        if (coverId !=null){
+        if (coverId != null){
             coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
         }
         String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
