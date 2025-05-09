@@ -49,15 +49,7 @@ public class SearchController {
             RestTemplate restTemplate = new RestTemplate();
 
             // Bygg URL för API-anrop
-            StringBuilder urlBuilder = new StringBuilder("https://openlibrary.org/search.json?q=");
-            urlBuilder.append(query.trim().replace(" ", "+"));
-
-            // Lägg till sorteringsalternativ
-            if (sort != null && !sort.isEmpty() && ("new".equals(sort) || "editions".equals(sort))) {
-                urlBuilder.append("&sort=").append(sort);
-            }
-
-            urlBuilder.append("&limit=").append(limit);
+            StringBuilder urlBuilder = createUrl(query, sort, limit);
 
             // Skapa URL och gör API-anrop
             String url = urlBuilder.toString();
@@ -67,35 +59,7 @@ public class SearchController {
             JsonNode root = mapper.readTree(response);
             JsonNode docs = root.path("docs");
 
-            List<Book> books = new ArrayList<>();
-            for (int i = 0; i < Math.min(limit, docs.size()); i++) {
-                JsonNode doc = docs.get(i);
-                String title = doc.path("title").asText();
-                JsonNode authors = doc.path("author_name");
-                String author = (authors.isArray() && authors.size() > 0) ? authors.get(0).asText() : "Unknown";
-                String workID = doc.path("key").asText();
-                String cleanId = workID.replace("/works/", "");
-
-                // Hämta omslag
-                int coverId;
-                JsonNode covers = doc.path("cover_i");
-
-                if (!covers.isMissingNode() && !covers.isNull()) {
-                    coverId = covers.asInt();
-                } else {
-                    coverId = 0;
-                }
-
-                String coverUrl = getCoverUrl(doc.path("cover_i").asInt(), cleanId, restTemplate, mapper);
-                books.add(new Book(title, author, workID, coverUrl, coverId));
-                System.out.println(coverUrl);
-            }
-
-            // Visa felmeddelande om inga böcker hittades
-            if (books.isEmpty()) {
-                model.addAttribute("errorMessage", "No books found matching your search criteria. Please try a different search term.");
-                model.addAttribute("showError", true);
-            }
+            List<Book> books = createBookObject(limit, docs, model, restTemplate, mapper);
 
             model.addAttribute("books", books);
             model.addAttribute("query", query);
@@ -112,6 +76,52 @@ public class SearchController {
             model.addAttribute("selectedSort", sort);
             return "search";
         }
+    }
+
+    private List <Book> createBookObject(int limit, JsonNode docs, Model model, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        List<Book> books = new ArrayList<>();
+        for (int i = 0; i < Math.min(limit, docs.size()); i++) {
+            JsonNode doc = docs.get(i);
+            String title = doc.path("title").asText();
+            JsonNode authors = doc.path("author_name");
+            String author = (authors.isArray() && authors.size() > 0) ? authors.get(0).asText() : "Unknown";
+            String workID = doc.path("key").asText();
+            String cleanId = workID.replace("/works/", "");
+
+            // Hämta omslag
+            int coverId;
+            JsonNode covers = doc.path("cover_i");
+
+            if (!covers.isMissingNode() && !covers.isNull()) {
+                coverId = covers.asInt();
+            } else {
+                coverId = 0;
+            }
+
+            String coverUrl = getCoverUrl(doc.path("cover_i").asInt(), cleanId, restTemplate, mapper);
+            books.add(new Book(title, author, workID, coverUrl, coverId));
+            System.out.println(coverUrl);
+        }
+
+        // Visa felmeddelande om inga böcker hittades
+        if (books.isEmpty()) {
+            model.addAttribute("errorMessage", "No books found matching your search criteria. Please try a different search term.");
+            model.addAttribute("showError", true);
+        }
+        return books;
+    }
+
+    private StringBuilder createUrl(String query, String sort, int limit) {
+        StringBuilder urlBuilder = new StringBuilder("https://openlibrary.org/search.json?q=");
+        urlBuilder.append(query.trim().replace(" ", "+"));
+
+        if (sort != null && !sort.isEmpty() && ("new".equals(sort) || "editions".equals(sort))) {
+            urlBuilder.append("&sort=").append(sort);
+        }
+
+        urlBuilder.append("&limit=").append(limit);
+
+        return urlBuilder;
     }
 
     private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
