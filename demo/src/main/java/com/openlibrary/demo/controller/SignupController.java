@@ -82,7 +82,8 @@ public class SignupController {
                 model.addAttribute("firstname", firstname);
                 return "signUp";
             }
-          
+
+            memberDAO.saveMember(username,firstname, password);
             var memberOpt = memberDAO.authenticate(username, password);
             if (memberOpt.isPresent()) {
                 session.setAttribute("currentMember", memberOpt.get());
