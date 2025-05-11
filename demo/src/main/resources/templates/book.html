@@ -77,7 +77,7 @@
 
 <!-- Footer -->
 <footer>
-    <h5>Latest Update: 2025-03-31</h5>
+    <h5>Latest Update: 2025-05-09</h5>
 </footer>
 
 <!-- Fragment includes -->
@@ -85,11 +85,13 @@
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 <div th:replace="fragments/modal :: confirmModal"></div>
 
+<script th:src="@{/script.js}" defer></script>
+
 <!-- JS: error handling -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
+            showError([[$,{errorMessage}]]);
         } else {
             setTimeout(tryShowError, 100);
         }

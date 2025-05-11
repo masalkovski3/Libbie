@@ -8,64 +8,8 @@
 </head>
 <body>
 <div class="layout">
-    <div class="menu-toggle" id="menuToggle">
-        <div class="hamburger">
-            <span></span><span></span><span></span>
-        </div>
-    </div>
-
-    <aside class="sidebar sidebar-hidden" id="sidebar">
-        <div class="container">
-            <header id="sidebar-header">
-                <img class="logo" src="images/pink-logo.jpeg" alt="Libie Logo">
-                <h2>Menu</h2>
-                <nav>
-                    <ul>
-                        <li class="button"><a href="/">Home</a></li>
-                        <li class="button"><a href="/search">Search</a></li>
-                        <li class="button"><a href="/profile">Profile</a></li>
-                        <li class="button"><a href="/about">About Libbie</a></li>
-                    </ul>
-                </nav>
-            </header>
-        </div>
-    </aside>
-
-    <main class="content">
-        <header class="main-header">
-            <div class="logo-container">
-                <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
-                <h1>Libbie</h1>
-            </div>
-            <div class="auth-buttons">
-                <th:block th:if="${session.currentMember != null}">
-                    <a href="/profile" class="button-header">Profile</a>
-                    <a href="/logout" class="button-header">Logout</a>
-                </th:block>
-                <th:block th:unless="${session.currentMember != null}">
-                    <a href="/logIn" class="button-header">Login</a>
-                    <a href="/signUp" class="button-header">Sign Up</a>
-                </th:block>
-            </div>
-        </header>
-
-        <nav class="genre-nav">
-            <ul class="genre-list">
-                <li class="genre-item"><a href="/search?query=Fantasy" class="genre-button">Fantasy</a></li>
-                <li class="genre-item"><a href="/search?query=Science+Fiction" class="genre-button">Science Fiction</a></li>
-                <li class="genre-item"><a href="/search?query=Mystery" class="genre-button">Mystery</a></li>
-                <li class="genre-item"><a href="/search?query=Romance" class="genre-button">Romance</a></li>
-                <li class="genre-item"><a href="/search?query=Drama" class="genre-button">Drama</a></li>
-                <li class="genre-item"><a href="/search?query=Period+drama" class="genre-button">Period drama</a></li>
-                <li class="genre-item"><a href="/search?query=Thriller" class="genre-button">Thriller</a></li>
-                <li class="genre-item"><a href="/search?query=Horror" class="genre-button">Horror</a></li>
-                <li class="genre-item"><a href="/search?query=Detective" class="genre-button">Detective</a></li>
-                <li class="genre-item"><a href="/search?query=Biography" class="genre-button">Biography</a></li>
-                <li class="genre-item"><a href="/search?query=History" class="genre-button">History</a></li>
-                <li class="genre-item"><a href="/search?query=Self-Help" class="genre-button">Self-Help</a></li>
-                <li class="genre-item"><a href="/search?query=Poetry" class="genre-button">Poetry</a></li>
-            </ul>
-        </nav>
+    <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+        <div th:fragment="pageContent">
 
         <div class="page-content">
             <h1 id="h1">Signup</h1>
@@ -107,11 +51,13 @@
                 <h5>Last Update: 2025-04-03</h5>
             </footer>
         </div>
-    </main>
+        </div>
+    </div>
+
 </div>
 
 <!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" defer></script>
+<script th:src="@{/script.js}" src="/script.js" defer></script>
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
@@ -122,7 +68,7 @@
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
+            showError([[$,{errorMessage}]]);
         } else {
             // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);

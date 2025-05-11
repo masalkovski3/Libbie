@@ -6,6 +6,7 @@
     <title>About Libbie - Ditt personliga digitala bibliotek</title>
     <link href="/style3.css" rel="stylesheet" type="text/css">
 </head>
+
 <body>
 <div class="layout">
     <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
@@ -66,11 +67,11 @@
                 <h5>Latest Update: 2025-05-07</h5>
             </footer>
         </div>
-    </main>
+</div>
 </div>
 
 <!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" defer></script>
+<script th:src="@{/script.js}" src="/script.js" defer></script>
 
 <!--fragment för felmeddelande-->
 <div th:replace="fragments/modal :: errorModal"></div>
@@ -80,7 +81,7 @@
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
+            showError([[$,{errorMessage}]]);
         } else {
             // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);
