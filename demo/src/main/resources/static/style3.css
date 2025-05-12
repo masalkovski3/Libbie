@@ -297,7 +297,7 @@ hr {
 
 
 .genre-nav {
-    background-color: #e9f1f5;
+    background-color: #e8edf3;
     width: 100%;
     padding: 10px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -317,7 +317,7 @@ hr {
     flex-shrink: 0;
 }
 .genre-button {
-    background-color: #eccee6;
+    background-color: #f3c1d6;
     color: #192640;
     border: none;
     border-radius: 15px;
@@ -331,7 +331,7 @@ hr {
 }
 
 .genre-button:hover {
-    background-color: #d9b5d2;
+    background-color: #e09ebd;
     transform: translateY(-2px);
     text-decoration: none; /* Behåll ingen understrykning även vid hover */
 }
@@ -1447,6 +1447,131 @@ input[type="range"]:focus::-webkit-slider-thumb {
     margin-top: 1rem;
 }
 
+/* STYLE FÖR KRAV FÖR LÖSENORD VID SIGNUP */
+/* ====== KOMPLETT CSS FÖR LÖSENORDS-TOOLTIP ====== */
+/* Lägg till denna kod i style3.css */
+
+/* Container för lösenordsfält med frågetecken */
+.password-field-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Se till att alla input-fält har samma bredd */
+.wrapper form input {
+    flex: 1;
+}
+
+/* Container för frågetecken och tooltip */
+.password-help-container {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Frågetecken-ikonen */
+.password-help-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #8EACBF;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 18px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: help;
+    transition: background-color 0.3s;
+}
+
+.password-help-icon:hover {
+    background-color: #6B8FA8;
+}
+
+/* Tooltip-rutan */
+.password-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 30px;
+    right: -50px;
+    width: 250px;
+    padding: 12px;
+    background-color: #dee6ec;
+    border: 1px solid #afc4d2;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Visa tooltip vid hovring */
+.password-help-container:hover .password-tooltip {
+    display: block;
+}
+
+/* Stilar för innehållet i tooltip */
+.password-tooltip strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #192640;
+}
+
+.password-tooltip ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.password-tooltip li {
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.password-tooltip li::before {
+    content: "•";
+    color: #8EACBF;
+    font-weight: bold;
+    position: absolute;
+    left: 5px;
+}
+
+/* Pil som pekar från tooltip till frågetecken */
+.password-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 50px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #dee6ec transparent transparent transparent;
+}
+
+/* Kantlinje runt pilen för bättre synlighet */
+.password-tooltip::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 50px;
+    border-width: 9px;
+    border-style: solid;
+    border-color: #afc4d2 transparent transparent transparent;
+    z-index: -1;
+}
+
+/* Specifik fix för lösenordsfältets höjd, var för liten annars */
+#password-input {
+    height: 34px !important;
+    padding: 1px 2px !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 13.3333px !important;  /* Matchar webbläsarens standard för lösenordsfält */
+    box-sizing: content-box !important;
+}
 
 
 
