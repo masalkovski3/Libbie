@@ -65,7 +65,7 @@ public class LoginController {
      * @return a redirect to the profile page if successful, or back to the login page if not
      * @throws SQLException if a database access error occurs during authentication
      *
-     * @author Amelie Music, Emmi Masalkovski
+     * @author Amelie Music, Emmi Masalkovski, Linn Otendal
      */
     @PostMapping("/logIn")
     public String handleLogin(@RequestParam String email,
@@ -79,7 +79,7 @@ public class LoginController {
                 model.addAttribute("errorMessage", "Please enter a valid email address");
                 model.addAttribute("showError", true);
                 model.addAttribute("email", email);
-                return "logIn"; //Returnerar till loginsidan med error
+                return "logIn";
             }
 
             //Försök autentisera
@@ -88,8 +88,12 @@ public class LoginController {
             if(optionalMember.isPresent()){
                 //Om det lyckas
                 session.setAttribute("currentMember", optionalMember.get());
-                redirectAttributes.addFlashAttribute("loginSuccess", "You have successfully logged in!");
-                return "redirect:/profile"; //går till profilsidan
+
+                //ha kvar bekräftelsemeddelande för login?
+                redirectAttributes.addFlashAttribute("errorMessage", "You have successfully logged in!"); //ej error men använder samma metod
+                redirectAttributes.addFlashAttribute("showError", true);
+
+                return "redirect:/profile";
             } else {
                 //Om det inte lyckas
                 //Kolla först om email existerar
@@ -115,7 +119,15 @@ public class LoginController {
         }
     }
 
-    //Enkel email-valideringsmetod
+    /**
+     * Validates whether the provided email address is in a valid format.
+     *
+     * An email is considered valid if it matches the regular expression pattern,
+     * which checks for the general structure of a typical email address.
+     *
+     * @param email the email address to validate
+     * @return {@code true} if the email is valid, {@code false} otherwise
+     */
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email != null && email.matches(emailRegex);
