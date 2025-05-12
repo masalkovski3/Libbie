@@ -3,6 +3,7 @@ package com.openlibrary.demo.controller;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Controller responsible for handling user logout.
@@ -25,9 +26,13 @@ public class LogoutController {
      * @return a redirect to the login page with logout indicator
      */
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         session.invalidate();
-        return "redirect:/logIn?logout=true";
+
+        redirectAttributes.addFlashAttribute("errorMessage", "You have been successfully logged out.");
+        redirectAttributes.addFlashAttribute("showError", true);
+
+        return "redirect:/logIn";
     }
 
 }

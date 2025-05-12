@@ -98,11 +98,13 @@ public class SignupController {
     }
 
     /**
-     * Validates whether the given email address is in a correct format.
-     * Note: This method is duplicated in {@code LoginController} and could be refactored into a shared utility class.
+     * Validates whether the provided email address is in a valid format.
+     *
+     * An email is considered valid if it matches the regular expression pattern,
+     * which checks for the general structure of a typical email address.
      *
      * @param email the email address to validate
-     * @return true if the email format is valid; false otherwise
+     * @return {@code true} if the email is valid, {@code false} otherwise
      */
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
