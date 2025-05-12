@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import com.openlibrary.demo.DAO.MemberDAO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Controller responsible for handling user sign-up related requests.
@@ -53,7 +54,8 @@ public class SignupController {
                               @RequestParam String password,
                               @RequestParam("repeat-password") String repeatPassword,
                                Model model,
-                               HttpSession session) {
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
         System.out.println("Sign-up: " + firstname + "/" + username + "/" + password + "/" + repeatPassword);
 
         try {
@@ -87,6 +89,9 @@ public class SignupController {
             var memberOpt = memberDAO.authenticate(username, password);
             if (memberOpt.isPresent()) {
                 session.setAttribute("currentMember", memberOpt.get());
+
+                redirectAttributes.addFlashAttribute("errorMessage", "Welcome to Libbie! Your account has been successfully created.");
+                redirectAttributes.addFlashAttribute("showError", true);
             }
           
             return "redirect:/profile";
