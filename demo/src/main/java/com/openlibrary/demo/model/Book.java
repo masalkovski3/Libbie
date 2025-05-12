@@ -12,6 +12,7 @@ public class Book {
     private String workId;
     private String coverUrl;
     private int coverId;
+    private double reviewScore;
 
     /**
      * Default constructor.
@@ -48,6 +49,14 @@ public class Book {
 
     public Book(String title, String author, String workId, String coverUrl) {
         this(title, author, workId, coverUrl, 0); // 0 som default för coverId tills det är löst
+    }
+
+    public Book(String openLibraryId, String title, String author, String coverUrl, double reviewScore) {
+        this.coverUrl = coverUrl;
+        this.workId = openLibraryId;
+        this.title = title;
+        this.author = author;
+        this.reviewScore = reviewScore;
     }
 
     /**
@@ -121,6 +130,14 @@ public class Book {
      */
     public void setWorkId(String workId) {
         this.workId = workId;
+    }
+
+    /**
+     * Returns the review score of the book.
+     * @return The book's score based on reviews.
+     */
+    public double getReviewScore() {
+        return reviewScore;
     }
 
 }

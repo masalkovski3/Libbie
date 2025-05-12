@@ -12,17 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AppController {
 
     /**
-     * Hanterar GET-förfrågningar till rotadressen ("/").
-     *
-     * @return namnet på HTML-vyn för startsidan.
-     * @author Delaram Azad
-     */
-    @GetMapping("/")
-    public String home() {
-        return "home";
-    }
-
-    /**
      * Hanterar GET-förfrågningar till "/about".
      *
      * @return namnet på HTML-vyn för om-sidan.

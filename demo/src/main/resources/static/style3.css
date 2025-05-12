@@ -807,15 +807,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
     -webkit-box-orient: vertical;
 }
 
-/* Bokhylla-image */
-.bookshelf-image {
-    width: 100%;
-    height: 25px;
-    background-image: url('/images/shelf.png');
-    background-repeat: repeat-x;
-    background-size: contain;
-}
-
 /* Scrollknappar */
 .scroll-button {
     position: absolute;
@@ -1573,5 +1564,122 @@ input[type="range"]:focus::-webkit-slider-thumb {
     box-sizing: content-box !important;
 }
 
+.book-carousel .carousel-item {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    padding: 10px; /* Avstånd mellan varje bok */
+}
 
+.book-item-wrapper {
+    border: 1px solid #ddd; /* Kant runt hela bokinnehållet */
+    border-radius: 10px; /* Rundade hörn */
+    padding: 15px; /* Utrymme runt omslaget och texten */
+    background-color: #c3d3e6; /* Bakgrundsfärg för varje bokruta */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lätt skugga för djup */
+    display: flex;
+    flex-direction: column; /* För att hålla bild och text vertikalt */
+    align-items: center; /* Centrerar innehållet */
+    max-width: 200px; /* Maxbredd på bokrutan */
+    margin: 0 auto; /* Centrerar elementet horisontellt */
+}
 
+.book-carousel .book-cover {
+    width: 150px; /* Minska bildstorlek */
+    height: 225px; /* Minska bildhöjd */
+    object-fit: cover;
+    margin-bottom: 10px; /* Avstånd mellan bild och text */
+}
+
+.book-carousel .carousel-item h3 {
+    margin: 5px 0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    white-space: nowrap; /* Förhindrar att titeln bryts till nästa rad */
+    overflow: hidden; /* Döljer text som överskrider boxen */
+    text-overflow: ellipsis; /* Lägger till "..." om texten är för lång */
+    max-width: 100%; /* Se till att texten inte går utanför boxen */
+}
+
+.book-carousel .carousel-item p {
+    margin: 5px 0;
+    text-align: center;
+}
+
+.home-headings{
+    padding-left: 30px;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.slick-prev, .slick-next {
+    background-color: #0d1f43;
+    color: white;
+    border-radius: 50%;
+    padding: 10px;
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    display: block;
+    visibility: visible;
+}
+
+.slick-prev {
+    left: 10px;
+}
+
+.slick-next {
+    right: 10px;
+}
+
+@media (max-width: 768px) {
+    .slick-prev, .slick-next {
+        font-size: 16px;
+        padding: 8px;
+    }
+}
+
+.slick-prev:hover, .slick-next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.slick-prev, .slick-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999; /* Se till att de ligger ovanpå andra element */
+    display: block;
+    visibility: visible;
+}
+
+.slick-prev {
+    left: 10px;
+}
+
+.slick-next {
+    right: 10px;
+}
+
+.slick-prev, .slick-next {
+    display: block;
+    visibility: visible;
+}
+
+.slick-prev {
+    left: 10px;
+}
+
+.slick-next {
+    right: 10px;
+}
+
+@media (min-width: 768px) {
+    .slick-prev, .slick-next {
+        font-size: 24px;
+        padding: 15px;
+    }
+}

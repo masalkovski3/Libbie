@@ -1,5 +1,6 @@
 package com.openlibrary.demo.DAO;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.openlibrary.demo.controller.DatabaseConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -235,12 +236,13 @@ public class BookshelfDAO {
                     }
 
                     // Extrahera omslagsbild
-                    String coverUrl = "";
+                    Integer coverId = null;
                     JsonNode covers = root.path("covers");
                     if (covers.isArray() && covers.size() > 0) {
-                        int coverId = covers.get(0).asInt();
-                        coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
+                        coverId = covers.get(0).asInt();
                     }
+                    String coverUrl = getCoverUrl(coverId, cleanId, restTemplate, mapper);
+
 
                     // Skapa SQL för att lägga till boken i databasen
                     String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description, cover_url) VALUES (?, ?, ?, ?, ?, ?)";
@@ -439,5 +441,29 @@ public class BookshelfDAO {
     public List<Map<String, Object>> findPublicByMemberId(Long memberId) throws SQLException {
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
+    }
+
+    private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        String coverUrl = "";
+        if (coverId != null){
+            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+        }
+        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
+        String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+        JsonNode editionRoot = mapper.readTree(editionResponse);
+        JsonNode editionDocs = editionRoot.path("entries");
+
+        if (editionDocs.isArray()) {
+            for (JsonNode edition : editionDocs) {
+                JsonNode covers = edition.path("covers");
+                if (covers.isArray() && covers.size() > 0) {
+                    coverId = covers.get(0).asInt();
+                    coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+                    System.out.println("Cover found: " + coverUrl);
+                    break;
+                }
+            }
+        }
+        return coverUrl;
     }
 }

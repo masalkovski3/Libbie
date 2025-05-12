@@ -128,7 +128,6 @@ public class SearchController {
 
             String coverUrl = getCoverUrl(doc.path("cover_i").asInt(), cleanId, restTemplate, mapper);
             books.add(new Book(title, author, workID, coverUrl, coverId));
-            System.out.println(coverUrl);
         }
 
         // Visa felmeddelande om inga böcker hittades

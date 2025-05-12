@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Libbie - Your personal library</title>
     <link href="style3.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 </head>
 <body>
 <div class="layout">
@@ -81,8 +83,37 @@
             </ul>
         </nav>
 
+        <!-- Display top-rated books -->
         <div class="page-content">
-            <h1 id="h1">Welcome to your digital library</h1>
+            <p class="home-headings">Top Rated Books</p>
+
+            <!-- Slick Carousel for top-rated books -->
+            <div th:if="${books != null}" class="book-carousel">
+                <div class="carousel">
+                    <div th:each="book : ${books}" class="carousel-item">
+                        <div class="book-item-wrapper">
+                            <img th:src="${book.coverUrl}"
+                                 onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                 alt="Book cover"
+                                 class="book-cover">
+                            <h3 th:text="${book.title}"></h3>
+                            <p th:text="${book.author}"></p>
+                            <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- If no books found -->
+            <div th:if="${books == null or books.isEmpty()}">
+                <p>No books found.</p>
+            </div>
+        </div>
+
+
+        <div class="page-content">
+            <p class="home-headings">Welcome to your digital library</p>
 
             <div class="img-flex">
                 <div class="img-container">
@@ -117,21 +148,8 @@
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
 
-<script th:if="${showError}" th:inline="javascript">
-    function tryShowError() {
-        if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
-        } else {
-            // Om vi fortfarande inte har showError, försök igen om 100ms
-            setTimeout(tryShowError, 100);
-        }
-    }
-
-    window.addEventListener('load', function() {
-        // Starta försöken att visa felmeddelandet
-        tryShowError();
-    });
-</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 </body>
 </html>

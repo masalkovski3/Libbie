@@ -188,3 +188,65 @@ function setupSessionWarning(timeoutMinutes = 10, warningOffsetMinutes = 1) {
 document.addEventListener("DOMContentLoaded", function () {
     setupSessionWarning(10, 1);
 });
+
+$(document).ready(function(){
+    $('.carousel').slick({
+        infinite: true,       // Oändlig scroll
+        slidesToShow: 3,      // Visa tre böcker åt gången
+        slidesToScroll: 1,    // Rulla en bok åt gången
+        prevArrow: '<button type="button" class="slick-prev">←</button>',  // Föregående pil
+        nextArrow: '<button type="button" class="slick-next">→</button>',  // Nästa pil
+        responsive: [
+            {
+                breakpoint: 768,   // På skärmar mindre än 768px (mobil)
+                settings: {
+                    slidesToShow: 1,  // Visa en bok åt gången
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    });
+});
+$(document).ready(function () {
+    $('.book-slider').slick({
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        arrows: true,
+        dots: true,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2,
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                }
+            }
+        ]
+    });
+});
+
+
+function tryShowError() {
+    if (typeof showError === 'function') {
+        showError([[$,{errorMessage}]]);
+    } else {
+        // Om vi fortfarande inte har showError, försök igen om 100ms
+        setTimeout(tryShowError, 100);
+    }
+}
+
+window.addEventListener('load', function() {
+    // Starta försöken att visa felmeddelandet
+    tryShowError();
+});
