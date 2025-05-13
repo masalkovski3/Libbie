@@ -35,12 +35,18 @@ public class BookApiController {
      * @throws JsonProcessingException if there is an error while parsing the OpenLibrary API response
      */
     @GetMapping("/search")
-    public List<Book> searchBooks(@RequestParam String query) throws JsonProcessingException {
+    public List<Book> searchBooks(@RequestParam String query,
+                                  @RequestParam(required = false) String genre) throws JsonProcessingException {
         if(query == null || query.trim().isEmpty()){
             return new ArrayList<>();
         }
 
         RestTemplate restTemplate = new RestTemplate();
+
+        if (genre != null && !genre.trim().isEmpty()){
+            query+= " " + genre;
+        }
+
         String url = "https://openlibrary.org/search.json?q=" + query;
         String response = restTemplate.getForObject(url, String.class);
 

@@ -36,63 +36,50 @@ public class SearchController {
     @GetMapping("/search")
     public String search(
             @RequestParam(required = false) String query,
+            @RequestParam(required = false) String genre,
             @RequestParam(required = false, defaultValue = "30") int limit,
             @RequestParam(required = false, defaultValue = "relevance") String sort,
             Model model,
             HttpSession session) {
 
-        // Om sökning är tom, kolla om vi har sparat en sökning i sessionen
-        if(query == null || query.trim().isEmpty()){
-            // Kolla om vi har en sparad sökning och använd den
-            String savedQuery = (String) session.getAttribute("lastSearchQuery");
-            String savedSort = (String) session.getAttribute("lastSearchSort");
+        RestTemplate restTemplate = new RestTemplate();
+        String url;
 
-            if(savedQuery != null && !savedQuery.isEmpty()) {
-                return "redirect:/search?query=" + savedQuery +
-                        (savedSort != null ? "&sort=" + savedSort : "");
-            }
-
+        // Om genren finns, hämta topplistan via OpenLibrary Subjects API
+        if (genre != null && !genre.trim().isEmpty()) {
+            url = "https://openlibrary.org/subjects/" + genre.toLowerCase().replace(" ", "_") + ".json?limit=" + limit;
+        }
+        // Annars, använd vanlig sökning via query
+        else if (query != null && !query.trim().isEmpty()) {
+            url = "https://openlibrary.org/search.json?q=" + query + "&limit=" + limit;
+        }
+        // Om varken query eller genre anges, returnera tomma resultat
+        else {
             model.addAttribute("books", new ArrayList<>());
-            model.addAttribute("query", "");
             return "search";
         }
 
-        // Spara denna sökning i session för senare användning
-        session.setAttribute("lastSearchQuery", query);
-        session.setAttribute("lastSearchSort", sort);
-
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
-            // Bygg URL för API-anrop
-            StringBuilder urlBuilder = createUrl(query, sort, limit);
-
-            // Skapa URL och gör API-anrop
-            String url = urlBuilder.toString();
             String response = restTemplate.getForObject(url, String.class);
-
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response);
-            JsonNode docs = root.path("docs");
+            JsonNode docs = root.has("works") ? root.path("works") : root.path("docs");
 
             List<Book> books = createBookObject(limit, docs, model, restTemplate, mapper);
-
             model.addAttribute("books", books);
             model.addAttribute("query", query);
+            model.addAttribute("genre", genre);
             model.addAttribute("selectedSort", sort);
 
             return "search";
 
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("errorMessage", "An error occurred during search. Please try again later.");
-            model.addAttribute("showError", true);
+            model.addAttribute("errorMessage", "An error occurred during search.");
             model.addAttribute("books", new ArrayList<>());
-            model.addAttribute("query", query);
-            model.addAttribute("selectedSort", sort);
             return "search";
         }
-    }
+}
 
     /**
      * Converts JSON response data from OpenLibrary into a list of Book objects.
@@ -187,7 +174,7 @@ public class SearchController {
                 if (covers.isArray() && covers.size() > 0) {
                     coverId = covers.get(0).asInt();
                     coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
-                    System.out.println("Cover found: " + coverUrl);
+                    //System.out.println("Cover found: " + coverUrl);
                     break;
                 }
             }
