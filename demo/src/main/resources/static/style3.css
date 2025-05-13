@@ -286,7 +286,7 @@ hr {
 .button-header:hover {
     background-color: #d9b5d2;
     transform: translateY(-2px);
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .auth-buttons {
