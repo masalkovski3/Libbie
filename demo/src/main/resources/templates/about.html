@@ -81,7 +81,7 @@
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
         if (typeof showError === 'function') {
-            showError([[$,{errorMessage}]]);
+            showError([[${errorMessage}]]);
         } else {
             // Om vi fortfarande inte har showError, försök igen om 100ms
             setTimeout(tryShowError, 100);
