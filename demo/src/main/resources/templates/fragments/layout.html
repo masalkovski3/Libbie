@@ -37,10 +37,11 @@
 
     <!-- Main Header -->
     <header class="main-header">
-        <div class="logo-container">
+        <a href="/" class="logo-container">
             <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
             <h1>Libbie</h1>
-        </div>
+        </a>
+
         <div class="auth-buttons">
             <th:block th:if="${session.currentMember != null}">
                 <a href="/profile" class="button-header">Profile</a>
