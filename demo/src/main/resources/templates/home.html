@@ -13,41 +13,39 @@
 <div class="layout">
     <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
         <div th:fragment="pageContent">
-        <div class="page-content">
-            <p class="home-headings">Top Rated Books</p>
+            <div class="page-content">
+                <p class="home-headings">Welcome to your digital library</p>
 
-            <!-- Slick Carousel for top-rated books -->
-            <div th:if="${books != null}" class="book-carousel">
-                <div class="carousel">
-                    <div th:each="book : ${books}" class="carousel-item">
-                        <div class="book-item-wrapper">
-                            <img th:src="${book.coverUrl}"
-                                 onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
-                                 alt="Book cover"
-                                 class="book-cover">
-                            <h3 th:text="${book.title}"></h3>
-                            <p th:text="${book.author}"></p>
-                            <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                <div class="img-flex">
+                    <div class="img-container">
+                        <img src="/images/bookshelf.jpg" alt="Bookshelf">
+                        <p class="caption">Create your own personal bookshelves</p>
+                    </div>
+                </div>
+
+                <p class="home-headings">Top Rated Books</p>
+
+                <!-- Slick Carousel for top-rated books -->
+                <div th:if="${books != null}" class="book-carousel">
+                    <div class="carousel">
+                        <div th:each="book : ${books}" class="carousel-item">
+                            <div class="book-item-wrapper">
+                                <img th:src="${book.coverUrl}"
+                                     onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                     alt="Book cover"
+                                     class="book-cover">
+                                <h3 th:text="${book.title}"></h3>
+                                <p th:text="${book.author}"></p>
+                                <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
 
-            <!-- If no books found -->
-            <div th:if="${books == null or books.isEmpty()}">
-                <p>No books found.</p>
-            </div>
-        </div>
-
-
-        <div class="page-content">
-            <p class="home-headings">Welcome to your digital library</p>
-
-            <div class="img-flex">
-                <div class="img-container">
-                    <img src="/images/bookshelf.jpg" alt="Bookshelf">
-                    <p class="caption">Create your own personal bookshelves</p>
+                <!-- If no books found -->
+                <div th:if="${books == null or books.isEmpty()}">
+                    <p>No books found.</p>
                 </div>
             </div>
 
