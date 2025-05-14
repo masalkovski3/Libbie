@@ -23,6 +23,7 @@
                     </div>
                 </div>
 
+                <!-- Top Rated Books -->
                 <p class="home-headings">Top Rated Books</p>
 
                 <!-- Slick Carousel for top-rated books -->
@@ -37,6 +38,43 @@
                                 <h3 th:text="${book.title}"></h3>
                                 <p th:text="${book.author}"></p>
                                 <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+
+                                <!-- Gör hela bokomslaget och texten klickbar för att gå till boksidan -->
+                                <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}"
+                                   class="stretched-link">
+                                    <!-- Gör om knappen så att den är direkt kopplad till detaljerna -->
+                                    <button id="top-rated-books-details" class="btn btn-outline-primary">
+                                        View Details
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <p class="page-heading"> Recommended for you </p>
+
+                <div th:if="${books != null}" class="book-carousel">
+                    <div class="carousel">
+                        <div th:each="book : ${books}" class="carousel-item">
+                            <div class="book-item-wrapper">
+                                <img th:src="${book.coverUrl}"
+                                     onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                     alt="Book cover"
+                                     class="book-cover">
+                                <h3 th:text="${book.title}"></h3>
+                                <p th:text="${book.author}"></p>
+                                <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+
+                                <!-- Gör hela bokomslaget och texten klickbar för att gå till boksidan -->
+                                <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}"
+                                   class="stretched-link">
+                                    <!-- Gör om knappen så att den är direkt kopplad till detaljerna -->
+                                    <button class="btn btn-outline-primary">
+                                        View Details
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </div>

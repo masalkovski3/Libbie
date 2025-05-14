@@ -585,8 +585,8 @@ hr {
     background: none;
     border: none;
     font-size: 24px;
+    color: #0d1f43;
     cursor: pointer;
-    color: #333;
     padding: 10px;
     transition: 0.5s;
     z-index: 10;
@@ -594,7 +594,7 @@ hr {
 
 .scroll-button:hover {
     background: none;
-    color: #4f6082;
+    color: #0d1f43;
     text-shadow: 1px 1px 10px black;
     transition: 0.5s;
 }
@@ -778,6 +778,10 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .bookshelf-title {
     font-size: 1.5rem;
     margin: 0;
+    font-family: Georgia;
+    color: #0d1f43;
+    padding-left: 30px;
+    font-weight: bold;
 }
 
 /* Böcker och scrollning */
@@ -833,8 +837,8 @@ input[type="range"]:focus::-webkit-slider-thumb {
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid #ddd;
+    background: none;
+    border: none;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -865,13 +869,28 @@ input[type="range"]:focus::-webkit-slider-thumb {
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #4CAF50;
+    background-color: #1f3366;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
     margin-bottom: 20px;
+    transition: background-color ease 0.3s;
+}
+
+.add-shelf-button:hover {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #0d1f43;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: background-color ease 0.3s;
 }
 
 .add-shelf-button svg {
@@ -1591,16 +1610,17 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 .book-item-wrapper {
-    border: 1px solid #ddd; /* Kant runt hela bokinnehållet */
-    border-radius: 10px; /* Rundade hörn */
-    padding: 15px; /* Utrymme runt omslaget och texten */
-    background-color: #c3d3e6; /* Bakgrundsfärg för varje bokruta */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lätt skugga för djup */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #c3d3e6;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
     display: flex;
-    flex-direction: column; /* För att hålla bild och text vertikalt */
-    align-items: center; /* Centrerar innehållet */
-    max-width: 200px; /* Maxbredd på bokrutan */
-    margin: 0 auto; /* Centrerar elementet horisontellt */
+    flex-direction: column;
+    align-items: center;
+    max-width: 200px;
+    height: 400px;
+    margin: 0 auto;
 }
 
 .book-carousel .book-cover {
@@ -1708,4 +1728,44 @@ main {
     width: 100%;
     max-width: clamp(320px, 90%, 1400px);    margin: 0 auto;
     padding: 1rem;
+}
+
+#top-rated-books-details {
+    background-color: #4f6082;
+    color: white;              /* vit text */
+    border: none;              /* ingen kantlinje */
+    padding: 10px 20px;        /* inre marginal */
+    font-size: 15px;           /* textstorlek */
+    border-radius: 5px;        /* rundade hörn */
+    cursor: pointer;           /* muspekare som knapp */
+    transition: background-color 0.3s ease;
+    height: 40px;
+    width: 120px;
+    text-align: center;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+ }
+
+#top-rated-books-details:hover {
+    background-color: #1f3366;
+}
+
+.page-heading {
+    font-family: Georgia;
+    color: #0d1f43;
+    padding-left: 70px;
+    padding-top: 30px;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.page-heading2 {
+    font-family: Georgia;
+    color: #0d1f43;
+    padding-left: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    padding-bottom: 30px;
 }

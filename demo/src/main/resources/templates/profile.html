@@ -13,8 +13,10 @@
 <div class="layout">
     <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
         <div th:fragment="pageContent">
+            <p class="page-heading">Your Profile</p>
 
-        <div class="page-content">
+
+            <div class="page-content">
             <div th:if="${loginSuccess}" class="alert alert-success alert-dismissible fade show mt-3 mx-auto text-center" style="max-width: 500px;" role="alert">
                 <span th:text="${loginSuccess}">Success message</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -50,7 +52,7 @@
                 </div>
             </div>
 
-            <h2 id="h2">My Bookshelves</h2>
+            <p class="page-heading2">My Bookshelves</p>
 
             <!-- Gammal metod för felmeddelanden, avkommentera om tidigare felmeddelanden behövs! -->
             <!--
