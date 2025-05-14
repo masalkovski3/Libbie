@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="layout">
-    <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+    <div th:replace="~{fragments/layout :: libbieLayout(~{::pageContent})}">
         <div th:fragment="pageContent">
         <div class="page-content">
             <h1 id="h1">Search for Books</h1>
@@ -71,7 +71,8 @@
             <!-- Flytta upp resultatet direkt efter formuläret -->
             <!-- Ny del med Bootstrap, filter och bokomslag -->
             <div th:if="${books}" class="container mb-5">
-                <h2 class="text-center mb-4">Results for "<span th:text="${query}"></span>"</h2>
+                <h2 class="text-center mb-4">
+                    Results for "<span th:text="${query != null and !query.isEmpty() ? query : genre}"></span></h2>
 
                 <!-- Show number of results and active filters if any -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
