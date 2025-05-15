@@ -7,21 +7,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-//import java.lang.reflect.Member;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.*;
 import java.util.*;
 
+/**
+ * Data Access Object for handling member-related operations in the database.
+ */
+
 @Component
 public class MemberDAO {
 
-    private DatabaseConnection sqlHandler;
+    private DatabaseConnection connection;
     private JdbcTemplate jdbcTemplate;
 
     public MemberDAO(DatabaseConnection sqlHandler, JdbcTemplate jdbcTemplate) {
-        this.sqlHandler = sqlHandler;
+        this.connection = sqlHandler;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -37,7 +40,14 @@ public class MemberDAO {
     };
 
     /**
-     * Sparar en ny medlem i databasen
+     * Saves a new member to the database if the email is unique and password is strong.
+     *
+     * @param email        Member's email address.
+     * @param displayName  Member's display name.
+     * @param password     Member's plain-text password.
+     * @return The generated member ID.
+     * @throws SQLException If a database error occurs.
+     * @throws IllegalArgumentException If the email already exists or the password is too weak.
      */
     public Long saveMember(String email, String displayName, String password) throws SQLException {
         String sql = "INSERT INTO member (email, display_name, password_hash, bio) VALUES (?, ?, ?, ?) RETURNING member_id";
@@ -54,7 +64,7 @@ public class MemberDAO {
 
         String defaultBio = this.bios[(int) (Math.random() * bios.length)];
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
             preparedStatement.setString(2, displayName);
@@ -66,7 +76,7 @@ public class MemberDAO {
                 System.out.println("Member created " + resultSet.getString("member_id") );
                 return resultSet.getLong(1);
             } else {
-                throw new SQLException("Kunde inte skapa medlem, ingen ID returnerades");
+                throw new SQLException("Could not create a member, not ID was returned.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,12 +85,18 @@ public class MemberDAO {
     }
 
     /**
-     * Uppdaterar en existerande medlem
+     * Updates the display name and password hash for an existing member.
+     *
+     * @param memberId     The ID of the member to update.
+     * @param displayName  New display name.
+     * @param passwordHash New hashed password.
+     * @return True if the update was successful.
+     * @throws SQLException If a database error occurs.
      */
     public boolean updateMember(Long memberId, String displayName, String passwordHash) throws SQLException {
         String sql = "UPDATE member SET display_name = ?, password_hash = ? WHERE member_id = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, displayName);
             preparedStatement.setString(2, passwordHash);
@@ -92,12 +108,16 @@ public class MemberDAO {
     }
 
     /**
-     * Hittar en medlem baserat på ID
+     * Finds a member by their ID.
+     *
+     * @param memberId The ID of the member.
+     * @return Optional containing member data as a map if found.
+     * @throws SQLException If a database error occurs.
      */
     public Optional<Map<String, Object>> findById(Long memberId) throws SQLException {
         String sql = "SELECT member_id, email, display_name, created_at, bio, profile_image FROM member WHERE member_id = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
 
@@ -118,12 +138,16 @@ public class MemberDAO {
     }
 
     /**
-     * Hittar en medlem baserat på e-post
+     * Finds a member by their email.
+     *
+     * @param email Email address.
+     * @return Optional containing member data as a map if found.
+     * @throws SQLException If a database error occurs.
      */
     public Optional<Map<String, Object>> findByEmail(String email) throws SQLException {
         String sql = "SELECT member_id, email, display_name, password_hash, created_at, bio, profile_image FROM member WHERE email = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
@@ -145,12 +169,16 @@ public class MemberDAO {
     }
 
     /**
-     * Kontrollerar om en medlem med en viss e-post redan finns
+     * Checks if a member exists with the given email.
+     *
+     * @param email Email address.
+     * @return True if a member exists.
+     * @throws SQLException If a database error occurs.
      */
     public boolean existsByEmail(String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM member WHERE email = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
@@ -163,6 +191,14 @@ public class MemberDAO {
         return false;
     }
 
+    /**
+     * Authenticates a member using their email and plain-text password.
+     *
+     * @param email         Email address.
+     * @param plainPassword Plain-text password.
+     * @return Optional containing authenticated Member if credentials are valid.
+     * @throws SQLException If a database error occurs.
+     */
 
     public Optional<Member> authenticate(String email, String plainPassword) throws SQLException {
         Optional<Map<String, Object>> optionalData = findByEmail(email);
@@ -187,10 +223,17 @@ public class MemberDAO {
         return Optional.empty(); // Lösenordet stämde inte
     }
 
+    /**
+     * Checks if a member exists by their display name (username).
+     *
+     * @param username Display name.
+     * @return True if the username exists.
+     * @throws SQLException If a database error occurs.
+     */
     public boolean existsByUsername(String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM member WHERE display_name = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, username.toLowerCase());
 
@@ -203,11 +246,19 @@ public class MemberDAO {
         return false;
     }
 
-
+    /**
+     * Verifies a password by comparing it directly to the stored hash.
+     * (NOTE: This method assumes the password is already hashed, which may be insecure.)
+     *
+     * @param email    Email address.
+     * @param password Password to verify.
+     * @return True if the password matches the stored hash.
+     * @throws SQLException If a database error occurs.
+     */
     public boolean verifyPasswordByEmail(String email, String password) throws SQLException {
         String sql = "SELECT password_hash FROM member WHERE email = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, email.toLowerCase());
 
@@ -227,6 +278,12 @@ public class MemberDAO {
         return false;
     }
 
+    /**
+     * Checks if a password meets strength requirements.
+     *
+     * @param password The password to evaluate.
+     * @return True if the password is strong.
+     */
     private boolean passwordIsStrong(String password) {
         if (password.length() < 12) {
             return false;
@@ -246,7 +303,12 @@ public class MemberDAO {
 
         return true;
     }
-
+    /**
+     * Updates a member's display name and bio.
+     * If bio is empty, a random default bio is assigned.
+     *
+     * @param member The member object containing updated info.
+     */
     public void updateProfileInfo(Member member) {
         String sql = "UPDATE member SET display_name = ?, bio = ?, updated_at = now() WHERE email = ?";
         String bio = member.getBio();
@@ -258,9 +320,16 @@ public class MemberDAO {
         jdbcTemplate.update(sql, member.getName(), member.getBio(), member.getUsername());
     }
 
+    /**
+     * Counts how many friends a member has.
+     *
+     * @param memberId ID of the member.
+     * @return Number of friends.
+     * @throws SQLException If a database error occurs.
+     */
     public int countFriends(Long memberId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM friendship WHERE member_1_id = ? OR member_2_id = ?";
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, memberId);
@@ -276,6 +345,12 @@ public class MemberDAO {
         }
     }
 
+    /**
+     * Updates the profile image path for a member.
+     *
+     * @param memberId The member's ID.
+     * @param filePath The new file path to the profile image.
+     */
     public void updateProfilePicture(Long memberId, String filePath) {
         String sql = "UPDATE member SET profile_image = ? WHERE member_id = ?";
         jdbcTemplate.update(sql, filePath, memberId);
