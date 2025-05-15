@@ -85,5 +85,28 @@ public class FriendshipDAO {
 
         return friendIds;
     }
+
+    /**
+     * Sends a friend request from one member to another by inserting a new record
+     * into the pending_friendship table with status set to 'pending'.
+     *
+     * @param requesterId the ID of the member sending the request
+     * @param receiverId the ID of the member receiving the request
+     * @throws SQLException if a database access error occurs or the insert fails
+     */
+    public void sendFriendRequest(int requesterId, int receiverId) throws SQLException {
+        String sql = """
+        INSERT INTO pending_friendship (requester_id, receiver_id, status, requested_at)
+        VALUES (?, ?, 'pending', NOW())
+    """;
+
+        try (Connection conn = connection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, requesterId);
+            stmt.setInt(2, receiverId);
+            stmt.executeUpdate();
+        }
+    }
+
 }
 

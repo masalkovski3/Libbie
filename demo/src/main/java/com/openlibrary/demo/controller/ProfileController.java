@@ -798,4 +798,52 @@ public class ProfileController {
         }
     }
 
+    /**
+     *
+     *
+     * @param query the search string
+     * @param session the current session
+     * @return a list of Member objects (as JSON)
+     */
+    @GetMapping("/searchMembers")
+    @ResponseBody
+    public ResponseEntity<?> searchMembers(String query, HttpSession session) {
+        System.out.println("✅ Received request with query: " + query);
+
+        System.out.println("🔍 [DEBUG] Incoming search-members request. Query = '" + query + "'");
+
+        Member currentUser = (Member) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            System.out.println("⚠️ [DEBUG] No user in session. Returning 401.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        System.out.println("👤 [DEBUG] User ID: " + currentUser.getId() + ", Display Name: " + currentUser.getName());
+
+
+        try {
+            List<Member> results = memberDAO.searchMembersByName(query, currentUser.getId());
+            System.out.println("✅ [DEBUG] DAO returned " + results.size() + " members");
+
+
+            List<Map<String, Object>> responseList = results.stream().map(member -> {
+                System.out.println("🧾 [DEBUG] Member: ID=" + member.getId() + ", Name=" + member.getName());
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", member.getId());
+                map.put("displayName", member.getName());
+                map.put("profileImage", member.getProfileImage());
+                return map;
+            }).toList();
+
+            return ResponseEntity.ok(responseList);
+        } catch (SQLException e) {
+            System.out.println("💥 [DEBUG] SQLException: " + e.getMessage());
+
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error");
+        }
+    }
+
+
 }

@@ -250,3 +250,86 @@ window.addEventListener('load', function() {
     // Starta försöken att visa felmeddelandet
     tryShowError();
 });
+
+
+function searchFriends() {
+    console.log("🔍 [JS DEBUG] searchFriends() called");
+
+    const query = document.getElementById('friendSearch').value;
+    const resultsDiv = document.getElementById('friend-search-results');
+    resultsDiv.innerHTML = ""; // Clear previous results
+
+    if (!query.trim()) {
+        console.log("⚠️ [JS DEBUG] No input provided.");
+
+        resultsDiv.innerHTML = "<p>Please enter a search term.</p>";
+        return;
+    }
+    const url = `/profile/searchMembers?query=${encodeURIComponent(query)}`;
+    console.log("🌐 [JS DEBUG] Sending fetch to:", url);
+
+
+    fetch(`/profile/search-members?query=${encodeURIComponent(query)}`)
+        .then(response => {
+            console.log("📡 [JS DEBUG] Fetch response status:", response.status);
+
+            if (!response.ok) throw new Error("Failed to fetch results");
+            return response.json();
+        })
+        .then(data => {
+            console.log("📦 [JS DEBUG] Fetch returned data:", data);
+
+            if (data.length === 0) {
+                resultsDiv.innerHTML = "<p>No matching users found.</p>";
+                return;
+            }
+
+            data.forEach(user => {
+                const userCard = document.createElement("div");
+                userCard.className = "d-flex justify-content-between align-items-center border p-2 mb-2 rounded";
+
+                const image = document.createElement("img");
+                image.src = user.profileImage ? `/profileImages/${user.profileImage}` : "/images/profilepicture.webp";
+                image.alt = "Profile";
+                image.className = "rounded-circle me-2";
+                image.style.width = "40px";
+                image.style.height = "40px";
+
+                const nameSpan = document.createElement("span");
+                nameSpan.textContent = user.displayName;
+
+                const nameContainer = document.createElement("div");
+                nameContainer.className = "d-flex align-items-center";
+                nameContainer.appendChild(image);
+                nameContainer.appendChild(nameSpan);
+                userCard.appendChild(nameContainer);
+
+                const form = document.createElement("form");
+                form.method = "post";
+                form.action = "/friendship/request";
+
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "recipientId";
+                input.value = user.id;
+
+                const button = document.createElement("button");
+                button.type = "submit";
+                button.className = "btn btn-sm btn-success";
+                button.textContent = "Send Request";
+
+                form.appendChild(input);
+                form.appendChild(button);
+
+                userCard.appendChild(nameSpan);
+                userCard.appendChild(form);
+                resultsDiv.appendChild(userCard);
+            });
+        })
+        .catch(error => {
+            resultsDiv.innerHTML = "<p>Error while searching. Please try again.</p>";
+            console.error("❌ [JS DEBUG] Fetch failed:", error);
+            console.error(error);
+        });
+}
+

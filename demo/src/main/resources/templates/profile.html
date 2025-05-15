@@ -320,30 +320,124 @@
                 <h5 class="modal-title" id="addFriendModalLabel">Find New Friends</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form method="get" action="/friendship/search">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="query" placeholder="Search by display name" required>
-                        <button class="btn-rose" type="submit">Search</button>
-                    </div>
-                </form>
 
-                <div th:if="${searchResults != null}">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center"
-                            th:each="user : ${searchResults}">
-                            <span th:text="${user.displayName}">Display Name</span>
-                            <form th:action="@{/friendship/request}" method="post" class="mb-0">
-                                <input type="hidden" name="recipientId" th:value="${user.id}">
-                                <button type="submit" class="btn btn-sm btn-success">Send Request</button>
-                            </form>
-                        </li>
-                    </ul>
+            <div class="modal-body">
+                <!-- Sökfält och knapp -->
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="friendSearch" placeholder="Search by display name" />
+                    <button class="btn-rose" type="button" id="searchFriendButton">Search</button>
                 </div>
+
+                <!-- Här hamnar resultaten -->
+                <div id="friend-search-results"></div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    console.log("🧪 Script loaded");
+    function searchFriends() {
+        console.log("🔍 [JS DEBUG] searchFriends() called");
+
+        const query = document.getElementById('friendSearch').value;
+        const resultsDiv = document.getElementById('friend-search-results');
+        resultsDiv.innerHTML = "";
+
+        if (!query.trim()) {
+            console.log("⚠️ [JS DEBUG] No input provided.");
+            resultsDiv.innerHTML = "<p>Please enter a search term.</p>";
+            return;
+        }
+
+        const url = `/searchMembers?query=${encodeURIComponent(query)}`;
+        console.log("🌐 [JS DEBUG] Sending fetch to:", url);
+
+        fetch(url, {
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                console.log("📡 [JS DEBUG] Fetch response status:", response.status);
+                if (!response.ok) return response.text().then(text => {
+                    console.error("❌ [JS DEBUG] Fetch error body:", text);
+                    throw new Error("Failed to fetch");
+                });
+                return response.json();
+            })
+            .then(data => {
+                console.log("📦 [JS DEBUG] Fetch returned data:", data);
+                const resultsDiv = document.getElementById('friend-search-results');
+                resultsDiv.innerHTML = "";
+
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = "<p>No matching users found.</p>";
+                    return;
+                }
+
+                data.forEach(user => {
+                    const userCard = document.createElement("div");
+                    userCard.className = "d-flex justify-content-between align-items-center border p-2 mb-2 rounded";
+
+                    const image = document.createElement("img");
+                    image.src = user.profileImage ? `/profileImages/${user.profileImage}` : "/images/profilepicture.webp";
+                    image.alt = "Profile";
+                    image.className = "rounded-circle me-2";
+                    image.style.width = "40px";
+                    image.style.height = "40px";
+
+                    const nameSpan = document.createElement("span");
+                    nameSpan.textContent = user.displayName;
+
+                    const nameContainer = document.createElement("div");
+                    nameContainer.className = "d-flex align-items-center";
+                    nameContainer.appendChild(image);
+                    nameContainer.appendChild(nameSpan);
+                    userCard.appendChild(nameContainer);
+
+                    const form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "/friendship/request";
+
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "recipientId";
+                    input.value = user.id;
+
+                    const button = document.createElement("button");
+                    button.type = "submit";
+                    button.className = "btn btn-sm btn-success";
+                    button.textContent = "Send Request";
+
+                    form.appendChild(input);
+                    form.appendChild(button);
+
+                    userCard.appendChild(form);
+                    resultsDiv.appendChild(userCard);
+                });
+            })
+            .catch(error => {
+                const resultsDiv = document.getElementById('friend-search-results');
+                resultsDiv.innerHTML = "<p>Error while searching. Please try again.</p>";
+                console.error("❌ [JS DEBUG] Fetch failed:", error);
+            });
+    }
+
+    // Koppla när modalen öppnas
+    const friendModal = document.getElementById('addFriendModal');
+    if (friendModal) {
+        friendModal.addEventListener('shown.bs.modal', function () {
+            const btn = document.getElementById("searchFriendButton");
+            if (btn && !btn.dataset.bound) {
+                console.log("✅ [JS DEBUG] Binding search button inside modal");
+                btn.addEventListener("click", searchFriends);
+                btn.dataset.bound = "true"; // förhindrar dubbelbindning
+            }
+        });
+    } else {
+        console.warn("❌ [JS DEBUG] addFriendModal not found");
+    }
+</script>
+
 
 <!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
@@ -361,5 +455,7 @@
         tryShowError();
     });
 </script>
+
+
 </body>
 </html>

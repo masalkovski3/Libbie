@@ -356,4 +356,64 @@ public class MemberDAO {
         jdbcTemplate.update(sql, filePath, memberId);
     }
 
+    /**
+     * Searches for members whose display name contains the given query string,
+     * excluding the current user and users who are already friends with them.
+     *
+     * @param query the search string to match against display names
+     * @param currentMemberId the ID of the currently logged-in user
+     * @return a list of matching Member objects
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Member> searchMembersByName(String query, Long currentMemberId) throws SQLException {
+        List<Member> results = new ArrayList<>();
+        String sql = """
+        SELECT * FROM member 
+        WHERE LOWER(display_name) LIKE LOWER(?) 
+        AND member_id != ? 
+        AND member_id NOT IN (
+            SELECT CASE 
+                WHEN member_1_id = ? THEN member_2_id 
+                ELSE member_1_id 
+            END
+            FROM friendship
+            WHERE member_1_id = ? OR member_2_id = ?
+        )
+    """;
+
+        try (Connection conn = connection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + query + "%");
+            stmt.setLong(2, currentMemberId);
+            stmt.setLong(3, currentMemberId);
+            stmt.setLong(4, currentMemberId);
+            stmt.setLong(5, currentMemberId);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(mapToMember(rs)); // Du har antagligen redan en sådan metod
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Maps a single row from the given ResultSet to a Member object.
+     *
+     * @param rs the ResultSet positioned at the current row
+     * @return a Member object populated with data from the current ResultSet row
+     * @throws SQLException if a database access error occurs
+     */
+    private Member mapToMember(ResultSet rs) throws SQLException {
+        Member member = new Member();
+        member.setId(rs.getLong("member_id"));
+        member.setUsername(rs.getString("email"));
+        member.setName(rs.getString("display_name"));
+        member.setPassword(rs.getString("password_hash"));
+        member.setBio(rs.getString("bio"));
+        member.setProfileImage(rs.getString("profile_image"));
+        return member;
+    }
+
+
 }
