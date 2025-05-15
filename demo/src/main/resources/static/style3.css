@@ -81,7 +81,6 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    margin-left: 0; /* Ingen marginal när menyn är dold */
     transition: margin-left 0.3s ease; /* Mjuk övergång */
     width: 100%; /* Full bredd när menyn är dold */
 }
