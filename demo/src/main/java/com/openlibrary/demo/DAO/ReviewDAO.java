@@ -8,9 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Data Access Object for handling database operations related to book reviews.
@@ -20,12 +18,10 @@ import java.util.Map;
 public class ReviewDAO {
 
     private DatabaseConnection sqlHandler;
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public ReviewDAO(DatabaseConnection sqlHandler, JdbcTemplate jdbcTemplate) {
         this.sqlHandler = sqlHandler;
-        this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
