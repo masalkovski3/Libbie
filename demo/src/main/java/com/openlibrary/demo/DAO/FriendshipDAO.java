@@ -20,10 +20,10 @@ import java.util.List;
 @Component
 public class FriendshipDAO {
 
-    private final DatabaseConnection sqlHandler;
+    private final DatabaseConnection connection;
 
     public FriendshipDAO(DatabaseConnection sqlHandler) {
-        this.sqlHandler = sqlHandler;
+        this.connection = sqlHandler;
     }
 
     /**
@@ -42,7 +42,7 @@ public class FriendshipDAO {
         long max = Math.max(id1, id2);
 
         String sql = "SELECT 1 FROM friendship WHERE member_1_id = ? AND member_2_id = ?";
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, min);
             stmt.setLong(2, max);
@@ -73,7 +73,7 @@ public class FriendshipDAO {
             """;
 
         List<Long> friendIds = new ArrayList<>();
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, memberId);
             stmt.setLong(2, memberId);
