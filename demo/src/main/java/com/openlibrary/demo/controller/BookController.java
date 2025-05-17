@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -135,7 +137,7 @@ public class BookController {
      * @param cleanId The cleaned work ID without `/works/` prefix
      * @return A full URL string for accessing work data via Open Library API
      */
-    private String getWorkUrl(String cleanId) {
+    public String getWorkUrl(String cleanId) {
         return "https://openlibrary.org/works/" + cleanId + ".json";
     }
 
@@ -145,7 +147,7 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The book title, or "Unknown" if not found
      */
-    private String getTitle(JsonNode root) {
+    public String getTitle(JsonNode root) {
         String title = root.path("title").asText();
         return title.isEmpty() ? "Unknown" : title;
     }
@@ -157,15 +159,14 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The description text, or an empty string if unavailable
      */
-    private String getDescription(JsonNode root) {
-        String description = "";
+    public String getDescription(JsonNode root) {
         JsonNode descNode = root.path("description");
         if (descNode.isTextual()) {
-            description = descNode.asText();
+            return descNode.asText();
         } else if (descNode.has("value")) {
-            description = descNode.path("value").asText();
+            return descNode.path("value").asText();
         }
-        return description;
+        return "No description available.";
     }
 
     /**
@@ -178,13 +179,51 @@ public class BookController {
      * @return The author's name, or "Unknown" if not found
      * @throws JsonProcessingException If parsing the JSON response fails
      */
-    private String getAuthor(JsonNode root, RestTemplate restTemplate, ObjectMapper mapper, String authorKey) throws JsonProcessingException {
-        String author = "Unknown";
+    public String getAuthor(JsonNode root, RestTemplate restTemplate, ObjectMapper mapper, String authorKey) throws JsonProcessingException {
+        String author;
         String authorUrl = "https://openlibrary.org" + authorKey + ".json";
         String authorResponse = restTemplate.getForObject(authorUrl, String.class);
         JsonNode authorRoot = mapper.readTree(authorResponse);
         author = authorRoot.path("name").asText("Unknown");
         return author;
+    }
+
+    public List<String> getAuthorWithKey(JsonNode root, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        List<String> authors = new ArrayList<>();
+        JsonNode authorsNode = root.path("authors");
+
+        if (authorsNode.isArray()) {
+            for (JsonNode authorNode : authorsNode) {
+                if (authorNode.has("author") && authorNode.path("author").has("key")) {
+                    String authorKey = authorNode.path("author").path("key").asText();
+
+                    // Hämta författarnamn via separat API-anrop
+                    String authorUrl = "https://openlibrary.org" + authorKey + ".json";
+                    String authorResponse = restTemplate.getForObject(authorUrl, String.class);
+                    JsonNode authorRoot = mapper.readTree(authorResponse);
+
+                    String authorName = authorRoot.path("name").asText("Okänd författare");
+                    authors.add(authorName);
+                }
+            }
+        }
+
+        if (authors.isEmpty()) {
+            authors.add("Okänd författare");
+        }
+
+        return authors;
+    }
+
+    public Integer getCoverId(JsonNode root) {
+        Integer coverId;
+        JsonNode covers = root.path("covers");
+        if (covers.isArray() && !covers.isEmpty()) {
+            coverId = covers.get(0).asInt();
+        } else {
+            coverId = null;
+        }
+        return coverId;
     }
 
     /**
@@ -193,7 +232,7 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The author's key string (e.g., /authors/OL1234A), or empty if not found
      */
-    private String getAuthorKey(JsonNode root) throws JsonProcessingException {
+    public String getAuthorKey(JsonNode root) throws JsonProcessingException {
         String authorKey = "";
         JsonNode authorsNode = root.path("authors");
         if (authorsNode.isArray() && authorsNode.size() > 0) {
@@ -214,11 +253,12 @@ public class BookController {
      * @return A URL string pointing to a large cover image, or empty string if none found
      * @throws JsonProcessingException If parsing the edition response fails
      */
-    private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+    public String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String coverUrl = "";
         if (coverId !=null){
             coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
         }
+
         String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
         String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
         JsonNode editionRoot = mapper.readTree(editionResponse);
@@ -237,4 +277,45 @@ public class BookController {
         }
         return coverUrl;
     }
+
+    /**
+     * Extracts the earliest publication year from the book's editions.
+     *
+     * @param cleanId      The cleaned work ID (without `/works/`)
+     * @param restTemplate Spring's HTTP client used to perform requests
+     * @param mapper       Jackson ObjectMapper for parsing JSON
+     * @return The earliest publication year found, or -1 if not available
+     * @throws JsonProcessingException If parsing the edition response fails
+     */
+    public int getPublishYear(String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
+        String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
+        JsonNode editionRoot = mapper.readTree(editionResponse);
+        JsonNode editionDocs = editionRoot.path("entries");
+
+        int earliestYear = Integer.MAX_VALUE;
+
+        if (editionDocs.isArray()) {
+            for (JsonNode edition : editionDocs) {
+                JsonNode publishDateNode = edition.path("publish_date");
+
+                if (publishDateNode.isTextual()) {
+                    String publishDate = publishDateNode.asText();
+                    // Try to extract year (e.g., from "May 1984" or "1984")
+                    String yearStr = publishDate.replaceAll(".*?(\\d{4}).*", "$1");
+                    try {
+                        int year = Integer.parseInt(yearStr);
+                        if (year < earliestYear) {
+                            earliestYear = year;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Skip invalid dates
+                    }
+                }
+            }
+        }
+
+        return earliestYear == Integer.MAX_VALUE ? LocalDate.now().getYear() : earliestYear;
+    }
+
 }

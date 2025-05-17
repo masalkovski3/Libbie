@@ -1,8 +1,7 @@
 package com.openlibrary.demo.DAO;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.openlibrary.demo.controller.BookController;
 import com.openlibrary.demo.controller.DatabaseConnection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -10,12 +9,9 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.sql.Connection;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,14 +21,23 @@ public class BookshelfDAO {
 
     private DatabaseConnection databaseConnection;
     private JdbcTemplate jdbcTemplate;
+    private BookController bookController;
 
     // TODO: Refactor to return List<Bookshelf> once model and DAO are aligned
-    public BookshelfDAO(DatabaseConnection sqlHandler) {
+    public BookshelfDAO(DatabaseConnection sqlHandler, BookController bookController) {
         this.databaseConnection = sqlHandler;
+        this.bookController = bookController;
     }
 
     /**
-     * Sparar en ny bokhylla och returnerar dess ID
+     * Saves a new bookshelf to the database and returns its generated ID.
+     *
+     * @param memberId the ID of the member who owns the bookshelf
+     * @param name the name of the bookshelf
+     * @param description the description of the bookshelf
+     * @param isPublic whether the bookshelf is public or private
+     * @return the generated ID of the newly created bookshelf
+     * @throws SQLException if a database access error occurs
      */
     public Long saveBookshelf(Long memberId, String name, String description, boolean isPublic) throws SQLException {
         String sql = "INSERT INTO bookshelf (name, member_id, description, is_public) VALUES (?, ?, ?, ?) RETURNING id";
@@ -48,13 +53,18 @@ public class BookshelfDAO {
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             } else {
-                throw new SQLException("Kunde inte skapa bokhyllan, ingen ID returnerades");
+                throw new SQLException("Couldn't create bookshelf, no ID returned.");
             }
         }
     }
 
     /**
-     * Kontrollerar om en bokhylla med samma namn redan finns för en medlem
+     * Checks if a bookshelf with the given name already exists for the specified member.
+     *
+     * @param name the name of the bookshelf
+     * @param memberId the ID of the member
+     * @return true if a bookshelf with the same name exists, false otherwise
+     * @throws SQLException if a database access error occurs
      */
     public boolean existsByNameAndMemberId(String name, Long memberId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookshelf WHERE name = ? AND member_id = ?";
@@ -74,7 +84,11 @@ public class BookshelfDAO {
     }
 
     /**
-     * Hämtar alla bokhyllor för en viss medlem, sorterar så senast tillagda är högst upp
+     * Retrieves all bookshelves for a specific member, ordered by creation time descending.
+     *
+     * @param memberId the ID of the member
+     * @return a list of maps, each representing a bookshelf's properties
+     * @throws SQLException if a database access error occurs
      */
     public List<Map<String, Object>> findByMemberId(Long memberId) throws SQLException {
         List<Map<String, Object>> bookshelves = new ArrayList<>();
@@ -100,7 +114,11 @@ public class BookshelfDAO {
     }
 
     /**
-     * Hämtar en bokhylla baserat på ID
+     * Retrieves a bookshelf by its ID.
+     *
+     * @param id the ID of the bookshelf
+     * @return an Optional containing the bookshelf map if found, or empty otherwise
+     * @throws SQLException if a database access error occurs
      */
     public Optional<Map<String, Object>> findById(Long id) throws SQLException {
         String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
@@ -126,7 +144,11 @@ public class BookshelfDAO {
     }
 
     /**
-     * Lägger till en bok på en bokhylla
+     * Adds a book to a bookshelf. If the book is not in the database, it is first fetched from Open Library.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param openLibraryId the Open Library ID of the book
+     * @throws SQLException if a database access error occurs
      */
     public void addBookToShelf(Long bookshelfId, String openLibraryId) throws SQLException {
         // Först kontrollera om boken redan finns i databasen, annars måste vi lägga till den
@@ -158,13 +180,15 @@ public class BookshelfDAO {
     }
 
     /**
-     * Säkerställer att boken finns i databasen
-     * Om boken inte finns, hämta information från Open Library API och lägg till den
+     * Checks if a book already exists in the local database. If not, fetches book data from the Open Library API.
+     *
+     * @param openLibraryId the Open Library ID of the book
+     * @throws SQLException if a database access error occurs
      */
     private void ensureBookExists(String openLibraryId) throws SQLException {
-        // Kontrollera om boken redan finns i databasen
         String cleanId = openLibraryId.replace("/works/", "");
         String checkSql = "SELECT COUNT(*) FROM book WHERE open_library_id = ?";
+
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(checkSql)) {
             preparedStatement.setString(1, cleanId);
@@ -176,111 +200,103 @@ public class BookshelfDAO {
                     // Rensa bort eventuella '/works/' prefix
                     //String cleanId = openLibraryId.replace("/works/", "");
 
-                    // Skapa RestTemplate för API-anrop
                     RestTemplate restTemplate = new RestTemplate();
                     ObjectMapper mapper = new ObjectMapper();
 
-                    // Hämta information om verket
-                    String workUrl = "https://openlibrary.org/works/" + cleanId + ".json";
+                    String workUrl = bookController.getWorkUrl(cleanId);
                     String response = restTemplate.getForObject(workUrl, String.class);
                     JsonNode root = mapper.readTree(response);
 
-                    // Extrahera boktitel
-                    String title = root.path("title").asText("Okänd titel");
+                    String title = bookController.getTitle(root);
+                    String description = bookController.getDescription(root);
+                    List<String> author = bookController.getAuthorWithKey(root, restTemplate, mapper);
 
-                    // Extrahera beskrivning
-                    String description = "";
-                    JsonNode descNode = root.path("description");
-                    if (descNode.isTextual()) {
-                        description = descNode.asText();
-                    } else if (descNode.has("value")) {
-                        description = descNode.path("value").asText();
-                    }
+                    Integer coverId = bookController.getCoverId(root);
+                    String coverUrl = bookController.getCoverUrl(coverId, cleanId, restTemplate, mapper);
+                    int publishedYear = bookController.getPublishYear(cleanId, restTemplate, mapper);
 
-                    if (description.isEmpty()) {
-                        description = "Ingen beskrivning tillgänglig";
-                    }
-
-                    // Hantera författare
-                    List<String> authors = new ArrayList<>();
-                    JsonNode authorsNode = root.path("authors");
-
-                    if (authorsNode.isArray()) {
-                        for (JsonNode authorNode : authorsNode) {
-                            if (authorNode.has("author") && authorNode.path("author").has("key")) {
-                                String authorKey = authorNode.path("author").path("key").asText();
-
-                                // Hämta författarnamn via separat API-anrop
-                                String authorUrl = "https://openlibrary.org" + authorKey + ".json";
-                                String authorResponse = restTemplate.getForObject(authorUrl, String.class);
-                                JsonNode authorRoot = mapper.readTree(authorResponse);
-
-                                String authorName = authorRoot.path("name").asText("Okänd författare");
-                                authors.add(authorName);
-                            }
-                        }
-                    }
-
-                    if (authors.isEmpty()) {
-                        authors.add("Okänd författare");
-                    }
-
-                    // Extrahera publiceringsår
-                    int publishedYear = 0;
-                    JsonNode firstPublishYear = root.path("first_publish_year");
-                    if (!firstPublishYear.isMissingNode() && firstPublishYear.isInt()) {
-                        publishedYear = firstPublishYear.asInt();
-                    } else {
-                        // Använd nuvarande år som standard om publiceringsår saknas
-                        publishedYear = java.time.Year.now().getValue();
-                    }
-
-                    // Extrahera omslagsbild
-                    Integer coverId = null;
-                    JsonNode covers = root.path("covers");
-                    if (covers.isArray() && covers.size() > 0) {
-                        coverId = covers.get(0).asInt();
-                    }
-                    String coverUrl = getCoverUrl(coverId, cleanId, restTemplate, mapper);
-
-
-                    // Skapa SQL för att lägga till boken i databasen
-                    String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description, cover_url) VALUES (?, ?, ?, ?, ?, ?)";
-                    try (Connection conn1 = databaseConnection.getConnection();
-                         PreparedStatement insertStatement = conn1.prepareStatement(insertSql)) {
-                        insertStatement.setString(1, cleanId);
-                        insertStatement.setString(2, title);
-
-                        // Konvertera författarlistan till PostgreSQL array
-                        java.sql.Array sqlAuthors = conn1.createArrayOf("text", authors.toArray());
-                        insertStatement.setArray(3, sqlAuthors);
-
-                        insertStatement.setInt(4, publishedYear);
-                        insertStatement.setString(5, description);
-                        insertStatement.setString(6, coverUrl);
-
-                        insertStatement.executeUpdate();
-                        System.out.println("Lade till ny bok i databasen: " + title);
-                    }
+                    addToDatabase(cleanId, title, author, publishedYear, description, coverUrl, conn);
 
                 } catch (Exception e) {
-                    System.err.println("Fel vid hämtning av bokdetaljer från API: " + e.getMessage());
-
-                    // Om API-anropet misslyckas, lägg till en minimal bokpost så att vi kan fortsätta
-                    String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description) " +
-                            "VALUES (?, ?, ARRAY['Okänd författare'], 2000, 'Beskrivning saknas')";
-                    try (Connection conn2 = databaseConnection.getConnection();
-                         PreparedStatement insertStatement = conn2.prepareStatement(insertSql)) {
-                        insertStatement.setString(1, openLibraryId);
-                        insertStatement.setString(2, "Bok " + openLibraryId);
-                        insertStatement.executeUpdate();
-                    }
+                    System.err.println("Error occurred while fetching data from API: " + e.getMessage());
+                    addMinimalBookEntry(cleanId);
                 }
             }
         }
     }
 
-    // Tar bort en bok från en bokhylla
+    /**
+     * Adds a minimal book entry to the database in case API fetching fails in ensureBookExists(String openLibraryId).
+     *
+     * @param id the Open Library ID of the book
+     * @throws SQLException if a database access error occurs
+     */
+    private void addMinimalBookEntry(String id) throws SQLException {
+        // Om API-anropet misslyckas, lägg till en minimal bokpost så att vi kan fortsätta
+        String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description) " +
+                "VALUES (?, ?, ARRAY['Unknown author'], 2000, 'No description available')";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement insertStatement = conn.prepareStatement(insertSql)) {
+            insertStatement.setString(1, id);
+            insertStatement.setString(2, "Book " + id);
+            insertStatement.executeUpdate();
+        }
+    }
+
+    /**
+     * Adds a fully populated book entry to the database.
+     *
+     * @param cleanId the sanitized Open Library ID
+     * @param title the title of the book
+     * @param authors the authors of the book
+     * @param publishedYear the year the book was published
+     * @param description the description of the book
+     * @param coverUrl the URL to the book's cover image
+     * @throws SQLException if a database access error occurs
+     */
+    private void addToDatabase(String cleanId, String title, List<String> authors, int publishedYear, String description, String coverUrl, Connection connection) throws SQLException {
+        String insertSql = "INSERT INTO book (open_library_id, title, authors, published_year, description, cover_url) VALUES (?, ?, ?, ?, ?, ?)";
+        java.sql.Array sqlAuthors = connection.createArrayOf("text", authors.toArray());
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement insertStatement = conn.prepareStatement(insertSql)) {
+            insertStatement.setString(1, cleanId);
+            insertStatement.setString(2, title);
+            insertStatement.setArray(3, sqlAuthors);
+            insertStatement.setInt(4, publishedYear);
+            insertStatement.setString(5, description);
+            insertStatement.setString(6, coverUrl);
+
+            insertStatement.executeUpdate();
+            System.out.println("Book added to database: " + title);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Converts a list of authors to an array of strings.
+     *
+     * <p>If the input list is {@code null}, the method returns an empty array.</p>
+     *
+     * @param authors the list of author names to convert
+     * @return an array containing the same author names, or an empty array if the input is {@code null}
+     */
+    private static Object[] convertAuthorsListToArray(List<String> authors) {
+        if (authors == null) {
+            return new Object[0];
+        }
+        return authors.toArray(new Object[0]);
+    }
+
+    /**
+     * Removes a book from a bookshelf.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param openLibraryId the Open Library ID of the book
+     * @return true if the book was successfully removed, false otherwise
+     * @throws SQLException if a database access error occurs
+     */
     public boolean removeBookFromShelf(Long bookshelfId, String openLibraryId) throws SQLException {
         // SQL-sats för att ta bort boken från bookshelf_book-tabellen
         String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND (book_id = ? OR book_id = '/works/' || ?)";
@@ -306,7 +322,12 @@ public class BookshelfDAO {
     }
 
 
-    // Uppdaterar positioner för böcker efter borttagning
+    /**
+     * Reorders the positions of books on a bookshelf after one is removed.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @throws SQLException if a database access error occurs
+     */
     private void reorderBooks(Long bookshelfId) throws SQLException {
         String sql = "WITH numbered AS (" +
                 "  SELECT book_id, ROW_NUMBER() OVER (ORDER BY position) - 1 AS new_pos " +
@@ -327,7 +348,13 @@ public class BookshelfDAO {
     }
 
 
-    //Hämtar alla böcker på en bokhylla
+    /**
+     * Retrieves all books on a specific bookshelf.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @return a list of maps, each representing a book and its properties
+     * @throws SQLException if a database access error occurs
+     */
     public List<Map<String, Object>> findBooksByBookshelfId(Long bookshelfId) throws SQLException {
         List<Map<String, Object>> books = new ArrayList<>();
         String sql = "SELECT b.open_library_id, b.title, b.authors, b.published_year, b.cover_url, bb.position " +
@@ -356,7 +383,13 @@ public class BookshelfDAO {
         return books;
     }
 
-    //Tar bort en bokhylla
+    /**
+     * Deletes a bookshelf from the database.
+     *
+     * @param bookshelfId the ID of the bookshelf to delete
+     * @return true if the bookshelf was deleted, false otherwise
+     * @throws SQLException if a database access error occurs
+     */
     public boolean deleteBookshelf(Long bookshelfId) throws SQLException {
         String sql = "DELETE FROM bookshelf WHERE id = ?";
 
@@ -369,7 +402,14 @@ public class BookshelfDAO {
         }
     }
 
-    //Uppdaterar namnet på en bokhylla
+    /**
+     * Updates the name of a bookshelf. Ensures the new name is unique for the user.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param newName the new name to set
+     * @return true if the update was successful, false otherwise
+     * @throws SQLException if a database access error occurs or if the new name already exists
+     */
     public boolean updateBookshelfName(Long bookshelfId, String newName) throws SQLException {
         // Först hämta bokhyllan för att få medlems-ID
         Optional<Map<String, Object>> bookshelfOpt = findById(bookshelfId);
@@ -381,7 +421,7 @@ public class BookshelfDAO {
 
         // Kontrollera att det nya namnet är unikt för denna medlem
         if (existsByNameAndMemberId(newName, memberId)) {
-            throw new SQLException("En bokhylla med namnet '" + newName + "' finns redan för denna användare");
+            throw new SQLException("A bookshelf named '" + newName + "' already exists in your profile.");
         }
 
         String sql = "UPDATE bookshelf SET name = ? WHERE id = ?";
@@ -397,7 +437,12 @@ public class BookshelfDAO {
     }
 
     /**
-     * Uppdaterar en bokhyllas beskrivning
+     * Updates the description of a bookshelf.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param description the new description
+     * @return true if the update was successful, false otherwise
+     * @throws SQLException if a database access error occurs
      */
     public boolean updateBookshelfDescription(Long bookshelfId, String description) throws SQLException {
         String sql = "UPDATE bookshelf SET description = ? WHERE id = ?";
@@ -413,7 +458,12 @@ public class BookshelfDAO {
     }
 
     /**
-     * Uppdaterar en bokhyllas synlighet (public/private)
+     * Updates the visibility of a bookshelf (public/private).
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param isPublic the new visibility setting
+     * @return true if the update was successful, false otherwise
+     * @throws SQLException if a database access error occurs
      */
     public boolean updateBookshelfVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
         String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
@@ -441,29 +491,5 @@ public class BookshelfDAO {
     public List<Map<String, Object>> findPublicByMemberId(Long memberId) throws SQLException {
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
-    }
-
-    private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
-        String coverUrl = "";
-        if (coverId != null){
-            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
-        }
-        String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
-        String editionResponse = restTemplate.getForObject(editionsUrl, String.class);
-        JsonNode editionRoot = mapper.readTree(editionResponse);
-        JsonNode editionDocs = editionRoot.path("entries");
-
-        if (editionDocs.isArray()) {
-            for (JsonNode edition : editionDocs) {
-                JsonNode covers = edition.path("covers");
-                if (covers.isArray() && covers.size() > 0) {
-                    coverId = covers.get(0).asInt();
-                    coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
-                    System.out.println("Cover found: " + coverUrl);
-                    break;
-                }
-            }
-        }
-        return coverUrl;
     }
 }
