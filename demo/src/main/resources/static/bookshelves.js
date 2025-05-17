@@ -214,6 +214,41 @@ function removeBookFromShelf(bookshelfId, workId) {
     });
 }
 
+function updateDescription() {
+    const shelfId = document.getElementById("editShelfId").value;
+    const description = document.getElementById("editShelfDescription").value;
+
+    fetch('/bookshelves/updateDescription', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            shelfId: shelfId,
+            description: description
+        })
+    })
+        .then(response => response.text())
+        .then(data => {
+            alert(data); // Visa meddelande från servern
+            location.reload(); // Uppdatera sidan för att visa den nya beskrivningen
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+
+function showEditDescriptionModal(button) {
+    const shelfId = button.getAttribute('data-shelf-id');
+    const description = button.getAttribute('data-shelf-description') || '';
+
+    document.getElementById('editShelfId').value = shelfId;
+    document.getElementById('editShelfDescription').value = description;
+
+    const modal = new bootstrap.Modal(document.getElementById('editDescriptionModal'));
+    modal.show();
+}
+
+
 
 // Function to show the modal for renaming a bookshelf
 function showRenameShelfModal(bookshelfId, currentName) {

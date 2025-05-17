@@ -113,6 +113,10 @@ public class BookshelfDAO {
         return bookshelves;
     }
 
+
+
+
+
     /**
      * Retrieves a bookshelf by its ID.
      *
@@ -448,11 +452,15 @@ public class BookshelfDAO {
         String sql = "UPDATE bookshelf SET description = ? WHERE id = ?";
 
         try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)){
+            System.out.println("Uppdaterar beskrivning för bookshelfId: " + bookshelfId + " till: " + description);
+
             preparedStatement.setString(1, description);
             preparedStatement.setLong(2, bookshelfId);
 
             int rowsAffected = preparedStatement.executeUpdate();
+            System.out.println("Antal ändrade rader: " + rowsAffected);
+
             return rowsAffected > 0;
         }
     }

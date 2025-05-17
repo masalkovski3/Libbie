@@ -215,6 +215,8 @@ public class ProfileController {
         }
     }
 
+
+
     /**
      * Lägger till en bok i en specifik bokhylla.
      *
@@ -368,7 +370,6 @@ public class ProfileController {
      * @param name Det nya namnet.
      * @return ResponseEntity med resultatet av uppdateringen.
      *
-     * @author Linn Otendal, Emmi Masalkovski
      */
     @PutMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
@@ -412,56 +413,54 @@ public class ProfileController {
         }
     }
 
+
     /**
      * Uppdaterar beskrivningen för en bokhylla.
      *
-     * @param bookshelfId ID för bokhyllan.
      * @param description Ny beskrivning.
      * @return ResponseEntity med resultatet av uppdateringen.
      *
      * @author Linn Otendal, Emmi Masalkovski
      */
-    @PutMapping("/bookshelves/{bookshelfId}/description")
-    @ResponseBody
-    public ResponseEntity<?> updateBookshelfDescription(
-            @PathVariable Long bookshelfId,
+    @PostMapping("/bookshelves/updateDescription")
+    public ResponseEntity<?> updateDescription(
+            @RequestParam Long shelfId,
             @RequestParam String description,
             HttpSession session) {
 
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            System.out.println("Member not logged in");
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
 
         Long memberId = currentMember.getId();
 
         try {
-            // Kontrollera att bokhyllan tillhör användaren
-            Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(bookshelfId);
-            if (bookshelfOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("errorMessage", "Bookshelf not found"));
+            Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(shelfId);
+            if (bookshelfOpt.isEmpty() || !bookshelfOpt.get().get("memberId").equals(memberId)) {
+                System.out.println("Access denied");
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
             }
 
-            // Jämför primitiva värden med ==
-            Long ownerId = (Long) bookshelfOpt.get().get("memberId");
-            if (!ownerId.equals(memberId)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("errorMessage", "Bookshelf belongs to another user"));
-            }
+            boolean updated = bookshelfDAO.updateBookshelfDescription(shelfId, description);
+            System.out.println("Update was ok? " + updated);
 
-            boolean updated = bookshelfDAO.updateBookshelfDescription(bookshelfId, description);
             if (updated) {
-                return ResponseEntity.ok(Map.of("success", true, "description", description));
+                return ResponseEntity.ok("Description updated!");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("errorMessage", "Bookshelf not found"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed");
             }
-        } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("errorMessage", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
+
+
+
+
 
     /**
      * Uppdaterar synligheten (publik/privat) för en bokhylla.
@@ -641,7 +640,7 @@ public class ProfileController {
     public String uploadProfileImage(@RequestParam("image") MultipartFile image,
                                      HttpSession session,
                                      RedirectAttributes redirectAttributes) {
-        
+
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "You are not currently logged in");
@@ -671,7 +670,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload image: " + e.getMessage());
             redirectAttributes.addFlashAttribute("showError", true);
         }
-        
+
         return "redirect:/profile";
     }
 

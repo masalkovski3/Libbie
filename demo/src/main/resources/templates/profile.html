@@ -95,6 +95,14 @@
                                     onclick="showRenameShelfModal(this.getAttribute('data-shelf-id'), this.getAttribute('data-shelf-name'))">
                                 Rename
                             </button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                    th:data-shelf-id="${shelf.id}"
+                                    th:data-shelf-name="${shelf.name}"
+                                    th:data-shelf-description="${shelf.description}"
+                                    onclick="showEditDescriptionModal(this)">
+                                Edit Description
+                            </button>
+
                             <button class="btn btn-sm btn-outline-danger"
                                     th:data-shelf-id="${shelf.id}"
                                     onclick="confirmDeleteShelf(this.getAttribute('data-shelf-id'))">
@@ -204,7 +212,33 @@
                 </div>
             </div>
 
-            <!-- Modal for adding a book to the bookshelf -->
+                <!--Modal for editing description-->
+                <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form id="editDescriptionForm">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editDescriptionModalLabel">Edit Bookshelf Description</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="editShelfId" name="shelfId">
+                                    <div class="mb-3">
+                                        <label for="editShelfDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="editShelfDescription" name="description" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn-rose" onclick="updateDescription()">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal for adding a book to the bookshelf -->
             <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -344,110 +378,6 @@
     </div>
 </div>
 
-<script>
-    console.log("🧪 Script loaded");
-    function searchFriends() {
-        console.log("🔍 [JS DEBUG] searchFriends() called");
-
-        const query = document.getElementById('friendSearch').value;
-        const resultsDiv = document.getElementById('friend-search-results');
-        resultsDiv.innerHTML = "";
-
-        if (!query.trim()) {
-            console.log("⚠️ [JS DEBUG] No input provided.");
-            resultsDiv.innerHTML = "<p>Please enter a search term.</p>";
-            return;
-        }
-
-        const url = `/searchMembers?query=${encodeURIComponent(query)}`;
-        console.log("🌐 [JS DEBUG] Sending fetch to:", url);
-
-        fetch(url, {
-            credentials: 'same-origin'
-        })
-            .then(response => {
-                console.log("📡 [JS DEBUG] Fetch response status:", response.status);
-                if (!response.ok) return response.text().then(text => {
-                    console.error("❌ [JS DEBUG] Fetch error body:", text);
-                    throw new Error("Failed to fetch");
-                });
-                return response.json();
-            })
-            .then(data => {
-                console.log("📦 [JS DEBUG] Fetch returned data:", data);
-                const resultsDiv = document.getElementById('friend-search-results');
-                resultsDiv.innerHTML = "";
-
-                if (data.length === 0) {
-                    resultsDiv.innerHTML = "<p>No matching users found.</p>";
-                    return;
-                }
-
-                data.forEach(user => {
-                    const userCard = document.createElement("div");
-                    userCard.className = "d-flex justify-content-between align-items-center border p-2 mb-2 rounded";
-
-                    const image = document.createElement("img");
-                    image.src = user.profileImage ? `/profileImages/${user.profileImage}` : "/images/profilepicture.webp";
-                    image.alt = "Profile";
-                    image.className = "rounded-circle me-2";
-                    image.style.width = "40px";
-                    image.style.height = "40px";
-
-                    const nameSpan = document.createElement("span");
-                    nameSpan.textContent = user.displayName;
-
-                    const nameContainer = document.createElement("div");
-                    nameContainer.className = "d-flex align-items-center";
-                    nameContainer.appendChild(image);
-                    nameContainer.appendChild(nameSpan);
-                    userCard.appendChild(nameContainer);
-
-                    const form = document.createElement("form");
-                    form.method = "post";
-                    form.action = "/friendship/request";
-
-                    const input = document.createElement("input");
-                    input.type = "hidden";
-                    input.name = "recipientId";
-                    input.value = user.id;
-
-                    const button = document.createElement("button");
-                    button.type = "submit";
-                    button.className = "btn btn-sm btn-success";
-                    button.textContent = "Send Request";
-
-                    form.appendChild(input);
-                    form.appendChild(button);
-
-                    userCard.appendChild(form);
-                    resultsDiv.appendChild(userCard);
-                });
-            })
-            .catch(error => {
-                const resultsDiv = document.getElementById('friend-search-results');
-                resultsDiv.innerHTML = "<p>Error while searching. Please try again.</p>";
-                console.error("❌ [JS DEBUG] Fetch failed:", error);
-            });
-    }
-
-    // Koppla när modalen öppnas
-    const friendModal = document.getElementById('addFriendModal');
-    if (friendModal) {
-        friendModal.addEventListener('shown.bs.modal', function () {
-            const btn = document.getElementById("searchFriendButton");
-            if (btn && !btn.dataset.bound) {
-                console.log("✅ [JS DEBUG] Binding search button inside modal");
-                btn.addEventListener("click", searchFriends);
-                btn.dataset.bound = "true"; // förhindrar dubbelbindning
-            }
-        });
-    } else {
-        console.warn("❌ [JS DEBUG] addFriendModal not found");
-    }
-</script>
-
-
 <!-- Script för felmeddelande, ändra inte -->
 <script th:if="${showError}" th:inline="javascript">
     function tryShowError() {
@@ -464,7 +394,6 @@
         tryShowError();
     });
 </script>
-
 
 </body>
 </html>
