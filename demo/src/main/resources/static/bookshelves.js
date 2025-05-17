@@ -19,6 +19,7 @@ const saveShelfButton = document.getElementById('saveShelfButton');
 if (saveShelfButton) {
     saveShelfButton.addEventListener('click', function () {
         const shelfName = document.getElementById('shelfName').value.trim();
+        const shelfDescription = document.getElementById('shelfDescription').value.trim();
 
 
         if (shelfName) {
@@ -27,7 +28,8 @@ if (saveShelfButton) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `name=${encodeURIComponent(shelfName)}`
+                body: `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}`
+                
             })
                 .then(response => {
                     // First check if the response is OK

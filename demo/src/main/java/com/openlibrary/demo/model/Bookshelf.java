@@ -6,6 +6,7 @@ public class Bookshelf {
     private Long id;
     private String name;
     private Long memberId;
+    private String description;
 
     public Bookshelf() {
     }
@@ -43,6 +44,14 @@ public class Bookshelf {
 
     public void setMemberId(Long memberId) {
         this.memberId = memberId;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
     }
 
     @Override

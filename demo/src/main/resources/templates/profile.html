@@ -62,6 +62,7 @@
             -->
 
             <!-- Button to add new bookshelf -->
+
             <button class="add-shelf-button" data-bs-toggle="modal" data-bs-target="#addShelfModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
@@ -79,8 +80,10 @@
                 <!-- Iterate over all bookshelves -->
                 <div th:each="shelf : ${bookshelves}" class="bookshelf-container" th:id="'bookshelf-' + ${shelf.id}">
                     <div class="bookshelf-header">
-                        <h3 class="bookshelf-title" th:text="${shelf.name}">Bookshelf</h3>
+                        <h3 class="bookshelf-title" th:text="${shelf.name}">Bookshelf Name</h3>
+
                         <div>
+                            <!-- Show/hide button and description -->
                             <button class="btn btn-sm btn-outline-primary"
                                     th:data-shelf-id="${shelf.id}"
                                     onclick="showAddBookModal(this.getAttribute('data-shelf-id'))">
@@ -98,6 +101,9 @@
                                 Delete
                             </button>
                         </div>
+                    </div>
+                    <div class="shelf-description-box">
+                        <p class="shelf-description" th:text="${shelf.description ?: 'No description available'}">Bookshelf description</p>
                     </div>
 
                     <!-- Books in the bookshelf -->
@@ -158,8 +164,11 @@
                                 <div class="mb-3">
                                     <label for="shelfName" class="form-label">Bookshelf Name</label>
                                     <input type="text" class="form-control" id="shelfName" required>
-                                    <div class="form-text">Give your bookshelf a unique name</div>
+                                    <div class="form-text">Give your Bookshelf a unique name</div>
                                 </div>
+                                <label for="shelfDescription" class="form-label">Bookshelf Description</label>
+                                <input type="text" class="form-control" id="shelfDescription" required>
+                                <div class="form-text">Describe your Bookshelf (optional)</div>
                             </form>
                         </div>
                         <div class="modal-footer">
