@@ -287,7 +287,10 @@
         <div class="modal-content">
 
             <!-- Makes sure that files can be uploaded -->
-            <form method="post" action="/profile/update" enctype="multipart/form-data" novalidate>
+            <form method="post"
+                  action="/update"
+                  enctype="multipart/form-data"
+                  novalidate>
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
@@ -301,7 +304,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="displayName" class="form-label">Display name:</label>
+                        <label for="displayName" class="form-label">Username:</label>
                         <input type="text" class="form-control" id="displayName" name="displayName"
                                th:value="${member.displayName}" required>
                     </div>
