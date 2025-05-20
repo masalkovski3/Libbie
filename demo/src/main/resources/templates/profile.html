@@ -23,18 +23,19 @@
             </div>
 
             <div class="profile-card d-flex flex-column flex-md-row align-items-center justify-content-center p-4 rounded shadow bg-white" style="gap: 2rem; margin-bottom: 2rem;">
+                <!-- Profile-pivture -->
                 <img class="rounded-circle"
-                     th:if="${member['pictureImage'] != null}"
-                     th:src="@{'/profileImages/' + ${member['pictureImage']}}"
+                     th:if="${member.profileImage != null}"
+                     th:src="@{${member.profileImage}}"
                      alt="Profile Picture"
-                     width="140" height="140">
+                     width="140" height="140"/>
 
+                <!-- default profile picture (is no profile picture is available)-->
                 <img class="rounded-circle"
-                     th:unless="${member['pictureImage'] != null}"
+                     th:unless="${member.profileImage != null}"
                      th:src="@{/images/profilepicture.webp}"
                      alt="Default Profile Picture"
-                     width="140" height="140">
-
+                     width="140" height="140"/>
 
                 <div>
                     <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>

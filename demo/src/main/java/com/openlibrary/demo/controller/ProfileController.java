@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Controller som hanterar användarprofilsidan och tillhörande API-funktioner
@@ -655,17 +658,23 @@ public class ProfileController {
         }
 
         try{
-            String uploadDirectory = "uploads/";
-            Files.createDirectories(Paths.get(uploadDirectory));
+            // --- EN ENDA KATALOG FÖR ALLA PROFILBILDER ---
+            String uploadDirectory = "profileImages/";
+            Path uploadPath = Paths.get(uploadDirectory);
+            if (Files.notExists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-            String fileName = currentMember.getId() + "_" + image.getOriginalFilename();
-            Path path = Paths.get(uploadDirectory + fileName);
-            image.transferTo(path);
+            // --- BYGG FILNAMN OCH SPARA ---
+            String filename = currentMember.getId() + "_" + image.getOriginalFilename();
+            Path filePath = uploadPath.resolve(filename);
+            image.transferTo(filePath);
 
-            memberDAO.updateProfilePicture(currentMember.getId(), "/" + uploadDirectory + fileName );
+            // --- UPPDATERA DAO MED DEN URL MALL VI KOMMER SERVA VIA ResourceHandler ---
+            String servedPath = "/profileImages/" + filename;
+            memberDAO.updateProfilePicture(currentMember.getId(), servedPath);
 
             redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
-
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload image: " + e.getMessage());
             redirectAttributes.addFlashAttribute("showError", true);
@@ -674,7 +683,36 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
-     private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
+    /**
+     * Sparar bilden i mappen profileImages/ och returnerar den URL som kan användas i <img>.
+     */
+    private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
+        // 1. Rensa bort farliga tecken
+        String original = StringUtils.cleanPath(image.getOriginalFilename());
+
+        // 2. Plocka ut basnamn och extension
+        String baseName = FilenameUtils.getBaseName(original).toLowerCase();     // gemena
+        String ext      = FilenameUtils.getExtension(original).toLowerCase();    // "png"
+
+        // 3. Sätt ihop nytt, gemenerat filnamn
+        String filename = memberId + "_" + baseName + "." + ext;
+
+        // 4. Spara filen
+        Path uploadDir = Paths.get("profileImages");
+        if (Files.notExists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+        Path target = uploadDir.resolve(filename);
+        try (InputStream is = image.getInputStream()) {
+            Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 5. Returnera mappad URL
+        return "/profileImages/" + filename;
+    }
+
+    /*
+    private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
          Path uploadPath = Paths.get("profileImages");
 
          if(!Files.exists(uploadPath)) {
@@ -688,6 +726,7 @@ public class ProfileController {
 
          return filename;
      }
+     */
 
     /**
      * Displays the profile of another member, if they are a confirmed friend.
