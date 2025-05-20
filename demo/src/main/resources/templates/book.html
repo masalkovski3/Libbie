@@ -92,23 +92,36 @@
 <div th:replace="fragments/modal :: confirmModal"></div>
 
 
-<!-- Fragment includes -->
+<!-- ÄNDRA INTE KOMMANDE 3 DELAR!!!-->
+<!-- 1. Först, ladda modalfragmentet -->
 <div th:replace="fragments/modal :: errorModal"></div>
-<!-- Script for script.js -->
+
+<!-- 2. Sedan, ladda JavaScript -->
 <script th:src="@{/script.js}" defer></script>
 
-    <!-- JS: error handling -->
+<!-- 3. Sist, inline-skriptet för felmeddelanden -->
 <script th:if="${showError}" th:inline="javascript">
-    function tryShowError() {
-        if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
-        } else {
-            setTimeout(tryShowError, 100);
-        }
-    }
+    window.addEventListener('DOMContentLoaded', function() {
+        var errorModal = document.getElementById('errorModal');
+        var modalMessage = document.getElementById('modalMessage');
 
-    window.addEventListener('load', function() {
-        tryShowError();
+        if (errorModal && modalMessage) {
+            modalMessage.textContent = [[${errorMessage}]];
+            errorModal.style.display = 'block';
+        } else {
+            console.error("Modal elements not found. Will retry.");
+            setTimeout(function() {
+                errorModal = document.getElementById('errorModal');
+                modalMessage = document.getElementById('modalMessage');
+                if (errorModal && modalMessage) {
+                    modalMessage.textContent = [[${errorMessage}]];
+                    errorModal.style.display = 'block';
+                } else {
+                    console.error("Modal elements still not found. Showing alert instead.");
+                    alert([[${errorMessage}]]);
+                }
+            }, 300);
+        }
     });
 </script>
 
