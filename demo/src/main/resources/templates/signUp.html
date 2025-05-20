@@ -61,28 +61,39 @@
 
 </div>
 
-<!-- JavaScript-koppling -->
-<script th:src="@{/script.js}" src="/script.js" defer></script>
-
-<!--fragment för felmeddelande-->
-<div th:replace="fragments/modal :: errorModal"></div>
 <!-- fragment för session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
-<!-- Script för felmeddelande, ändra inte -->
-<script th:if="${showError}" th:inline="javascript">
-    function tryShowError() {
-        if (typeof showError === 'function') {
-            showError([[${errorMessage}]]);
-        } else {
-            // Om vi fortfarande inte har showError, försök igen om 100ms
-            setTimeout(tryShowError, 100);
-        }
-    }
+<!-- ÄNDRA INTE KOMMANDE 3 DELAR!!!-->
+<!-- 1. Först, ladda modalfragmentet -->
+<div th:replace="fragments/modal :: errorModal"></div>
 
-    window.addEventListener('load', function() {
-        // Starta försöken att visa felmeddelandet
-        tryShowError();
+<!-- 2. Sedan, ladda JavaScript -->
+<script th:src="@{/script.js}" defer></script>
+
+<!-- 3. Sist, inline-skriptet för felmeddelanden -->
+<script th:if="${showError}" th:inline="javascript">
+    window.addEventListener('DOMContentLoaded', function() {
+        var errorModal = document.getElementById('errorModal');
+        var modalMessage = document.getElementById('modalMessage');
+
+        if (errorModal && modalMessage) {
+            modalMessage.textContent = [[${errorMessage}]];
+            errorModal.style.display = 'block';
+        } else {
+            console.error("Modal elements not found. Will retry.");
+            setTimeout(function() {
+                errorModal = document.getElementById('errorModal');
+                modalMessage = document.getElementById('modalMessage');
+                if (errorModal && modalMessage) {
+                    modalMessage.textContent = [[${errorMessage}]];
+                    errorModal.style.display = 'block';
+                } else {
+                    console.error("Modal elements still not found. Showing alert instead.");
+                    alert([[${errorMessage}]]);
+                }
+            }, 300);
+        }
     });
 </script>
 

@@ -82,20 +82,20 @@
     </div>
 </div>
 
-<!-- Fragment includes -->
-<div th:replace="fragments/modal :: errorModal"></div>
-
 <!-- fragment for session-timeout-warning-->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
+
+<!-- Script for "Add to bookshelf"-button -->
+<script src="/bookshelves.js" defer></script>
 
 <!-- fragment for confirm messages -->
 <div th:replace="fragments/modal :: confirmModal"></div>
 
+
+<!-- Fragment includes -->
+<div th:replace="fragments/modal :: errorModal"></div>
 <!-- Script for script.js -->
 <script th:src="@{/script.js}" defer></script>
-
-<!-- Script for "Add to bookshelf"-button -->
-<script src="/bookshelves.js" defer></script>
 
     <!-- JS: error handling -->
 <script th:if="${showError}" th:inline="javascript">

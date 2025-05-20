@@ -236,12 +236,11 @@ $(document).ready(function () {
     });
 });
 
-
+//kan förmodligen tas bort, tror inte den används längre
 function tryShowError() {
     if (typeof showError === 'function') {
         showError([[$,{errorMessage}]]);
     } else {
-        // Om vi fortfarande inte har showError, försök igen om 100ms
         setTimeout(tryShowError, 100);
     }
 }
