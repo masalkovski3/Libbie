@@ -144,8 +144,36 @@ public class BookshelfDAO {
                 return Optional.of(bookshelf);
             }
         }
-
         return Optional.empty();
+    }
+
+    /**
+     * Retrieves a bookshelf by its ID.
+     *
+     * @param id the ID of the bookshelf
+     * @return an Optional containing the bookshelf map if found, or empty otherwise
+     * @throws SQLException if a database access error occurs
+     */
+    public Bookshelf findByIdReturnBookshelf(Long id) throws SQLException {
+        String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setLong(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Bookshelf bookshelf = new Bookshelf();
+                bookshelf.setId(resultSet.getLong("id"));
+                bookshelf.setName(resultSet.getString("name"));
+                bookshelf.setMemberId(resultSet.getLong("member_id"));
+                bookshelf.setDescription(resultSet.getString("description"));
+                bookshelf.setVisibility(resultSet.getBoolean("is_public"));
+                bookshelf.setPosition(resultSet.getInt("position"));
+                return bookshelf;
+            }
+        }
+        return null;
     }
 
     /**
@@ -521,11 +549,11 @@ public class BookshelfDAO {
 
             while (rs.next()) {
                 Bookshelf shelf = new Bookshelf();
-                shelf.setId(rs.getLong("bookshelf_id"));
+                shelf.setId(rs.getLong("id"));
                 shelf.setMemberId(rs.getLong("member_id"));
                 shelf.setName(rs.getString("name"));
                 shelf.setDescription(rs.getString("description"));
-                shelf.setPublic(rs.getBoolean("is_public"));
+                shelf.setVisibility(rs.getBoolean("is_public"));
                 // Lägg till fler fält om Bookshelf har fler attribut
                 bookshelves.add(shelf);
             }
@@ -534,5 +562,16 @@ public class BookshelfDAO {
 
         return bookshelves;
     }
+
+    public void setVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
+        String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, isPublic);
+            stmt.setLong(2, bookshelfId);
+            stmt.executeUpdate();
+        }
+    }
+
 
 }

@@ -1,12 +1,12 @@
 package com.openlibrary.demo.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.BookshelfDAO;
 import com.openlibrary.demo.DAO.MemberDAO;
 import com.openlibrary.demo.DAO.FriendshipDAO;
 import com.openlibrary.demo.model.Book;
+import com.openlibrary.demo.model.Bookshelf;
 import com.openlibrary.demo.model.Member;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -883,5 +883,27 @@ public class ProfileController {
         }
     }
 
+    @PostMapping("/bookshelves/{id}/toggle-visibility")
+    public String toggleBookshelfVisibility(@PathVariable Long id,
+                                            HttpSession session,
+                                            RedirectAttributes redirectAttributes) throws SQLException {
+        System.out.println("Trying to toggle visibility of bookshelves: " + id);
+        Member currentMember = (Member) session.getAttribute("currentMember");
 
+        Bookshelf shelf = bookshelfDAO.findByIdReturnBookshelf(id);
+        if (shelf == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bookshelf not found");
+        }
+
+        Long shelfOwnerId = shelf.getMemberId();
+
+        if (!shelfOwnerId.equals(currentMember.getId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "This bookshelf does not belong to your profile");
+        }
+
+        boolean isCurrentlyPublic = shelf.isVisibility();
+        bookshelfDAO.setVisibility(id, !isCurrentlyPublic);
+
+        return "redirect:/profile";
+    }
 }
