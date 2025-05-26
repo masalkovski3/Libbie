@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -50,20 +51,24 @@ public class FriendProfileController {
     @GetMapping("/{friendId}")
     public String showFriendProfile(@PathVariable Long friendId,
                                     HttpSession session,
-                                    Model model) throws SQLException {
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) throws SQLException {
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You are not currently logged in\nPlease login again.");
             return "redirect:/logIn";
         }
         Long currentUserId = currentMember.getId();
 
         if (!friendshipDAO.areFriends(currentUserId, friendId)) {
-            return "error/403"; //TODO: ändra till felmeddelande
+            redirectAttributes.addFlashAttribute("errorMessage", "You are not friends with this user");
+            return "profile";
         }
 
         Optional<Map<String, Object>> friendOptional = memberDAO.findById(friendId);
         if (friendOptional.isEmpty()) {
-            return "error/404"; //TODO: ändra till felmeddelande
+            redirectAttributes.addFlashAttribute("errorMessage", "This user doesn't exist");
+            return "profile";
         }
 
         Map<String, Object> friend = friendOptional.get();
