@@ -7,6 +7,7 @@ public class Bookshelf {
     private String name;
     private Long memberId;
     private String description;
+    private boolean isPublic;
 
     public Bookshelf() {
     }
@@ -52,6 +53,14 @@ public class Bookshelf {
 
     public void setDescription(String description){
         this.description = description;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 
     @Override

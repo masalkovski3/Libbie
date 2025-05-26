@@ -2,6 +2,7 @@ package com.openlibrary.demo.DAO;
 
 import com.openlibrary.demo.controller.BookController;
 import com.openlibrary.demo.controller.DatabaseConnection;
+import com.openlibrary.demo.model.Bookshelf;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -500,4 +501,38 @@ public class BookshelfDAO {
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
     }
+
+    /**
+     * Retrieves all public bookshelves for a given member.
+     *
+     * @param memberId The ID of the member whose public bookshelves are requested.
+     * @return A list of {@link Bookshelf} objects that are marked as public.
+     * @throws SQLException if a database access error occurs.
+     */
+    public List<Bookshelf> getPublicBookshelvesByMemberId(Long memberId) throws SQLException {
+        List<Bookshelf> bookshelves = new ArrayList<>();
+        String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = TRUE";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Bookshelf shelf = new Bookshelf();
+                shelf.setId(rs.getLong("bookshelf_id"));
+                shelf.setMemberId(rs.getLong("member_id"));
+                shelf.setName(rs.getString("name"));
+                shelf.setDescription(rs.getString("description"));
+                shelf.setPublic(rs.getBoolean("is_public"));
+                // Lägg till fler fält om Bookshelf har fler attribut
+                bookshelves.add(shelf);
+            }
+
+        }
+
+        return bookshelves;
+    }
+
 }
