@@ -343,7 +343,7 @@
 
                 <ul th:unless="${#lists.isEmpty(friends)}" class="friend-list">
                     <li th:each="friend : ${friends}">
-                        <a th:href="@{'/profile/' + ${friend['id']}}"
+                        <a th:href="@{'/friend/' + ${friend['id']}}"
                            th:text="${friend['displayName']}">Friend</a>
                     </li>
                 </ul>
