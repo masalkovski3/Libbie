@@ -20,10 +20,9 @@ if (saveShelfButton) {
     saveShelfButton.addEventListener('click', function () {
         const shelfName = document.getElementById('shelfName').value.trim();
         const shelfDescription = document.getElementById('shelfDescription').value.trim();
-        const isPublic = document.getElementById('shelfPublic').checked;
 
         if (shelfName) {
-            const body = `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}&isPublic=${isPublic}`;
+            const body = `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}`;
 
             fetch('/profile/bookshelves', {
                 method: 'POST',
