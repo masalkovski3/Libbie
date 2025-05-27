@@ -1,5 +1,7 @@
 package com.openlibrary.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import com.openlibrary.demo.DAO.MemberDAO;
@@ -11,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Controller responsible for handling user sign-up related requests.
  */
 @Controller
+@Tag(name = "Authentication", description = "User registration")
 public class SignupController {
 
     private MemberDAO memberDAO;
@@ -29,6 +32,7 @@ public class SignupController {
      *
      * @return the name of the sign-up view template
      */
+    @Operation(summary = "Display signup page")
     @GetMapping("/signUp")
     public String signUp() {
         return "signUp";
@@ -48,6 +52,8 @@ public class SignupController {
      * @param session        the HTTP session used to store user data
      * @return a redirect to the profile page on success, or the sign-up view on failure
      */
+    @Operation(summary = "Process user registration",
+            description = "Create new user account and authenticate")
     @PostMapping("/signUp")
     public String handleSignUp(@RequestParam String firstname,
                               @RequestParam String username,
@@ -111,6 +117,8 @@ public class SignupController {
      * @param email the email address to validate
      * @return {@code true} if the email is valid, {@code false} otherwise
      */
+    @Operation(summary = "Validate email format",
+            description = "Check if email address has valid format")
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email != null && email.matches(emailRegex);

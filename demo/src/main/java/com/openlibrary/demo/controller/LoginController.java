@@ -2,15 +2,16 @@ package com.openlibrary.demo.controller;
 
 //import com.openlibrary.demo.repository.MemberRepository;
 import com.openlibrary.demo.DAO.MemberDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.openlibrary.demo.model.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -20,19 +21,16 @@ import java.util.Optional;
  * If the login is successful, the authenticated member is stored in the session and redirected to the profile page.
  * If authentication fails, the user is redirected back to the login page.
  *
- * @author Emmi Masalkovski, Delaram Azad, Amelie Music
  */
 @Controller
+@Tag(name = "Authentication", description = "User authentication endpoints")
 public class LoginController {
 
     private MemberDAO memberDAO;
 
     /**
      * Constructs a LoginController with a MemberDAO dependency.
-     *
      * @param memberDAO the DAO used to authenticate members
-     *
-     * @author Emmi Masalkovski
      */
     public LoginController(MemberDAO memberDAO) {
         this.memberDAO = memberDAO;
@@ -40,11 +38,9 @@ public class LoginController {
 
     /**
      * Displays the login page.
-     *
      * @return the name of the login view
-     *
-     * @author Delaram Azad
      */
+    @Operation(summary = "Display login page")
     @GetMapping("/logIn")
     public String logIn() {
         return "logIn";
@@ -52,7 +48,6 @@ public class LoginController {
 
     /**
      * Handles login form submission.
-     *
      * Authenticates the user based on the provided email and password.
      * If authentication is successful, the member is stored in the session and redirected to the profile page.
      * Otherwise, the user is redirected back to the login page.
@@ -63,9 +58,13 @@ public class LoginController {
      * @param redirectAttributes  attributes for flash messages during redirection
      * @return a redirect to the profile page if successful, or back to the login page if not
      * @throws SQLException if a database access error occurs during authentication
-     *
-     * @author Amelie Music, Emmi Masalkovski, Linn Otendal
      */
+    @Operation(summary = "Authenticate user",
+            description = "Authenticate user with email and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Login successful, redirect to profile"),
+            @ApiResponse(responseCode = "200", description = "Login failed, return to login page with error")
+    })
     @PostMapping("/logIn")
     public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
@@ -127,6 +126,8 @@ public class LoginController {
      * @param email the email address to validate
      * @return {@code true} if the email is valid, {@code false} otherwise
      */
+    @Operation(summary = "Validate email format",
+            description = "Check if email address has valid format")
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email != null && email.matches(emailRegex);

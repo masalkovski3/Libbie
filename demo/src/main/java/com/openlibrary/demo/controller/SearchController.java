@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.model.Book;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +23,7 @@ import java.util.List;
  * Provides a search page and displays results based on user input, sorting, and limit.
  */
 @Controller
+@Tag(name = "Book Search", description = "Book search functionality")
 public class SearchController {
 
     /**
@@ -33,6 +38,12 @@ public class SearchController {
      * @param session HTTP session to store and retrieve the user's last search
      * @return The name of the view to render (search.html)
      */
+    @Operation(summary = "Search books page",
+            description = "Display search page with results from OpenLibrary API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search page displayed with results"),
+            @ApiResponse(responseCode = "200", description = "Search page displayed with error message")
+    })
     @GetMapping("/search")
     public String search(
             @RequestParam(required = false) String query,
@@ -93,6 +104,8 @@ public class SearchController {
      * @return A list of Book objects created from the API response
      * @throws JsonProcessingException If an error occurs while parsing JSON
      */
+    @Operation(summary = "Create book objects from API response",
+            description = "Convert JSON response from OpenLibrary to Book objects")
     private List <Book> createBookObject(int limit, JsonNode docs, Model model, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         List<Book> books = new ArrayList<>();
         for (int i = 0; i < Math.min(limit, docs.size()); i++) {
@@ -133,6 +146,8 @@ public class SearchController {
      * @param limit The maximum number of results to return
      * @return A StringBuilder representing the full API request URL
      */
+    @Operation(summary = "Create search URL",
+            description = "Build OpenLibrary API URL with search parameters")
     private StringBuilder createUrl(String query, String sort, int limit) {
         StringBuilder urlBuilder = new StringBuilder("https://openlibrary.org/search.json?q=");
         urlBuilder.append(query.trim().replace(" ", "+"));
@@ -158,6 +173,8 @@ public class SearchController {
      * @return A URL string pointing to the best available cover image
      * @throws JsonProcessingException If JSON processing fails when reading editions
      */
+    @Operation(summary = "Get cover URL for book",
+            description = "Determine best cover image URL for a book")
     private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String coverUrl = "";
         if (coverId != null){

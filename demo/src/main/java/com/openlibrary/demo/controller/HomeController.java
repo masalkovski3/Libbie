@@ -2,6 +2,8 @@ package com.openlibrary.demo.controller;
 
 import com.openlibrary.demo.DAO.RecommendationDAO;
 import com.openlibrary.demo.model.Book;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Controller
+@Tag(name = "Home", description = "Home page and main navigation")
 public class HomeController {
     private final RecommendationDAO recommendationDAO;
 
@@ -18,6 +21,8 @@ public class HomeController {
     }
 
     @GetMapping("/")
+    @Operation(summary = "Display home page",
+            description = "Shows the main home page with top rated books")
     public String home(Model model) {
         try {
             List<Book> books = recommendationDAO.getTopRatedBooks(20);

@@ -8,6 +8,10 @@ import com.openlibrary.demo.DAO.MemberDAO;
 import com.openlibrary.demo.DAO.FriendshipDAO;
 import com.openlibrary.demo.model.Book;
 import com.openlibrary.demo.model.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +41,11 @@ import org.apache.commons.io.FilenameUtils;
 /**
  * Controller som hanterar användarprofilsidan och tillhörande API-funktioner
  * såsom hantering av bokhyllor och sökning av böcker via OpenLibrary API.
- *
- * @author Linn Otendal, Emmi Masalkovski
  */
 //TODO: Ändra så att demo-användare inte används vid inlogg
 @Controller
 @RequestMapping("/profile")
+@Tag(name = "User Profile", description = "User profile management and bookshelf operations")
 public class ProfileController {
 
     private MemberDAO memberDAO;
@@ -63,9 +66,9 @@ public class ProfileController {
      *
      * @param model Model-objekt som används för att skicka data till vyn.
      * @return Namnet på HTML-vyn ("profile").
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Display user profile page",
+            description = "Show user's profile with bookshelves and books")
     @GetMapping
     public String profile(Model model, HttpSession session) {
         Member currentMember = (Member) session.getAttribute("currentMember");
@@ -154,9 +157,9 @@ public class ProfileController {
      * Säkerställer att demo-användaren existerar i databasen.
      *
      * @throws SQLException om databasåtkomst misslyckas.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Ensure demo user exists",
+            description = "Create demo user if it doesn't exist in database")
     private void ensureDemoUserExists() throws SQLException {
         if (!memberDAO.findById(DEMO_USER_ID).isPresent()) {
             // Skapa en stark demo-lösenordshash som uppfyller kraven
@@ -180,11 +183,16 @@ public class ProfileController {
      * @param description (Valfritt) Beskrivning av bokhyllan.
      * @param isPublic Anger om bokhyllan ska vara publik.
      * @return ResponseEntity med ny bokhyllas information eller felmeddelande.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
     @PostMapping("/bookshelves")
     @ResponseBody
+    @Operation(summary = "Create new bookshelf",
+            description = "Create a new bookshelf for the authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid bookshelf data or name already exists"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated")
+    })
     public ResponseEntity<?> createBookshelf(
             @RequestParam String name,
             @RequestParam(required = false) String description,
@@ -218,17 +226,21 @@ public class ProfileController {
         }
     }
 
-
-
     /**
      * Lägger till en bok i en specifik bokhylla.
      *
      * @param bookshelfId ID för bokhyllan.
      * @param workId OpenLibrary work ID för boken.
      * @return ResponseEntity som indikerar om operationen lyckades.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Add book to bookshelf",
+            description = "Add a book to a specific bookshelf")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book added successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Bookshelf belongs to another user"),
+            @ApiResponse(responseCode = "404", description = "Bookshelf not found")
+    })
     @PostMapping("/bookshelves/{bookshelfId}/books")
     @ResponseBody
     public ResponseEntity<?> addBookToShelf(
@@ -272,9 +284,15 @@ public class ProfileController {
      * @param bookshelfId ID för bokhyllan.
      * @param workId OpenLibrary work ID för boken.
      * @return ResponseEntity som indikerar om borttagningen lyckades.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Remove book from bookshelf",
+            description = "Remove a specific book from a bookshelf")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book removed successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Bookshelf belongs to another user"),
+            @ApiResponse(responseCode = "404", description = "Book or bookshelf not found")
+    })
     @DeleteMapping("/bookshelves/{bookshelfId}/books/{workId}")
     @ResponseBody
     public ResponseEntity<?> removeBookFromShelf(
@@ -322,9 +340,15 @@ public class ProfileController {
      *
      * @param bookshelfId ID för bokhyllan som ska tas bort.
      * @return ResponseEntity som indikerar resultatet av borttagningen.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Delete bookshelf",
+            description = "Delete an entire bookshelf and all its contents")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Bookshelf belongs to another user"),
+            @ApiResponse(responseCode = "404", description = "Bookshelf not found")
+    })
     @DeleteMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
     public ResponseEntity<?> deleteBookshelf(
@@ -374,6 +398,14 @@ public class ProfileController {
      * @return ResponseEntity med resultatet av uppdateringen.
      *
      */
+    @Operation(summary = "Update bookshelf name",
+            description = "Change the name of an existing bookshelf")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf renamed successfully"),
+            @ApiResponse(responseCode = "400", description = "Name already exists or invalid"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Bookshelf belongs to another user")
+    })
     @PutMapping("/bookshelves/{bookshelfId}")
     @ResponseBody
     public ResponseEntity<?> renameBookshelf(
@@ -422,9 +454,14 @@ public class ProfileController {
      *
      * @param description Ny beskrivning.
      * @return ResponseEntity med resultatet av uppdateringen.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Update bookshelf description",
+            description = "Update the description of a bookshelf")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Description updated successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @PostMapping("/bookshelves/updateDescription")
     public ResponseEntity<?> updateDescription(
             @RequestParam Long shelfId,
@@ -462,18 +499,21 @@ public class ProfileController {
     }
 
 
-
-
-
     /**
      * Uppdaterar synligheten (publik/privat) för en bokhylla.
      *
      * @param bookshelfId ID för bokhyllan.
      * @param isPublic Ny synlighetsstatus.
      * @return ResponseEntity med resultatet av uppdateringen.
-     *
-     * @author Linn Otendal, Emmi Masalkovski
      */
+    @Operation(summary = "Update bookshelf visibility",
+            description = "Change whether a bookshelf is public or private")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Visibility updated successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Bookshelf belongs to another user"),
+            @ApiResponse(responseCode = "404", description = "Bookshelf not found")
+    })
     @PutMapping("/bookshelves/{bookshelfId}/visibility")
     @ResponseBody
     public ResponseEntity<?> updateBookshelfVisibility(
@@ -521,9 +561,13 @@ public class ProfileController {
      *
      * @param query the search query string
      * @return ResponseEntity with list of books or error message
-     *
-     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
      */
+    @Operation(summary = "Search for books",
+            description = "Search OpenLibrary API for books to add to bookshelves")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search completed successfully"),
+            @ApiResponse(responseCode = "500", description = "Search failed")
+    })
     @GetMapping("/search")
     @ResponseBody
     public ResponseEntity<?> searchBooks(@RequestParam String query) {
@@ -546,9 +590,9 @@ public class ProfileController {
      * @param response JSON string from the OpenLibrary API
      * @return list of book maps
      * @throws IOException if JSON parsing fails
-     *
-     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
      */
+    @Operation(summary = "Parse book search results",
+            description = "Parse JSON response from OpenLibrary API")
     private List<Map<String, Object>> parseBookResults(String response) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
@@ -573,9 +617,9 @@ public class ProfileController {
      *
      * @param doc a JSON node representing one book
      * @return a map with title, author, workId, and coverUrl
-     *
-     * @author Linn Otendal, Emmi Masalkovski, Amelie Music
      */
+    @Operation(summary = "Extract book information",
+            description = "Extract relevant book data from JSON node")
     private Map<String, Object> extractBookInfo(JsonNode doc) {
         Map<String, Object> book = new HashMap<>();
         book.put("title", doc.path("title").asText("Unknown title"));
@@ -597,6 +641,12 @@ public class ProfileController {
         return book;
     }
 
+    @Operation(summary = "Update user profile",
+            description = "Update user's display name, bio, and profile image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Profile updated successfully"),
+            @ApiResponse(responseCode = "302", description = "Update failed, redirect with error")
+    })
     @PostMapping("/update")
     public String updateProfile(@RequestParam String displayName,
                                 @RequestParam(required = false) String bio,
@@ -639,6 +689,12 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    @Operation(summary = "Upload profile picture",
+            description = "Upload a new profile picture for the user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Image uploaded successfully"),
+            @ApiResponse(responseCode = "302", description = "Upload failed, redirect with error")
+    })
     @PostMapping("/upload-picture")
     public String uploadProfileImage(@RequestParam("image") MultipartFile image,
                                      HttpSession session,
@@ -686,6 +742,8 @@ public class ProfileController {
     /**
      * Sparar bilden i mappen profileImages/ och returnerar den URL som kan användas i <img>.
      */
+    @Operation(summary = "Save profile image",
+            description = "Save uploaded image file to server directory")
     private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
         // 1. Rensa bort farliga tecken
         String original = StringUtils.cleanPath(image.getOriginalFilename());
@@ -737,6 +795,13 @@ public class ProfileController {
      * @param model Spring MVC model for passing data to the view.
      * @return The "profile" view if allowed, or a redirect/error otherwise.
      */
+    @Operation(summary = "View friend's profile",
+            description = "Display another user's public profile if they are friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Friend profile displayed"),
+            @ApiResponse(responseCode = "302", description = "Redirect to login or own profile"),
+            @ApiResponse(responseCode = "403", description = "Not friends with this user")
+    })
     @GetMapping("/{id}")
     public String viewFriendProfile(@PathVariable Long id, HttpSession session, Model model) {
         Member currentUser = (Member) session.getAttribute("currentMember");
@@ -816,6 +881,13 @@ public class ProfileController {
      * @return a ResponseEntity containing the list of bookshelves as JSON if the user is logged in,
      *         or an error message if the user is not authenticated or a database error occurs
      */
+    @Operation(summary = "Get user bookshelves",
+            description = "Get all bookshelves for the authenticated user as JSON")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelves retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Database error")
+    })
     @GetMapping("/bookshelves")
     @ResponseBody
     public ResponseEntity<?> getUserBookshelves(HttpSession session) {
@@ -837,12 +909,17 @@ public class ProfileController {
     }
 
     /**
-     *
-     *
      * @param query the search string
      * @param session the current session
      * @return a list of Member objects (as JSON)
      */
+    @Operation(summary = "Search members",
+            description = "Search for other users by name for friend requests")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search completed successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Database error")
+    })
     @GetMapping("/searchMembers")
     @ResponseBody
     public ResponseEntity<?> searchMembers(String query, HttpSession session) {
@@ -882,6 +959,4 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error");
         }
     }
-
-
 }

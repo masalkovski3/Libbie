@@ -3,6 +3,8 @@ package com.openlibrary.demo.controller;
 import com.openlibrary.demo.DAO.ReviewDAO;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.model.Review;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/reviews")
+@Tag(name = "Book Reviews", description = "Book review management API")
 public class ReviewController {
 
     private final ReviewDAO reviewDAO;
@@ -38,6 +41,8 @@ public class ReviewController {
      * @param workId The Open Library work ID of the book
      * @return JSON response containing reviews and average score
      */
+    @Operation(summary = "Get book reviews",
+            description = "Retrieve all reviews for a specific book")
     @GetMapping("/book/{workId}")
     @ResponseBody
     public ResponseEntity<?> getBookReviews(@PathVariable String workId) {
@@ -65,6 +70,8 @@ public class ReviewController {
      * @param session The HTTP session containing the logged-in user information
      * @return JSON response containing the user's review data or an error message
      */
+    @Operation(summary = "Get user's review",
+            description = "Get the current user's review for a book")
     @GetMapping("/user/{workId}")
     @ResponseBody
     public ResponseEntity<?> getUserReview(@PathVariable String workId,
@@ -106,6 +113,8 @@ public class ReviewController {
      * @param session The HTTP session containing the logged-in user information
      * @return JSON response containing the updated reviews and average score, or an error message
      */
+    @Operation(summary = "Save review",
+            description = "Create or update a review for a book")
     @PostMapping("/book/{workId}")
     @ResponseBody
     public ResponseEntity<?> saveReview(
@@ -156,6 +165,8 @@ public class ReviewController {
      * @param session The HTTP session containing the logged-in user information
      * @return JSON response confirming deletion and containing updated review data, or an error message
      */
+    @Operation(summary = "Delete review",
+            description = "Delete the user's review for a book")
     @DeleteMapping("/book/{workId}")
     @ResponseBody
     public ResponseEntity<?> deleteReview(@PathVariable String workId,

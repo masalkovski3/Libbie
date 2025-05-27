@@ -1,5 +1,7 @@
 package com.openlibrary.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * that the user's identity is stored under the session attribute "currentMember".
  */
 @Controller
+@Tag(name = "Authentication", description = "User logout functionality")
 public class LogoutController {
 
     /**
@@ -26,6 +29,8 @@ public class LogoutController {
      * @return a redirect to the login page with logout indicator
      */
     @GetMapping("/logout")
+    @Operation(summary = "Log out user",
+            description = "Invalidate user session and redirect to login page")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         session.invalidate();
 

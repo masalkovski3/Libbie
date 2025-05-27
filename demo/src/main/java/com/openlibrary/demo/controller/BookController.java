@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.ReviewDAO;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.model.Review;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +32,7 @@ import java.util.List;
  * It also fetches and displays user reviews for the book.
  * The data is then added to the model and passed to the "book" view for rendering.
  */
+@Tag(name = "Books", description = "Endpoints for retrieving book data and reviews")
 @Controller
 public class BookController {
 
@@ -53,6 +57,15 @@ public class BookController {
      * @return The name of the view to render ("book") or "error" if the work was not found
      * @throws JsonProcessingException If parsing the JSON responses fails
      */
+    @Operation(
+            summary = "Get book details by work ID",
+            description = "Fetches book metadata from Open Library and retrieves reviews from the local database",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Book details and reviews retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Book not found in Open Library"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @GetMapping("/books/{workId}")
     public String books(@PathVariable String workId,
                         @RequestParam(required = false) Integer coverId,
@@ -137,6 +150,7 @@ public class BookController {
      * @param cleanId The cleaned work ID without `/works/` prefix
      * @return A full URL string for accessing work data via Open Library API
      */
+    @Operation(summary = "Get full Open Library API URL for a given work ID")
     public String getWorkUrl(String cleanId) {
         return "https://openlibrary.org/works/" + cleanId + ".json";
     }
@@ -147,6 +161,7 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The book title, or "Unknown" if not found
      */
+    @Operation(summary = "Extract book title from Open Library API response")
     public String getTitle(JsonNode root) {
         String title = root.path("title").asText();
         return title.isEmpty() ? "Unknown" : title;
@@ -159,6 +174,7 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The description text, or an empty string if unavailable
      */
+    @Operation(summary = "Extract book description from Open Library API response")
     public String getDescription(JsonNode root) {
         JsonNode descNode = root.path("description");
         if (descNode.isTextual()) {
@@ -179,6 +195,7 @@ public class BookController {
      * @return The author's name, or "Unknown" if not found
      * @throws JsonProcessingException If parsing the JSON response fails
      */
+    @Operation(summary = "Get author name using author key")
     public String getAuthor(JsonNode root, RestTemplate restTemplate, ObjectMapper mapper, String authorKey) throws JsonProcessingException {
         String author;
         String authorUrl = "https://openlibrary.org" + authorKey + ".json";
@@ -188,6 +205,7 @@ public class BookController {
         return author;
     }
 
+    @Operation(summary = "Get list of all authors for a work")
     public List<String> getAuthorWithKey(JsonNode root, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         List<String> authors = new ArrayList<>();
         JsonNode authorsNode = root.path("authors");
@@ -215,6 +233,7 @@ public class BookController {
         return authors;
     }
 
+    @Operation(summary = "Extract first available cover ID from work JSON")
     public Integer getCoverId(JsonNode root) {
         Integer coverId;
         JsonNode covers = root.path("covers");
@@ -232,6 +251,7 @@ public class BookController {
      * @param root The root JSON node from the work API response
      * @return The author's key string (e.g., /authors/OL1234A), or empty if not found
      */
+    @Operation(summary = "Extract first author key from work JSON")
     public String getAuthorKey(JsonNode root) throws JsonProcessingException {
         String authorKey = "";
         JsonNode authorsNode = root.path("authors");
@@ -253,6 +273,7 @@ public class BookController {
      * @return A URL string pointing to a large cover image, or empty string if none found
      * @throws JsonProcessingException If parsing the edition response fails
      */
+    @Operation(summary = "Determine best cover URL based on coverId or edition data")
     public String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String coverUrl = "";
         if (coverId !=null){
@@ -287,6 +308,7 @@ public class BookController {
      * @return The earliest publication year found, or -1 if not available
      * @throws JsonProcessingException If parsing the edition response fails
      */
+    @Operation(summary = "Get earliest known publication year from edition data")
     public int getPublishYear(String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String editionsUrl = "https://openlibrary.org/works/" + cleanId + "/editions.json?limit=50";
         String editionResponse = restTemplate.getForObject(editionsUrl, String.class);

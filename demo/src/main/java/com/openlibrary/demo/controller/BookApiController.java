@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.model.Book;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,19 +25,26 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/books")
+@Tag(name = "Book Search API", description = "REST API for searching books using OpenLibrary")
 public class BookApiController {
 
     /**
      * Searches for books based on a query string.
      * The method sends a GET request to the OpenLibrary API with the specified search query.
      * It parses the JSON response and maps up to 10 results to {@link Book} objects.
-     *  * Each book includes a title, author name, OpenLibrary work Id, and optionally a cover image URL and Id.
+     * Each book includes a title, author name, OpenLibrary work Id, and optionally a cover image URL and Id.
      *
      * @param query the search string to look for books; must not be null or blank
      * @return a list of up to 10 {@link Book} objects matching the query;
      *         an empty list if the query is blank or yields no results
      * @throws JsonProcessingException if there is an error while parsing the OpenLibrary API response
      */
+    @Operation(summary = "Search for books",
+            description = "Search for books using OpenLibrary API with optional genre filter")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Books found successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid search parameters")
+    })
     @GetMapping("/search")
     public List<Book> searchBooks(@RequestParam String query,
                                   @RequestParam(required = false) String genre) throws JsonProcessingException {
@@ -75,6 +86,8 @@ public class BookApiController {
      * @param coverId, the coverId for the actual book
      * @return coverUrl
      */
+    @Operation(summary = "Get cover URL for book",
+            description = "Retrieve cover image URL from OpenLibrary")
     public String getCoverUrl(JsonNode doc, int coverId){
         String coverUrl = "";
         JsonNode covers = doc.path("cover_i");
@@ -97,6 +110,8 @@ public class BookApiController {
      * @param doc the JSON node representing a single book from OpenLibrary's API response
      * @return the cover Id if present; otherwise, 0
      */
+    @Operation(summary = "Extract cover ID from book data",
+            description = "Get the cover ID from OpenLibrary book JSON")
     public int getCoverId(JsonNode doc){
         int coverId = 0;
         JsonNode covers = doc.path("cover_i");
@@ -114,6 +129,8 @@ public class BookApiController {
      * @param doc the JSON node representing a single book from OpenLibrary's API response
      * @return the title of the book as a string
      */
+    @Operation(summary = "Extract book title",
+            description = "Get the title from OpenLibrary book JSON")
     public String getTitle(JsonNode doc){
         String title = doc.path("title").asText();
 
@@ -122,14 +139,14 @@ public class BookApiController {
 
     /**
      * Extracts the author's name from the given JSON node.
-     * <p>
      * If multiple authors are listed, only the first one is returned.
      * If no author is available, "Unknown" is returned.
-     * </p>
      *
      * @param doc the JSON node representing a single book from OpenLibrary's API response
      * @return the author's name, or "Unknown" if not available
      */
+    @Operation(summary = "Extract book title",
+            description = "Get the title from OpenLibrary book JSON")
     public String getAuthor(JsonNode doc){
         JsonNode authors = doc.path("author_name");
         String author = (authors.isArray() && authors.size() > 0) ? authors.get(0).asText() : "Unknown";
@@ -140,13 +157,13 @@ public class BookApiController {
 
     /**
      * Extracts the work Id from the given JSON node.
-     * <p>
      * The work Id is a unique identifier for the book in the OpenLibrary system.
-     * </p>
      *
      * @param doc the JSON node representing a single book from OpenLibrary's API response
      * @return the work Id as a string
      */
+    @Operation(summary = "Extract work ID",
+            description = "Get the OpenLibrary work ID from book JSON")
     public String getWorkId(JsonNode doc){
         String workId = doc.path("key").asText();
 
