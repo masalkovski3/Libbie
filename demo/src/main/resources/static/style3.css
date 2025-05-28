@@ -1683,3 +1683,8 @@ input[type="range"]:focus::-webkit-slider-thumb {
         padding: 15px;
     }
 }
+
+#no-books-message {
+    color: #0d1f43;
+    font-size: 18px;
+}

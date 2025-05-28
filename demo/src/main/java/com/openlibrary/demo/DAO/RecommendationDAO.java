@@ -92,7 +92,7 @@ public class RecommendationDAO {
                         "JOIN book b ON b.open_library_id = rb.open_library_id " +
                         "ORDER BY rb.avg_score DESC " +
                         "LIMIT ?";
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // Set parameters (memberId used twice)
