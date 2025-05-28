@@ -1808,7 +1808,7 @@ main {
 }
 
 .pagination .page-item .page-link {
-    color: #B9CBE8;
+    color: #0d1f43;
     border: 1px solid #F3B0C3;
     background-color: #FCF2F3;
     font-weight: 500;
@@ -1820,7 +1820,7 @@ main {
 
 .pagination .page-item .page-link:hover {
     background-color: #FEE1E8;
-    color: #B9CBE8;
+    color: #0d1f43 !important;
 }
 
 .pagination .page-item.active .page-link {
