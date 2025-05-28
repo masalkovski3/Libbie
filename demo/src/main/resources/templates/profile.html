@@ -82,7 +82,6 @@
                 <div th:each="shelf : ${bookshelves}" class="bookshelf-container" th:id="'bookshelf-' + ${shelf.id}">
                     <div class="bookshelf-header">
                         <h3 class="bookshelf-title" th:text="${shelf.name}">Bookshelf Name</h3>
-
                         <div>
                             <!-- Show/hide button and description -->
                             <button class="btn btn-sm btn-outline-primary"
@@ -103,7 +102,12 @@
                                     onclick="showEditDescriptionModal(this)">
                                 Edit Description
                             </button>
-
+                            <button class="btn btn-sm toggle-visibility-btn"
+                                    th:data-shelf-id="${shelf.id}"
+                                    th:data-shelf-public="${shelf['visibility']}"
+                                    th:text="${shelf['visibility']} ? 'Make Private' : 'Make Public'"
+                                    th:classappend="${shelf['visibility']} ? 'btn-outline-secondary' : 'btn-outline-primary'">
+                            </button>
                             <button class="btn btn-sm btn-outline-danger"
                                     th:data-shelf-id="${shelf.id}"
                                     onclick="confirmDeleteShelf(this.getAttribute('data-shelf-id'))">
@@ -181,8 +185,8 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="saveShelfButton">Save</button>
+                            <button type="button" class="btn-rose" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-rose" id="saveShelfButton">Save</button>
                         </div>
                     </div>
                 </div>
@@ -206,8 +210,8 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="renameShelfButton">Save</button>
+                            <button type="button" class="btn-rose" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-rose" id="renameShelfButton">Save</button>
                         </div>
                     </div>
                 </div>
@@ -231,7 +235,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn-rose" onclick="updateDescription()">Save</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn-rose" data-bs-dismiss="modal">Cancel</button>
                                 </div>
                             </form>
                         </div>
@@ -253,7 +257,7 @@
                                 <label for="bookSearch" class="form-label">Search for a Book</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="bookSearch" placeholder="Enter title or author">
-                                    <button class="btn btn-outline-primary" type="button" id="searchBookButton">Search</button>
+                                    <button class="btn-rose" type="button" id="searchBookButton">Search</button>
                                 </div>
                             </div>
                             <div id="searchResults" class="search-book-results">
@@ -343,7 +347,7 @@
 
                 <ul th:unless="${#lists.isEmpty(friends)}" class="friend-list">
                     <li th:each="friend : ${friends}">
-                        <a th:href="@{'/profile/' + ${friend['id']}}"
+                        <a th:href="@{'/friend/' + ${friend['id']}}"
                            th:text="${friend['displayName']}">Friend</a>
                     </li>
                 </ul>

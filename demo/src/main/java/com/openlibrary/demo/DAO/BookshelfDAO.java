@@ -2,6 +2,7 @@ package com.openlibrary.demo.DAO;
 
 import com.openlibrary.demo.controller.BookController;
 import com.openlibrary.demo.controller.DatabaseConnection;
+import com.openlibrary.demo.model.Bookshelf;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -143,8 +144,36 @@ public class BookshelfDAO {
                 return Optional.of(bookshelf);
             }
         }
-
         return Optional.empty();
+    }
+
+    /**
+     * Retrieves a bookshelf by its ID.
+     *
+     * @param id the ID of the bookshelf
+     * @return an Optional containing the bookshelf map if found, or empty otherwise
+     * @throws SQLException if a database access error occurs
+     */
+    public Bookshelf findByIdReturnBookshelf(Long id) throws SQLException {
+        String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setLong(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Bookshelf bookshelf = new Bookshelf();
+                bookshelf.setId(resultSet.getLong("id"));
+                bookshelf.setName(resultSet.getString("name"));
+                bookshelf.setMemberId(resultSet.getLong("member_id"));
+                bookshelf.setDescription(resultSet.getString("description"));
+                bookshelf.setVisibility(resultSet.getBoolean("is_public"));
+                bookshelf.setPosition(resultSet.getInt("position"));
+                return bookshelf;
+            }
+        }
+        return null;
     }
 
     /**
@@ -500,4 +529,49 @@ public class BookshelfDAO {
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
     }
+
+    /**
+     * Retrieves all public bookshelves for a given member.
+     *
+     * @param memberId The ID of the member whose public bookshelves are requested.
+     * @return A list of {@link Bookshelf} objects that are marked as public.
+     * @throws SQLException if a database access error occurs.
+     */
+    public List<Bookshelf> getPublicBookshelvesByMemberId(Long memberId) throws SQLException {
+        List<Bookshelf> bookshelves = new ArrayList<>();
+        String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = TRUE";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Bookshelf shelf = new Bookshelf();
+                shelf.setId(rs.getLong("id"));
+                shelf.setMemberId(rs.getLong("member_id"));
+                shelf.setName(rs.getString("name"));
+                shelf.setDescription(rs.getString("description"));
+                shelf.setVisibility(rs.getBoolean("is_public"));
+                // Lägg till fler fält om Bookshelf har fler attribut
+                bookshelves.add(shelf);
+            }
+
+        }
+
+        return bookshelves;
+    }
+
+    public void setVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
+        String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, isPublic);
+            stmt.setLong(2, bookshelfId);
+            stmt.executeUpdate();
+        }
+    }
+
+
 }
