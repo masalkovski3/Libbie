@@ -450,6 +450,7 @@ public class BookshelfDAO {
      */
     public boolean updateBookshelfDescription(Long bookshelfId, String description) throws SQLException {
         String sql = "UPDATE bookshelf SET description = ? WHERE id = ?";
+        System.out.println("In BookshelfDAO");
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)){

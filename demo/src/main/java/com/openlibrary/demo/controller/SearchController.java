@@ -106,31 +106,33 @@ public class SearchController {
      */
     @Operation(summary = "Create book objects from API response",
             description = "Convert JSON response from OpenLibrary to Book objects")
-    private List <Book> createBookObject(int limit, JsonNode docs, Model model, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+    private List<Book> createBookObject(int limit, JsonNode docs, Model model, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         List<Book> books = new ArrayList<>();
         for (int i = 0; i < Math.min(limit, docs.size()); i++) {
             JsonNode doc = docs.get(i);
             String title = doc.path("title").asText();
-            JsonNode authors = doc.path("author_name");
-            String author = (authors.isArray() && authors.size() > 0) ? authors.get(0).asText() : "Unknown";
+            String author = "Unknown";
+            JsonNode authorsNode = doc.path("author_name"); // Try author_name first
+            if (authorsNode.isMissingNode() || !authorsNode.isArray() || authorsNode.size() == 0) {
+                authorsNode = doc.path("authors"); // Try authors as fallback
+                if (authorsNode.isArray() && authorsNode.size() > 0) {
+                    JsonNode authorObj = authorsNode.get(0).path("name");
+                    author = authorObj.isMissingNode() ? "Unknown" : authorObj.asText();
+                }
+            } else {
+                author = authorsNode.get(0).asText();
+            }
             String workID = doc.path("key").asText();
             String cleanId = workID.replace("/works/", "");
 
-            // Hämta omslag
             int coverId;
             JsonNode covers = doc.path("cover_i");
+            coverId = covers.isMissingNode() || covers.isNull() ? 0 : covers.asInt();
 
-            if (!covers.isMissingNode() && !covers.isNull()) {
-                coverId = covers.asInt();
-            } else {
-                coverId = 0;
-            }
-
-            String coverUrl = getCoverUrl(doc.path("cover_i").asInt(), cleanId, restTemplate, mapper);
+            String coverUrl = getCoverUrl(coverId, cleanId, restTemplate, mapper);
             books.add(new Book(title, author, workID, coverUrl, coverId));
         }
 
-        // Visa felmeddelande om inga böcker hittades
         if (books.isEmpty()) {
             model.addAttribute("errorMessage", "No books found matching your search criteria. Please try a different search term.");
             model.addAttribute("showError", true);
