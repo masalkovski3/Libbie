@@ -108,6 +108,82 @@
                         </div>
                     </div>
                 </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4" th:if="${totalPages > 1}">
+                    <nav>
+                        <ul class="pagination">
+
+                            <!-- Previous -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=${currentPage - 1}, limit=${limit})}">
+                                    Previous
+                                </a>
+                            </li>
+
+                            <!-- Page 1 -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=0, limit=${limit})}">1</a>
+                            </li>
+
+                            <!-- Left ellipsis -->
+                            <li class="page-item disabled" th:if="${currentPage > 2}">
+                                <span class="page-link">…</span>
+                            </li>
+
+                            <!-- CurrentPage -1 -->
+                            <li class="page-item" th:if="${currentPage > 1}">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=${currentPage - 1}, limit=${limit})}"
+                                   th:text="${currentPage}">Prev</a>
+                            </li>
+
+                            <!-- CurrentPage (active) -->
+                            <li class="page-item active" th:if="${currentPage != 0 && currentPage != totalPages - 1}">
+                                <a class="page-link" href="#" th:text="${currentPage + 1}">Current</a>
+                            </li>
+
+                            <!-- CurrentPage +1 -->
+                            <li class="page-item"
+                                th:if="${currentPage + 1 < totalPages - 1}">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=${currentPage + 1}, limit=${limit})}"
+                                   th:text="${currentPage + 2}">Next</a>
+                            </li>
+
+                            <!-- Right ellipsis -->
+                            <li class="page-item disabled"
+                                th:if="${currentPage < totalPages - 3}">
+                                <span class="page-link">…</span>
+                            </li>
+
+                            <!-- Last page (active if you're on it) -->
+                            <li class="page-item"
+                                th:if="${currentPage == totalPages - 1}"
+                                th:classappend="'active'">
+                                <a class="page-link" href="#" th:text="${totalPages}">Last</a>
+                            </li>
+
+                            <!-- Last page (link if you're NOT on it) -->
+                            <li class="page-item"
+                                th:if="${currentPage != totalPages - 1}">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=${totalPages - 1}, limit=${limit})}"
+                                   th:text="${totalPages}">Last</a>
+                            </li>
+
+                            <!-- Next -->
+                            <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/search(query=${query}, genre=${genre}, page=${currentPage + 1}, limit=${limit})}">
+                                    Next
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
             </div>
 
 

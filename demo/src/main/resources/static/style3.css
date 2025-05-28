@@ -83,8 +83,6 @@ body {
     flex-direction: column;
     transition: margin-left 0.3s ease; /* Mjuk övergång */
     width: 100%; /* Full bredd när menyn är dold */
-    margin-top: 0;    
-    padding-top: 0;
 }
 
 /* När sidofältet är synligt, justerar vi innehållets marginal */
@@ -1838,3 +1836,53 @@ main {
     margin-top: -5px; /* Lite overlap med books-container */
     border-radius: 0 0 15px 15px;
 }
+
+/* Pagination custom style */
+.pagination {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.pagination .page-item .page-link {
+    color: #0d1f43;
+    border: 1px solid #F3B0C3;
+    background-color: #FCF2F3;
+    font-weight: 500;
+    border-radius: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    margin: 0 0.15rem;
+    transition: background-color 0.2s ease;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #FEE1E8;
+    color: #0d1f43 !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #F3B0C3;
+    color: white;
+    border-color: #F3B0C3;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #ccc;
+    background-color: #f9f9f9;
+    border-color: #eee;
+}
+
+.btn-outline-primary {
+    color: #B9CBE8;
+    border-color: #B9CBE8;
+    background-color: transparent;
+    border-radius: 0.6rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #CDDEEF;
+    color: #fff;
+    border-color: #B9CBE8;
+}
+
