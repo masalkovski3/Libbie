@@ -577,27 +577,6 @@ hr {
     background-color: #deb8d6;
 }
 
-.scroll-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #0d1f43;
-    cursor: pointer;
-    padding: 10px;
-    transition: 0.5s;
-    z-index: 10;
-}
-
-.scroll-button:hover {
-    background: none;
-    color: #0d1f43;
-    text-shadow: 1px 1px 10px black;
-    transition: 0.5s;
-}
-
 .left {
     left: 45px;
 }
@@ -793,13 +772,13 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .books-container {
     display: flex;
     overflow-x: auto;
-    border: 2px solid white;
+    border: 2px solid #deacdf5d;
     border-radius: 15px;
     padding: 15px;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    background-color: #ffffff;
+    background-color: transparent; /*bakgrund bakom böcker i bokhylla*/
     padding: 0 50px;
     padding-top: 20px;
     padding-bottom: 10px;
@@ -847,20 +826,58 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 /* Scrollknappar */
-.scroll-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 2;
+.books-wrapper .scroll-button,
+button.scroll-button,
+.scroll-button.scroll-left,
+.scroll-button.scroll-right {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 40px !important;
+    height: 40px !important;
+    background-color: #f3c1d6 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* CSS-pilar istället för Unicode */
+.scroll-left::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 12px solid #5c2d91;
+    display: block;
+}
+
+.scroll-right::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid #5c2d91;
+    display: block;
+}
+
+/* Hover states */
+.scroll-button:hover {
+    background-color: #e09ebd !important;
+}
+
+.scroll-left:hover::before {
+    border-right-color: #4a1f73 !important;
+}
+
+.scroll-right:hover::before {
+    border-left-color: #4a1f73 !important;
 }
 
 .scroll-left {
@@ -875,9 +892,9 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .empty-shelf-message {
     padding: 20px;
     text-align: center;
-    background-color: #f9f9f9;
+    background-color: transparent;
     border-radius: 5px;
-    color: #777;
+    color: #5c2d91;
 }
 
 /* Knapp för att lägga till bokhylla */
@@ -1632,6 +1649,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
     box-sizing: content-box !important;
 }
 
+/*KARUSELL-STYLE */
 .book-carousel .carousel-item {
     text-align: center;
     display: flex;
@@ -1799,4 +1817,16 @@ main {
     font-size: 28px;
     font-weight: bold;
     padding-bottom: 30px;
+}
+
+/* Bokhyllbild under varje bokhylla */
+.bookshelf-image {
+    width: 100%;
+    height: 60px;
+    background-image: url('/images/bookshelf.png');
+    background-repeat: no-repeat; /* Ingen upprepning */
+    background-size: 100% 100%; /* Stretch hela bilden */
+    background-position: center bottom;
+    margin-top: -5px; /* Lite overlap med books-container */
+    border-radius: 0 0 15px 15px;
 }
