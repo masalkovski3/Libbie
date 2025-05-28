@@ -61,4 +61,9 @@ public class RecommendationDAO {
         }
         return books;
     }
+
+    public List<Book> getRecommendedForYou(int limit) throws SQLException {
+        List<Book> books = new ArrayList<>();
+        return books;
+    }
 }
