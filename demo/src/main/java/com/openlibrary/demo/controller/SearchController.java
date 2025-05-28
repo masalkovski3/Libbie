@@ -3,7 +3,9 @@ package com.openlibrary.demo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openlibrary.demo.dto.SearchResult;
 import com.openlibrary.demo.model.Book;
+import com.openlibrary.demo.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,6 +27,17 @@ import java.util.List;
 @Controller
 @Tag(name = "Book Search", description = "Book search functionality")
 public class SearchController {
+
+    private final BookService bookService;
+
+    /**
+     * Constructor-based dependency injection.
+     * Spring will automatically inject BookService since there's only one constructor.
+     * @param bookService The BookService object
+     */
+    public SearchController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     /**
      * Handles GET requests to the /search endpoint. If no query is provided, attempts to reuse
@@ -48,49 +61,40 @@ public class SearchController {
     public String search(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) String genre,
+            @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "30") int limit,
             @RequestParam(required = false, defaultValue = "relevance") String sort,
             Model model,
             HttpSession session) {
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url;
+        int offset = page * limit;
 
-        // Om genren finns, hämta topplistan via OpenLibrary Subjects API
-        if (genre != null && !genre.trim().isEmpty()) {
-            url = "https://openlibrary.org/subjects/" + genre.toLowerCase().replace(" ", "_") + ".json?limit=" + limit;
-        }
-        // Annars, använd vanlig sökning via query
-        else if (query != null && !query.trim().isEmpty()) {
-            url = "https://openlibrary.org/search.json?q=" + query + "&limit=" + limit;
-        }
-        // Om varken query eller genre anges, returnera tomma resultat
-        else {
-            model.addAttribute("books", new ArrayList<>());
+        if ((query == null || query.isBlank()) && (genre == null || genre.isBlank())) {
+            model.addAttribute("books", List.of());
+            model.addAttribute("totalCount", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("currentPage", 0);
             return "search";
         }
 
-        try {
-            String response = restTemplate.getForObject(url, String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response);
-            JsonNode docs = root.has("works") ? root.path("works") : root.path("docs");
-
-            List<Book> books = createBookObject(limit, docs, model, restTemplate, mapper);
-            model.addAttribute("books", books);
-            model.addAttribute("query", query);
+        SearchResult result;
+        if (genre != null && !genre.isBlank()) {
+            result = bookService.searchByGenre(genre, limit, offset);
             model.addAttribute("genre", genre);
-            model.addAttribute("selectedSort", sort);
-
-            return "search";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "An error occurred during search.");
-            model.addAttribute("books", new ArrayList<>());
-            return "search";
+        } else {
+            result = bookService.searchByQuery(query, limit, offset);
+            model.addAttribute("query", query);
         }
-}
+
+        model.addAttribute("books", result.getBooks());
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("totalCount", result.getTotalCount());
+        model.addAttribute("totalPages", (int) Math.ceil((double) result.getTotalCount() / limit));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("limit", limit);
+
+        return "search";
+    }
 
     /**
      * Converts JSON response data from OpenLibrary into a list of Book objects.
