@@ -5,8 +5,9 @@ body {
     padding: 0;
     font-family: Georgia, 'Times New Roman', Times, serif;
     color: #0d1f43;
-    min-height: 100vh; /*viewport height - måttenhet för webbläsrens vyfönster. 100vh betyder 100% av vyfönstret*/
-    display: flex; /*skapar flexbox för hela sidan*/
+    min-height: 100vh;
+    display: flex;
+    width: 100%; /* Ensure body takes full width */
 }
 
 /* HAMBURGAREMENY STILAR */
@@ -75,9 +76,10 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    margin-left: 0; /* Ingen marginal när menyn är dold */
-    transition: margin-left 0.3s ease; /* Mjuk övergång */
-    width: 100%; /* Full bredd när menyn är dold */
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+    width: 100%;
+    padding: 0; /* Ensure no padding is shrinking the header */
 }
 
 /* När sidofältet är synligt, justerar vi innehållets marginal */
@@ -104,6 +106,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    text-decoration: none;
 }
 
 nav ul {
@@ -119,7 +122,6 @@ nav ul {
 }
 
 .layout{
-    display: flex;
     min-height: 100vh;
     width: 100%;
     position: relative;
@@ -248,10 +250,13 @@ hr {
     color: white;
     padding: 20px 0;
     display: flex;
-    justify-content: flex-end; /* Justera horisontellt till höger */
-    align-items: center; /* Justera vertikalt till mitten */
+    justify-content: flex-end;
+    align-items: center;
     width: 100%;
     font-family: Georgia;
+    position: relative;
+    left: 0;
+    right: 0;
 }
 
 .main-header h1 {
@@ -259,6 +264,7 @@ hr {
     font-size: 48px;
     color: white;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .button-header {
@@ -1568,21 +1574,21 @@ input[type="range"]:focus::-webkit-slider-thumb {
     text-align: center;
     display: flex;
     justify-content: center;
-    padding: 10px; /* Avstånd mellan varje bok */
+    padding: 10px;
 }
 
 .book-item-wrapper {
-    border: 1px solid #ddd; /* Kant runt hela bokinnehållet */
-    border-radius: 10px; /* Rundade hörn */
-    padding: 15px; /* Utrymme runt omslaget och texten */
-    background-color: #c3d3e6; /* Bakgrundsfärg för varje bokruta */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lätt skugga för djup */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #c3d3e6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column; /* För att hålla bild och text vertikalt */
-    align-items: center; /* Centrerar innehållet */
-    width: 200px; /* Maxbredd på bokrutan */
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
     height: 375px;
-    margin: 0 auto; /* Centrerar elementet horisontellt */
+    margin: 0 auto;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

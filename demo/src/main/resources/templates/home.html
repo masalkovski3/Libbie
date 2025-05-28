@@ -1,87 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Libbie - Your personal library</title>
-    <link href="style3.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <link href="/style3.css" rel="stylesheet" type="text/css">
+    <!-- Remove Slick Carousel CSS since we won't use it -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/> -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/> -->
 </head>
 <body>
-<div class="layout">
-    <!-- Hamburgarikon för att öppna menyn -->
-    <div class="menu-toggle" id="menuToggle">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-
-    <!-- Sidebar med 'sidebar-hidden' klass som default -->
-    <aside class="sidebar sidebar-hidden" id="sidebar">
-        <div class="container">
-            <header id="sidebar-header">
-                <img class="logo" src="images/pink-logo.jpeg" alt="Libie Logo">
-                <h2>Menu</h2>
-                <nav>
-                    <ul>
-                        <li class="button">
-                            <a href="/">Home</a>
-                        </li>
-                        <li class="button">
-                            <a href="/search">Search</a>
-                        </li>
-                        <li class="button">
-                            <a href="/profile">Profile</a>
-                        </li>
-                        <li class="button">
-                            <a href="/about">About Libbie</a>
-                        </li>
-                    </ul>
-                </nav>
-            </header>
-        </div>
-    </aside>
-
-    <main class="content">
-        <!-- Ny header för Libbie -->
-        <header class="main-header">
-            <div class="logo-container">
-                <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
-                <h1>Libbie</h1>
-            </div>
-            <div class="auth-buttons">
-                <th:block th:if="${session.currentMember != null}">
-                    <a href="/profile" class="button-header">Profile</a>
-                    <a href="/logout" class="button-header">Logout</a>
-                </th:block>
-                <th:block th:unless="${session.currentMember != null}">
-                    <a href="/logIn" class="button-header">Login</a>
-                    <a href="/signUp" class="button-header">Sign Up</a>
-                </th:block>
-            </div>
-        </header>
-
-        <!-- navigationsrad för genrer -->
-        <nav class="genre-nav">
-            <ul class="genre-list">
-                <li class="genre-item"><a href="/search?query=Fantasy" class="genre-button">Fantasy</a></li>
-                <li class="genre-item"><a href="/search?query=Science+Fiction" class="genre-button">Science Fiction</a></li>
-                <li class="genre-item"><a href="/search?query=Mystery" class="genre-button">Mystery</a></li>
-                <li class="genre-item"><a href="/search?query=Romance" class="genre-button">Romance</a></li>
-                <li class="genre-item"><a href="/search?query=Drama" class="genre-button">Drama</a></li>
-                <li class="genre-item"><a href="/search?query=Thriller" class="genre-button">Thriller</a></li>
-                <li class="genre-item"><a href="/search?query=Horror" class="genre-button">Horror</a></li>
-                <li class="genre-item"><a href="/search?query=Detective" class="genre-button">Detective</a></li>
-                <li class="genre-item"><a href="/search?query=Biography" class="genre-button">Biography</a></li>
-                <li class="genre-item"><a href="/search?query=History" class="genre-button">History</a></li>
-                <li class="genre-item"><a href="/search?query=Self-Help" class="genre-button">Self-Help</a></li>
-                <li class="genre-item"><a href="/search?query=Poetry" class="genre-button">Poetry</a></li>
-            </ul>
-        </nav>
-
+<div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+    <div th:fragment="pageContent">
         <div class="page-content">
             <p class="home-headings">Welcome to your digital library</p>
 
@@ -89,10 +19,35 @@
             <div class="page-content">
                 <p class="home-headings">Top Rated Books</p>
 
-                <!-- Slick Carousel for top-rated books -->
-                <div th:if="${books != null}" class="book-carousel">
-                    <div class="carousel">
-                        <div th:each="book : ${books}" class="carousel-item">
+                <!-- Replace carousel with a grid layout -->
+                <div th:if="${books != null}" class="book-grid">
+                    <div th:each="book : ${books}" class="book-grid-item">
+                        <div class="book-item-wrapper">
+                            <img th:src="${book.coverUrl}"
+                                 onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                 alt="Book cover"
+                                 class="book-cover">
+                            <h3 th:text="${book.title}"></h3>
+                            <p th:text="${book.author}"></p>
+                            <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                            <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- If no books found -->
+                <div th:if="${books == null or books.isEmpty()}">
+                    <p>No books found.</p>
+                </div>
+            </div>
+
+            <th:block th:if="${session.currentMember != null}">
+                <div class="page-content">
+                    <p class="home-headings">Recommended for you</p>
+
+                    <!-- Replace carousel with a grid layout -->
+                    <div th:if="${recommendedBooks != null}" class="book-grid">
+                        <div th:each="book : ${recommendedBooks}" class="book-grid-item">
                             <div class="book-item-wrapper">
                                 <img th:src="${book.coverUrl}"
                                      onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
@@ -105,45 +60,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-
-                <!-- If no books found -->
-                <div th:if="${books == null or books.isEmpty()}">
-                    <p>No books found.</p>
-                </div>
-            </div>
-
-            <th:block th:if="${session.currentMember != null}">
-                <div class="page-content">
-                    <p class="home-headings">Recommended for you</p>
-
-                    <!-- Slick Carousel for top-rated books -->
-                    <div th:if="${recommendedBooks != null}" class="book-carousel">
-                        <div class="carousel">
-                            <div th:each="book : ${recommendedBooks}" class="carousel-item">
-                                <div class="book-item-wrapper">
-                                    <img th:src="${book.coverUrl}"
-                                         onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
-                                         alt="Book cover"
-                                         class="book-cover">
-                                    <h3 th:text="${book.title}"></h3>
-                                    <p th:text="${book.author}"></p>
-                                    <p th:text="'Rating: ' + ${book.reviewScore}"></p>
-                                    <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- If no books found -->
+                    <!-- If no recommended books found -->
                     <div th:if="${recommendedBooks == null or recommendedBooks.isEmpty()}">
-                        <p id="no-books-message" >No recommended books, review books to get recommendations.</p>
+                        <p id="no-books-message">No recommended books, review books to get recommendations.</p>
                     </div>
                 </div>
             </th:block>
-
 
             <div class="img-flex">
                 <div class="img-container">
@@ -151,35 +74,25 @@
                     <p class="caption">Create your own personal bookshelves</p>
                 </div>
             </div>
-
-            <hr>
-
             <div class="bottom-section">
                 <img src="/images/library.jpg" alt="Picture">
-                <p class="text">Libbie is your personal digital bookshelf where you can organize, explore and share your reading experiences. Create themed shelves, discover new authors, and connect with other book lovers..</p>
+                <p class="text">Libbie is your personal digital bookshelf where you can organize, explore and share your reading experiences. Create themed shelves, discover new authors, and connect with other book lovers.</p>
                 <p class="text" id="text">With Libbie, you can keep track of what you've read, what you want to read, and get recommendations based on your interests. Start your digital reading journey today.</p>
             </div>
-
-            <hr>
-
-            <footer>
-                <h5>Latest Update: 2025-03-27</h5>
-            </footer>
         </div>
-    </main>
+    </div>
 </div>
 
 <!-- JavaScript-koppling -->
 <script th:src="@{/script.js}" defer></script>
 
-<!--fragment för felmeddelande-->
+<!-- Fragment för felmeddelande -->
 <div th:replace="fragments/modal :: errorModal"></div>
-<!-- fragment för session-timeout-warning-->
+<!-- Fragment för session-timeout-warning -->
 <div th:replace="fragments/modal :: sessionWarningModal"></div>
 
-
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-
+<!-- Remove Slick Carousel scripts since we won't use it -->
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script> -->
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
 </body>
 </html>
