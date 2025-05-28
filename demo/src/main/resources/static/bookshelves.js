@@ -21,20 +21,18 @@ if (saveShelfButton) {
         const shelfName = document.getElementById('shelfName').value.trim();
         const shelfDescription = document.getElementById('shelfDescription').value.trim();
 
-
         if (shelfName) {
+            const body = `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}`;
+
             fetch('/profile/bookshelves', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}`
-                
+                body: body
             })
                 .then(response => {
-                    // First check if the response is OK
                     if (!response.ok) {
-                        // If not, try to parse the JSON error message
                         return response.json().then(errorData => {
                             throw new Error(errorData.errorMessage || 'An error occurred');
                         });
@@ -42,14 +40,9 @@ if (saveShelfButton) {
                     return response.json();
                 })
                 .then(data => {
-                    // This code only runs if the response was OK
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addShelfModal'));
                     modal.hide();
-
-                    // Visa bekräftelsemeddelande (inte en error men använder samma funktion)
                     showError(`Bookshelf created: ${shelfName}`);
-
-                    // Fördröj omladdningen så att användaren hinner se meddelandet
                     setTimeout(() => {
                         location.reload();
                     }, 2000);
@@ -156,8 +149,12 @@ function addBookToShelf(bookshelfId, workId) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addBookModal'));
                 modal.hide();
 
+                showError('Book added to bookshelf');
+
                 // Reload the page to show the new book
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
             }
         })
         .catch(error => {
@@ -584,4 +581,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedBookshelves.clear();
             });
     }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButtons = document.querySelectorAll(".toggle-visibility-btn");
+
+    toggleButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const shelfId = this.dataset.shelfId;
+            const isCurrentlyPublic = this.dataset.shelfPublic === "true";
+
+            fetch(`/profile/bookshelves/${shelfId}/toggle-visibility`, {
+                method: "POST"
+            }).then(response => {
+                if (response.ok) {
+                    // Uppdatera knappens utseende utan reload
+                    const newIsPublic = !isCurrentlyPublic;
+                    this.dataset.shelfPublic = newIsPublic.toString();
+                    this.textContent = newIsPublic ? "Make Private" : "Make Public";
+
+                    // Justera färgklass
+                    this.classList.remove("btn-outline-secondary", "btn-outline-primary");
+                    this.classList.add(newIsPublic ? "btn-outline-secondary" : "btn-outline-primary");
+                } else {
+                    alert("Failed to toggle visibility. Status: " + response.status);
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+                alert("Error toggling visibility.");
+            });
+        });
+    });
 });

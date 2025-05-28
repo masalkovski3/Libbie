@@ -1,12 +1,12 @@
 package com.openlibrary.demo.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.BookshelfDAO;
 import com.openlibrary.demo.DAO.MemberDAO;
 import com.openlibrary.demo.DAO.FriendshipDAO;
 import com.openlibrary.demo.model.Book;
+import com.openlibrary.demo.model.Bookshelf;
 import com.openlibrary.demo.model.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -769,23 +769,6 @@ public class ProfileController {
         return "/profileImages/" + filename;
     }
 
-    /*
-    private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
-         Path uploadPath = Paths.get("profileImages");
-
-         if(!Files.exists(uploadPath)) {
-             Files.createDirectory(uploadPath);
-         }
-
-         String filename = memberId + "_" + image.getOriginalFilename();
-         Path filePath = uploadPath.resolve(filename);
-
-         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-         return filename;
-     }
-     */
-
     /**
      * Displays the profile of another member, if they are a confirmed friend.
      * Only public bookshelves are shown.
@@ -958,5 +941,29 @@ public class ProfileController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error");
         }
+    }
+
+    @PostMapping("/bookshelves/{id}/toggle-visibility")
+    public String toggleBookshelfVisibility(@PathVariable Long id,
+                                            HttpSession session,
+                                            RedirectAttributes redirectAttributes) throws SQLException {
+        System.out.println("Trying to toggle visibility of bookshelves: " + id);
+        Member currentMember = (Member) session.getAttribute("currentMember");
+
+        Bookshelf shelf = bookshelfDAO.findByIdReturnBookshelf(id);
+        if (shelf == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bookshelf not found");
+        }
+
+        Long shelfOwnerId = shelf.getMemberId();
+
+        if (!shelfOwnerId.equals(currentMember.getId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "This bookshelf does not belong to your profile");
+        }
+
+        boolean isCurrentlyPublic = shelf.isVisibility();
+        bookshelfDAO.setVisibility(id, !isCurrentlyPublic);
+
+        return "redirect:/profile";
     }
 }

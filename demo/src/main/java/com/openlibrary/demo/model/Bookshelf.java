@@ -7,6 +7,8 @@ public class Bookshelf {
     private String name;
     private Long memberId;
     private String description;
+    private boolean visibility;
+    private int position;
 
     public Bookshelf() {
     }
@@ -52,6 +54,22 @@ public class Bookshelf {
 
     public void setDescription(String description){
         this.description = description;
+    }
+
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override

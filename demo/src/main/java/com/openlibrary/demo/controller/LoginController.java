@@ -86,6 +86,8 @@ public class LoginController {
             if(optionalMember.isPresent()){
                 //Om det lyckas
                 session.setAttribute("currentMember", optionalMember.get());
+                System.out.println(">>> Session SET: memberId = " + session.getAttribute("currentMember"));
+                System.out.println(">>> Session ID = " + session.getId());
 
                 //ha kvar bekräftelsemeddelande för login?
                 redirectAttributes.addFlashAttribute("errorMessage", "You have successfully logged in!"); //ej error men använder samma metod
