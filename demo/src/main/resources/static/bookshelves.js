@@ -149,8 +149,12 @@ function addBookToShelf(bookshelfId, workId) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addBookModal'));
                 modal.hide();
 
+                showError('Book added to bookshelf');
+
                 // Reload the page to show the new book
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
             }
         })
         .catch(error => {

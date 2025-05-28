@@ -769,23 +769,6 @@ public class ProfileController {
         return "/profileImages/" + filename;
     }
 
-    /*
-    private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
-         Path uploadPath = Paths.get("profileImages");
-
-         if(!Files.exists(uploadPath)) {
-             Files.createDirectory(uploadPath);
-         }
-
-         String filename = memberId + "_" + image.getOriginalFilename();
-         Path filePath = uploadPath.resolve(filename);
-
-         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-         return filename;
-     }
-     */
-
     /**
      * Displays the profile of another member, if they are a confirmed friend.
      * Only public bookshelves are shown.
