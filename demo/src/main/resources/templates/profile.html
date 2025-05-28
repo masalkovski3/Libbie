@@ -118,11 +118,10 @@
                     <!-- Books in the bookshelf -->
                     <div class="books-wrapper">
                         <!-- Left scroll button -->
-                        <button class="scroll-button scroll-left"
-                                th:data-shelf-id="${shelf.id}"
-                                onclick="scrollBooks(this.getAttribute('data-shelf-id'), -200)">
-                            &#9664;
-                        </button>
+                        <div class="scroll-button scroll-left"
+                             th:data-shelf-id="${shelf.id}"
+                             onclick="scrollBooks(this.getAttribute('data-shelf-id'), -200)">
+                        </div>
 
                         <div class="books-container" th:id="'books-' + ${shelf.id}">
                             <!-- If no books exist -->
@@ -148,11 +147,10 @@
                         </div>
 
                         <!-- Right scroll button -->
-                        <button class="scroll-button scroll-right"
-                                th:data-shelf-id="${shelf.id}"
-                                onclick="scrollBooks(this.getAttribute('data-shelf-id'), 200)">
-                            &#9654;
-                        </button>
+                        <div class="scroll-button scroll-right"
+                             th:data-shelf-id="${shelf.id}"
+                             onclick="scrollBooks(this.getAttribute('data-shelf-id'), 200)">
+                        </div>
                     </div>
 
                     <!-- Bookshelf image -->
