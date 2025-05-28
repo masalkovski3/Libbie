@@ -114,6 +114,36 @@
                 </div>
             </div>
 
+            <th:block th:if="${session.currentMember != null}">
+                <div class="page-content">
+                    <p class="home-headings">Recommended for you</p>
+
+                    <!-- Slick Carousel for top-rated books -->
+                    <div th:if="${books != null}" class="book-carousel">
+                        <div class="carousel">
+                            <div th:each="book : ${books}" class="carousel-item">
+                                <div class="book-item-wrapper">
+                                    <img th:src="${book.coverUrl}"
+                                         onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                         alt="Book cover"
+                                         class="book-cover">
+                                    <h3 th:text="${book.title}"></h3>
+                                    <p th:text="${book.author}"></p>
+                                    <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- If no books found -->
+                    <div th:if="${books == null or books.isEmpty()}">
+                        <p>No books found.</p>
+                    </div>
+                </div>
+            </th:block>
+
+
             <div class="img-flex">
                 <div class="img-container">
                     <img src="/images/bookshelf.jpg" alt="Bookshelf">
