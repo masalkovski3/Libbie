@@ -102,6 +102,7 @@
                                 <h3 th:text="${book.title}"></h3>
                                 <p th:text="${book.author}"></p>
                                 <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                                <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -119,9 +120,9 @@
                     <p class="home-headings">Recommended for you</p>
 
                     <!-- Slick Carousel for top-rated books -->
-                    <div th:if="${books != null}" class="book-carousel">
+                    <div th:if="${recommendedBooks != null}" class="book-carousel">
                         <div class="carousel">
-                            <div th:each="book : ${books}" class="carousel-item">
+                            <div th:each="book : ${recommendedBooks}" class="carousel-item">
                                 <div class="book-item-wrapper">
                                     <img th:src="${book.coverUrl}"
                                          onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
@@ -130,6 +131,7 @@
                                     <h3 th:text="${book.title}"></h3>
                                     <p th:text="${book.author}"></p>
                                     <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                                    <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
                                 </div>
                             </div>
                         </div>
@@ -137,8 +139,8 @@
 
 
                     <!-- If no books found -->
-                    <div th:if="${books == null or books.isEmpty()}">
-                        <p>No books found.</p>
+                    <div th:if="${recommendedBooks == null or recommendedBooks.isEmpty()}">
+                        <p id="no-books-message" >No recommended books, review books to get recommendations.</p>
                     </div>
                 </div>
             </th:block>
@@ -155,7 +157,7 @@
 
             <div class="bottom-section">
                 <img src="/images/library.jpg" alt="Picture">
-                <p class="text">Libbie is your personal digital book shelf where you can organize, explore and share your reading experiences. Create themed shelves, discover new authors, and connect with other book lovers..</p>
+                <p class="text">Libbie is your personal digital bookshelf where you can organize, explore and share your reading experiences. Create themed shelves, discover new authors, and connect with other book lovers..</p>
                 <p class="text" id="text">With Libbie, you can keep track of what you've read, what you want to read, and get recommendations based on your interests. Start your digital reading journey today.</p>
             </div>
 

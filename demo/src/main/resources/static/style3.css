@@ -1,9 +1,3 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
 body {
     overflow: visible;
     background-color: #deacdf5d !important;
@@ -81,6 +75,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    margin-left: 0; /* Ingen marginal när menyn är dold */
     transition: margin-left 0.3s ease; /* Mjuk övergång */
     width: 100%; /* Full bredd när menyn är dold */
 }
@@ -124,23 +119,11 @@ nav ul {
 }
 
 .layout{
+    display: flex;
     min-height: 100vh;
     width: 100%;
     position: relative;
-    overflow:hidden;
 }
-.logo-container {
-    display: flex;
-    align-items: center;
-    text-decoration: none;     /* tar bort understrykning */
-    color: inherit;            /* ärver färg från omgivningen */
-}
-
-.logo-container h1 {
-    margin: 0;                 /* så att det inte skapar extra avstånd */
-    font-size: 24px;
-}
-
 
 #sidebar-header {
     flex: 0 0 200px;
@@ -254,10 +237,9 @@ hr {
 /* Stilar för page-content container */
 .page-content {
     width: 100%;
-    padding: 20px 50px;  /* Justera padding som du vill */
-    box-sizing: border-box;
-    margin: 0 auto;
-    max-width: 100vw;
+    box-sizing: border-box; /* Inkluderar padding i breddberäkningen */
+    padding: 20px 50px;
+    flex-grow: 1;
 }
 
 /* NYA STILAR FÖR HEADER OCH GENRE-KNAPPAR */
@@ -266,13 +248,10 @@ hr {
     color: white;
     padding: 20px 0;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+    justify-content: flex-end; /* Justera horisontellt till höger */
+    align-items: center; /* Justera vertikalt till mitten */
+    width: 100%;
     font-family: Georgia;
-    box-sizing: border-box;
-    position: relative;
 }
 
 .main-header h1 {
@@ -307,7 +286,7 @@ hr {
 .button-header:hover {
     background-color: #d9b5d2;
     transform: translateY(-2px);
-    cursor: pointer;
+    cursor: pointer; 
 }
 
 .auth-buttons {
@@ -319,12 +298,9 @@ hr {
 
 .genre-nav {
     background-color: #e8edf3;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+    width: 100%;
     padding: 10px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
-    box-sizing: border-box;
 }
 
 .genre-list {
@@ -583,6 +559,27 @@ hr {
     background-color: #deb8d6;
 }
 
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    padding: 10px;
+    transition: 0.5s;
+    z-index: 10;
+}
+
+.scroll-button:hover {
+    background: none;
+    color: #4f6082;
+    text-shadow: 1px 1px 10px black;
+    transition: 0.5s;
+}
+
 .left {
     left: 45px;
 }
@@ -762,10 +759,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .bookshelf-title {
     font-size: 1.5rem;
     margin: 0;
-    font-family: Georgia;
-    color: #0d1f43;
-    padding-left: 30px;
-    font-weight: bold;
 }
 
 /* Böcker och scrollning */
@@ -778,19 +771,11 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .books-container {
     display: flex;
     overflow-x: auto;
-    border: 2px solid #deacdf5d;
-    border-radius: 15px;
-    padding: 15px;
+    padding-bottom: 15px;
     scroll-behavior: smooth;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    background-color: transparent; /*bakgrund bakom böcker i bokhylla*/
-    padding: 0 50px;
-    padding-top: 20px;
-    padding-bottom: 10px;
-
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
-
 
 .books-container::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
@@ -801,15 +786,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
     max-width: 120px;
     margin-right: 15px;
     text-align: center;
-    height: 100%;
-    max-height: 300px;
-
 }
-
-.book-item button {
-    margin-top: auto;
-}
-
 
 .book-cover {
     height: 160px;
@@ -828,62 +805,23 @@ input[type="range"]:focus::-webkit-slider-thumb {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    min-height: 3em;
 }
 
 /* Scrollknappar */
-.books-wrapper .scroll-button,
-button.scroll-button,
-.scroll-button.scroll-left,
-.scroll-button.scroll-right {
-    position: absolute !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: 40px !important;
-    height: 40px !important;
-    background-color: #f3c1d6 !important;
-    border: none !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    z-index: 2 !important;
-    transition: all 0.3s ease !important;
-}
-
-/* CSS-pilar istället för Unicode */
-.scroll-left::before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 12px solid #5c2d91;
-    display: block;
-}
-
-.scroll-right::before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-left: 12px solid #5c2d91;
-    display: block;
-}
-
-/* Hover states */
-.scroll-button:hover {
-    background-color: #e09ebd !important;
-}
-
-.scroll-left:hover::before {
-    border-right-color: #4a1f73 !important;
-}
-
-.scroll-right:hover::before {
-    border-left-color: #4a1f73 !important;
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
 }
 
 .scroll-left {
@@ -898,9 +836,9 @@ button.scroll-button,
 .empty-shelf-message {
     padding: 20px;
     text-align: center;
-    background-color: transparent;
+    background-color: #f9f9f9;
     border-radius: 5px;
-    color: #5c2d91;
+    color: #777;
 }
 
 /* Knapp för att lägga till bokhylla */
@@ -908,28 +846,13 @@ button.scroll-button,
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #1f3366;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
     margin-bottom: 20px;
-    transition: background-color ease 0.3s;
-}
-
-.add-shelf-button:hover {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: #0d1f43;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-bottom: 20px;
-    transition: background-color ease 0.3s;
 }
 
 .add-shelf-button svg {
@@ -1356,20 +1279,6 @@ button.scroll-button,
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
 }
-.shelf-description-box {
-    border: 1px solid #8EACBF; /* eller en annan accentfärg */
-    padding: 0.5rem 1rem;
-    margin-top : 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    color: #444;
-    min-height: 50px;
-    max-height: 50px;
-    display: flex;
-    align-items: center;
-}
-
 
 .modal-content {
     background-color: #fff;
@@ -1655,7 +1564,6 @@ button.scroll-button,
     box-sizing: content-box !important;
 }
 
-/*KARUSELL-STYLE */
 .book-carousel .carousel-item {
     text-align: center;
     display: flex;
@@ -1664,17 +1572,16 @@ button.scroll-button,
 }
 
 .book-item-wrapper {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    background-color: #c3d3e6;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+    border: 1px solid #ddd; /* Kant runt hela bokinnehållet */
+    border-radius: 10px; /* Rundade hörn */
+    padding: 15px; /* Utrymme runt omslaget och texten */
+    background-color: #c3d3e6; /* Bakgrundsfärg för varje bokruta */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lätt skugga för djup */
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 200px;
-    height: 400px;
-    margin: 0 auto;
+    flex-direction: column; /* För att hålla bild och text vertikalt */
+    align-items: center; /* Centrerar innehållet */
+    max-width: 200px; /* Maxbredd på bokrutan */
+    margin: 0 auto; /* Centrerar elementet horisontellt */
 }
 
 .book-carousel .book-cover {
@@ -1699,7 +1606,6 @@ button.scroll-button,
     margin: 5px 0;
     text-align: center;
 }
-
 
 .home-headings{
     padding-left: 30px;
@@ -1777,112 +1683,3 @@ button.scroll-button,
         padding: 15px;
     }
 }
-
-/*lade till denna för att sidan inte ska bli så bred*/
-main {
-    width: 100%;
-    max-width: clamp(320px, 90%, 1400px);    margin: 0 auto;
-    padding: 1rem;
-}
-
-#top-rated-books-details {
-    background-color: #4f6082;
-    color: white;              /* vit text */
-    border: none;              /* ingen kantlinje */
-    padding: 10px 20px;        /* inre marginal */
-    font-size: 15px;           /* textstorlek */
-    border-radius: 5px;        /* rundade hörn */
-    cursor: pointer;           /* muspekare som knapp */
-    transition: background-color 0.3s ease;
-    height: 40px;
-    width: 120px;
-    text-align: center;
-    vertical-align: middle;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
- }
-
-#top-rated-books-details:hover {
-    background-color: #1f3366;
-}
-
-.page-heading {
-    font-family: Georgia;
-    color: #0d1f43;
-    padding-left: 70px;
-    padding-top: 30px;
-    font-size: 34px;
-    font-weight: bold;
-}
-
-.page-heading2 {
-    font-family: Georgia;
-    color: #0d1f43;
-    padding-left: 30px;
-    font-size: 28px;
-    font-weight: bold;
-    padding-bottom: 30px;
-}
-
-/* Bokhyllbild under varje bokhylla */
-.bookshelf-image {
-    width: 100%;
-    height: 60px;
-    background-image: url('/images/bookshelf.png');
-    background-repeat: no-repeat; /* Ingen upprepning */
-    background-size: 100% 100%; /* Stretch hela bilden */
-    background-position: center bottom;
-    margin-top: -5px; /* Lite overlap med books-container */
-    border-radius: 0 0 15px 15px;
-}
-
-/* Pagination custom style */
-.pagination {
-    font-weight: 500;
-    font-size: 1rem;
-}
-
-.pagination .page-item .page-link {
-    color: #0d1f43;
-    border: 1px solid #F3B0C3;
-    background-color: #FCF2F3;
-    font-weight: 500;
-    border-radius: 0.6rem;
-    padding: 0.5rem 0.8rem;
-    margin: 0 0.15rem;
-    transition: background-color 0.2s ease;
-}
-
-.pagination .page-item .page-link:hover {
-    background-color: #FEE1E8;
-    color: #0d1f43 !important;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #F3B0C3;
-    color: white;
-    border-color: #F3B0C3;
-}
-
-.pagination .page-item.disabled .page-link {
-    color: #ccc;
-    background-color: #f9f9f9;
-    border-color: #eee;
-}
-
-.btn-outline-primary {
-    color: #B9CBE8;
-    border-color: #B9CBE8;
-    background-color: transparent;
-    border-radius: 0.6rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-outline-primary:hover {
-    background-color: #CDDEEF;
-    color: #fff;
-    border-color: #B9CBE8;
-}
-
