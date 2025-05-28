@@ -152,7 +152,7 @@ public class ReviewController {
             return ResponseEntity.ok(response);
         } catch (SQLException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Failed to save review: " + e.getMessage());
+            error.put("error", "You need to add this book to a bookshelf to be able to write a review.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
