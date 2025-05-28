@@ -1602,7 +1602,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .btn-book-details {
     margin-top: auto; /* tryck ner knappen till botten om flex används */
     padding: 8px 12px;
-    background-color: #4f6082;
+    background-color: #0d1f43;
     color: white;
     border: none;
     border-radius: 5px;
@@ -1612,7 +1612,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
     transition: background-color 0.3s ease;
     display: inline-block;
     text-align: center;
-    width: 140px;
 }
 
 .btn-book-details:hover {
