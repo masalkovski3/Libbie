@@ -83,6 +83,8 @@ body {
     flex-direction: column;
     transition: margin-left 0.3s ease; /* Mjuk övergång */
     width: 100%; /* Full bredd när menyn är dold */
+    margin-top: 0;    
+    padding-top: 0;
 }
 
 /* När sidofältet är synligt, justerar vi innehållets marginal */
@@ -266,10 +268,13 @@ hr {
     color: white;
     padding: 20px 0;
     display: flex;
-    justify-content: flex-end; /* Justera horisontellt till höger */
-    align-items: center; /* Justera vertikalt till mitten */
-    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     font-family: Georgia;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .main-header h1 {
@@ -316,9 +321,12 @@ hr {
 
 .genre-nav {
     background-color: #e8edf3;
-    width: 100%;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     padding: 10px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    box-sizing: border-box;
 }
 
 .genre-list {
