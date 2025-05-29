@@ -91,27 +91,30 @@
                 <p class="home-headings">Top Rated Books</p>
 
                 <!-- Slick Carousel for top-rated books -->
-                <div th:if="${books != null}" class="book-carousel">
-                    <div class="carousel">
-                        <div th:each="book : ${books}" class="carousel-item">
-                            <div class="book-item-wrapper">
-                                <img th:src="${book.coverUrl}"
-                                     onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
-                                     alt="Book cover"
-                                     class="book-cover">
-                                <h3 th:text="${book.title}"></h3>
-                                <p th:text="${book.author}"></p>
-                                <p th:text="'Rating: ' + ${book.reviewScore}"></p>
-                                <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
+                <div class="carousel-background">
+                    <div class="carousel-wrapper">
+                        <div th:if="${books != null}" class="book-carousel">
+                            <div class="carousel">
+                                <div th:each="book : ${books}" class="carousel-item">
+                                    <div class="book-item-wrapper">
+                                        <img th:src="${book.coverUrl}"
+                                             onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                             alt="Book cover"
+                                             class="book-cover">
+                                        <h3 th:text="${book.title}"></h3>
+                                        <p th:text="${book.author}"></p>
+                                        <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                                        <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-
-                <!-- If no books found -->
-                <div th:if="${books == null or books.isEmpty()}">
-                    <p>No books found.</p>
+                    <!-- If no books found -->
+                    <div th:if="${books == null or books.isEmpty()}">
+                        <p>No books found.</p>
+                    </div>
                 </div>
             </div>
 
@@ -120,18 +123,22 @@
                     <p class="home-headings">Recommended for you</p>
 
                     <!-- Slick Carousel for top-rated books -->
-                    <div th:if="${recommendedBooks != null}" class="book-carousel">
-                        <div class="carousel">
-                            <div th:each="book : ${recommendedBooks}" class="carousel-item">
-                                <div class="book-item-wrapper">
-                                    <img th:src="${book.coverUrl}"
-                                         onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
-                                         alt="Book cover"
-                                         class="book-cover">
-                                    <h3 th:text="${book.title}"></h3>
-                                    <p th:text="${book.author}"></p>
-                                    <p th:text="'Rating: ' + ${book.reviewScore}"></p>
-                                    <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
+                    <div class="carousel-background">
+                        <div class="carousel-wrapper">
+                            <div th:if="${recommendedBooks != null}" class="book-carousel">
+                                <div class="carousel">
+                                    <div th:each="book : ${recommendedBooks}" class="carousel-item">
+                                        <div class="book-item-wrapper">
+                                            <img th:src="${book.coverUrl}"
+                                                 onerror="this.onerror=null;this.src='/images/blue-logo.jpeg';"
+                                                 alt="Book cover"
+                                                 class="book-cover">
+                                            <h3 th:text="${book.title}"></h3>
+                                            <p th:text="${book.author}"></p>
+                                            <p th:text="'Rating: ' + ${book.reviewScore}"></p>
+                                            <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

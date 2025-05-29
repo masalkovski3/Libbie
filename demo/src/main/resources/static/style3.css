@@ -1894,6 +1894,22 @@ main {
     width: 140px;
 }
 
+.carousel-background {
+    background-color: #f4c6da; /* Rosa bakgrund */
+    width: 100vw;              /* Full bredd av skärmen */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    transform: translateX(-50%); /* Centrera trots 100vw */
+    padding: 40px 0;            /* Lodrät padding för luft */
+    box-sizing: border-box;
+}
+
+.carousel-wrapper {
+    position: relative; /* NY positionering här istället */
+    max-width: 1200px;   /* Eller vad du använder för centrering */
+    margin: 0 auto;
+}
 
 .btn-book-details:hover {
     background-color: #081632;
