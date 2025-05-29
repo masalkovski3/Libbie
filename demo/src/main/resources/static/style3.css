@@ -1886,3 +1886,126 @@ main {
     border-color: #B9CBE8;
 }
 
+
+/* BOOKSHELF EDIT BUTTON STYLING */
+/* Bookshelf actions container - använder bara inline-block för att undvika layout-problem */
+.bookshelf-actions {
+    display: inline-block;
+}
+
+/* Dropdown knapp styling */
+.bookshelf-dropdown-btn {
+    background-color: #f3c1d6 !important;
+    color: #5c2d91 !important;
+    border: 1px solid #e09ebd !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    /* Använder inline-flex istället för flex för att undvika layout-problem */
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.bookshelf-dropdown-btn:hover {
+    background-color: #e09ebd !important;
+    border-color: #d088a3 !important;
+    color: #4a1f73 !important;
+}
+
+.bookshelf-dropdown-btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(243, 193, 214, 0.5) !important;
+    outline: none !important;
+}
+
+/* Pil som roterar när dropdown öppnas */
+.dropdown-arrow {
+    transition: transform 0.2s ease !important;
+    margin-left: 2px !important;
+}
+
+.bookshelf-dropdown-btn[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg) !important;
+}
+
+/* Dropdown menu styling */
+.bookshelf-dropdown-menu {
+    border: 1px solid #e09ebd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    padding: 8px 0 !important;
+    min-width: 200px !important;
+    background-color: #fff !important;
+    margin-top: 4px !important;
+}
+
+/* Dropdown items */
+.bookshelf-dropdown-menu .dropdown-item {
+    padding: 10px 16px !important;
+    color: #5c2d91 !important;
+    font-size: 14px !important;
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    text-align: left !important;
+    transition: background-color 0.2s ease !important;
+    /* Använder inline-flex för ikoner utan att påverka layout */
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.bookshelf-dropdown-menu .dropdown-item:hover {
+    background-color: #f8f0f3 !important;
+    color: #4a1f73 !important;
+}
+
+.bookshelf-dropdown-menu .dropdown-item:focus {
+    background-color: #f8f0f3 !important;
+    color: #4a1f73 !important;
+    outline: none !important;
+}
+
+/* Röd färg för delete-knappen */
+.bookshelf-dropdown-menu .dropdown-item.text-danger {
+    color: #dc3545 !important;
+}
+
+.bookshelf-dropdown-menu .dropdown-item.text-danger:hover {
+    background-color: #fdf2f2 !important;
+    color: #b02a37 !important;
+}
+
+/* Divider mellan items */
+.bookshelf-dropdown-menu .dropdown-divider {
+    margin: 8px 0 !important;
+    border-color: #f3c1d6 !important;
+}
+
+/* Ikoner i dropdown */
+.bookshelf-dropdown-menu .dropdown-item svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+    margin-right: 8px !important;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .bookshelf-dropdown-menu {
+        min-width: 180px !important;
+        font-size: 13px !important;
+    }
+
+    .bookshelf-dropdown-btn {
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+    }
+
+    .bookshelf-dropdown-menu .dropdown-item {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+}
+
