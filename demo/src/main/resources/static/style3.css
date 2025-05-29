@@ -1668,14 +1668,29 @@ button.scroll-button,
     border-radius: 10px;
     padding: 15px;
     background-color: #c3d3e6;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 200px;
+    height: 385px;
     max-width: 200px;
-    height: 400px;
     margin: 0 auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
 }
+
+.book-item-wrapper h3,
+.book-item-wrapper p {
+    width: 100%;          /* Max bredd inom wrappern */
+    overflow: hidden;     /* Dölj text som går utanför */
+    white-space: nowrap;  /* Ingen radbrytning */
+    text-overflow: ellipsis; /* Visa "..." vid overflow */
+    box-sizing: border-box; /* Så padding och border räknas in i bredden */
+}
+
 
 .book-carousel .book-cover {
     width: 150px; /* Minska bildstorlek */
@@ -1700,26 +1715,27 @@ button.scroll-button,
     text-align: center;
 }
 
-
 .home-headings{
     padding-left: 30px;
     font-size: 34px;
     font-weight: bold;
 }
 
-.slick-prev, .slick-next {
-    background-color: #0d1f43;
-    color: white;
+.slick-prev,
+.slick-next {
+    width: 60px;
+    height: 60px;
+    background: none;
     border-radius: 50%;
-    padding: 10px;
-    font-size: 18px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 9999;
-    display: block;
-    visibility: visible;
 }
+
 
 .slick-prev {
     left: 10px;
@@ -1729,11 +1745,35 @@ button.scroll-button,
     right: 10px;
 }
 
+.slick-prev::before,
+.slick-next::before {
+    content: '‹'; /* eller använd '❮' och '❯' för större pil */
+    color: #0d1f43 !important;
+    font-size: 40px !important;
+    line-height: 1;
+    display: block;
+    align-items: center;
+}
+
 @media (max-width: 768px) {
     .slick-prev, .slick-next {
-        font-size: 16px;
-        padding: 8px;
+        font-size: 20px;
+        padding: 15px;
     }
+}
+
+
+@media (min-width: 768px) {
+    .slick-prev, .slick-next {
+        font-size: 28px;
+        padding: 25px;
+    }
+}
+
+#no-books-message {
+    color: #0d1f43;
+    font-size: 18px;
+    padding-left: 50px;
 }
 
 .slick-prev:hover, .slick-next:hover {
@@ -1750,32 +1790,25 @@ button.scroll-button,
     visibility: visible;
 }
 
-.slick-prev {
-    left: 10px;
+.btn-book-details {
+    margin-top: auto; /* tryck ner knappen till botten om flex används */
+    padding: 8px 12px;
+    background-color: #4f6082;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    width: 140px;
 }
 
-.slick-next {
-    right: 10px;
-}
 
-.slick-prev, .slick-next {
-    display: block;
-    visibility: visible;
-}
-
-.slick-prev {
-    left: 10px;
-}
-
-.slick-next {
-    right: 10px;
-}
-
-@media (min-width: 768px) {
-    .slick-prev, .slick-next {
-        font-size: 24px;
-        padding: 15px;
-    }
+.btn-book-details:hover {
+    background-color: #081632;
 }
 
 /*lade till denna för att sidan inte ska bli så bred*/
