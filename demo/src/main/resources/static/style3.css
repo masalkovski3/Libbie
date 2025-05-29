@@ -1661,6 +1661,7 @@ button.scroll-button,
     display: flex;
     justify-content: center;
     padding: 10px; /* Avstånd mellan varje bok */
+    /*background-color: #e09ebd;*/
 }
 
 .book-item-wrapper {
@@ -1749,7 +1750,7 @@ button.scroll-button,
 .slick-next::before {
     content: '‹'; /* eller använd '❮' och '❯' för större pil */
     color: #0d1f43 !important;
-    font-size: 40px !important;
+    font-size: 30px !important;
     line-height: 1;
     display: block;
     align-items: center;
@@ -1875,6 +1876,27 @@ main {
     background-color: #F3B0C3;
     color: white;
     border-color: #F3B0C3;
+}
+
+.btn-book-details {
+    margin-top: auto; /* tryck ner knappen till botten om flex används */
+    padding: 8px 12px;
+    background-color: #4f6082;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    width: 140px;
+}
+
+
+.btn-book-details:hover {
+    background-color: #081632;
 }
 
 .pagination .page-item.disabled .page-link {
