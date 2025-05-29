@@ -140,4 +140,7 @@ public class Book {
         return reviewScore;
     }
 
+    public void setReviewScore(double reviewScore) {
+        this.reviewScore = reviewScore;
+    }
 }
