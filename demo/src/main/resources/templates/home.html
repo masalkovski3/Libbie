@@ -102,7 +102,6 @@
                                 <h3 th:text="${book.title}"></h3>
                                 <p th:text="${book.author}"></p>
                                 <p th:text="'Rating: ' + ${book.reviewScore}"></p>
-                                <a th:href="@{/books/{workId}(workId=${book.workId})}" class="btn-book-details">View Details</a>
                             </div>
                         </div>
                     </div>

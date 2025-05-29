@@ -1790,27 +1790,6 @@ button.scroll-button,
     visibility: visible;
 }
 
-.btn-book-details {
-    margin-top: auto; /* tryck ner knappen till botten om flex används */
-    padding: 8px 12px;
-    background-color: #4f6082;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: inline-block;
-    text-align: center;
-    width: 140px;
-}
-
-
-.btn-book-details:hover {
-    background-color: #081632;
-}
-
 /*lade till denna för att sidan inte ska bli så bred*/
 main {
     width: 100%;
