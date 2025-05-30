@@ -330,7 +330,7 @@ function autoCloseSuccessModals() {
             messageText.includes('added') ||
             messageText.includes('created')
         )) {
-            console.log("Success message detected, will auto-close in 3 seconds");
+            console.log("Success message detected, will auto-close in 2 seconds");
 
             setTimeout(function() {
                 errorModal.style.display = 'none';
@@ -345,4 +345,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(autoCloseSuccessModals, 100);
     setTimeout(autoCloseSuccessModals, 500);
 });
+
+//kör också auto-close när showError anropas
+const originalShowError = window.showError;
+if (typeof originalShowError === 'function') {
+    window.showError = function(message) {
+        originalShowError(message);
+        // Kör auto-close efter att modalen visats
+        setTimeout(autoCloseSuccessModals, 100);
+    };
+}
 
