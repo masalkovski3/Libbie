@@ -2,25 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
 
-    menuToggle.addEventListener('click', function() {
-        sidebar.classList.toggle('sidebar-hidden');
-        menuToggle.classList.toggle('active');
-    });
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-hidden');
+            menuToggle.classList.toggle('active');
+        });
+    }
 });
 
-//Javascript för att slidern med årtalen i advanced filters ska uppdateras.
-const slider = document.getElementById('yearFilter');
-const yearDisplay = document.getElementById('yearValue');
-
-if (slider && yearDisplay) {
-    yearDisplay.textContent = slider.value;
-
-    slider.addEventListener('input', () => {
-        yearDisplay.textContent = slider.value;
-    });
-}
-
-function showPasswordErrorModal() {
+function showPasswordErrorModal() {      //ta bort???
     $('#passwordErrorModal').modal('show');
 }
 
@@ -189,68 +179,63 @@ document.addEventListener("DOMContentLoaded", function () {
     setupSessionWarning(10, 1);
 });
 
-$(document).ready(function(){
-    $('.carousel').slick({
-        infinite: true,       // Oändlig scroll
-        slidesToShow: 3,      // Visa tre böcker åt gången
-        slidesToScroll: 1,    // Rulla en bok åt gången
-        prevArrow: '<button type="button" class="slick-prev">←</button>',  // Föregående pil
-        nextArrow: '<button type="button" class="slick-next">→</button>',  // Nästa pil
-        responsive: [
-            {
-                breakpoint: 768,   // På skärmar mindre än 768px (mobil)
-                settings: {
-                    slidesToShow: 1,  // Visa en bok åt gången
-                    slidesToScroll: 1
-                }
-            }
-        ]
+if (typeof $ !== 'undefined' && $.fn.slick) {
+    $(document).ready(function(){
+        if ($('.carousel').length) {
+            $('.carousel').slick({
+                infinite: true,       // Oändlig scroll
+                slidesToShow: 3,      // Visa tre böcker åt gången
+                slidesToScroll: 1,    // Rulla en bok åt gången
+                prevArrow: '<button type="button" class="slick-prev">←</button>',  // Föregående pil
+                nextArrow: '<button type="button" class="slick-next">→</button>',  // Nästa pil
+                responsive: [
+                    {
+                        breakpoint: 768,   // På skärmar mindre än 768px (mobil)
+                        settings: {
+                            slidesToShow: 1,  // Visa en bok åt gången
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+        }
     });
-});
-$(document).ready(function () {
-    $('.book-slider').slick({
-        slidesToShow: 4,
-        slidesToScroll: 1,
-        arrows: true,
-        dots: true,
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                }
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 2,
-                }
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1,
-                }
-            }
-        ]
-    });
-});
 
-//kan förmodligen tas bort, tror inte den används längre
-function tryShowError() {
-    if (typeof showError === 'function') {
-        showError([[$,{errorMessage}]]);
-    } else {
-        setTimeout(tryShowError, 100);
-    }
+    $(document).ready(function () {
+        if ($('.book-slider').length) {
+            $('.book-slider').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                arrows: true,
+                dots: true,
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        }
+    });
+} else {
+    console.log('jQuery or Slick not loaded, carousel functionality disabled');
 }
 
-window.addEventListener('load', function() {
-    // Starta försöken att visa felmeddelandet
-    tryShowError();
-});
-
-
+//används denna???
 function searchFriends() {
     console.log("🔍 [JS DEBUG] searchFriends() called");
 
@@ -331,4 +316,33 @@ function searchFriends() {
             console.error(error);
         });
 }
+
+// Auto-stäng success modaler efter 2 sekunder
+function autoCloseSuccessModals() {
+    const errorModal = document.getElementById('errorModal');
+    const modalMessage = document.getElementById('modalMessage');
+
+    if (errorModal && modalMessage && errorModal.style.display === 'block') {
+        const messageText = modalMessage.textContent;
+
+        if (messageText && (
+            messageText.includes('successfully') ||
+            messageText.includes('added') ||
+            messageText.includes('created')
+        )) {
+            console.log("Success message detected, will auto-close in 3 seconds");
+
+            setTimeout(function() {
+                errorModal.style.display = 'none';
+                console.log("Modal closed automatically");
+            }, 2000);
+        }
+    }
+}
+
+// Kör auto-close funktionen när DOM laddas
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(autoCloseSuccessModals, 100);
+    setTimeout(autoCloseSuccessModals, 500);
+});
 
