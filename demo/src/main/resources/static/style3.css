@@ -803,13 +803,74 @@ input[type="range"]:focus::-webkit-slider-thumb {
     text-align: center;
     height: 100%;
     max-height: 300px;
-
+    position: relative;
 }
 
 .book-item button {
     margin-top: auto;
 }
 
+/* Remove-knapp styling */
+.btn-remove-book {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    border: 2px solid white;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    z-index: 2; /* Säkerställ att den ligger ovanpå */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0; /* Dold som standard */
+}
+
+/* Visa remove-knappen vid hover på book-item */
+.book-item:hover .btn-remove-book {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Hover-effekt på själva knappen */
+.btn-remove-book:hover {
+    background-color: #c82333;
+    transform: scale(1.2) !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Alternativ: Alltid synlig men mindre framträdande */
+.btn-remove-book.always-visible {
+    opacity: 0.7;
+    background-color: #6c757d;
+}
+
+.btn-remove-book.always-visible:hover {
+    opacity: 1;
+    background-color: #dc3545;
+}
+
+/* Responsiv design för mindre skärmar */
+@media (max-width: 768px) {
+    .btn-remove-book {
+        opacity: 0.8; /* Mer synlig på touch-enheter */
+        width: 20px;
+        height: 20px;
+        top: -6px;
+        right: -6px;
+    }
+
+    .btn-remove-book svg {
+        width: 10px;
+        height: 10px;
+    }
+}
 
 .book-cover {
     height: 160px;
