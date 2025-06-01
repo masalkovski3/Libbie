@@ -2059,3 +2059,48 @@ main {
     }
 }
 
+/* Styling för "Create First Bookshelf" funktionalitet */
+.first-bookshelf-container {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #d9b5d2;
+}
+
+.first-bookshelf-container p {
+    margin-bottom: 1rem;
+    color: #5c2d91;
+    font-weight: 500;
+}
+
+.create-first-shelf-form {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.create-first-shelf-form .form-control {
+    border: 1px solid #d9b5d2;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 14px;
+}
+
+.create-first-shelf-form .form-control:focus {
+    border-color: #e09ebd;
+    box-shadow: 0 0 0 0.2rem rgba(243, 193, 214, 0.25);
+    outline: none;
+}
+
+.create-first-shelf-form .btn-rose {
+    width: 100%;
+    padding: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.create-first-shelf-form .btn-rose:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+

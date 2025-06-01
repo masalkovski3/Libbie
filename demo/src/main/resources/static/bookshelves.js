@@ -544,14 +544,55 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Visa alla bokhyllor med checkboxar
+// Uppdaterad displayBookshelves funktion som hanterar tom bokhylle-lista
     function displayBookshelves(bookshelves) {
         if (bookshelves.length === 0) {
-            bookshelfListContainer.innerHTML = '<p>You have no bookshelves yet. Create one in your profile first.</p>';
+            // Visa formulär för att skapa första bokhyllan
+            bookshelfListContainer.innerHTML = `
+            <div class="first-bookshelf-container">
+                <p>You don't have any bookshelves yet.</p>
+                <p>Create your first bookshelf and we'll add this book to it automatically!</p>
+                
+                <div class="create-first-shelf-form">
+                    <input type="text" id="firstShelfName" placeholder="Enter bookshelf name" class="form-control mb-2">
+                    <textarea id="firstShelfDescription" placeholder="Description (optional)" class="form-control mb-2" rows="2"></textarea>
+                    <button id="createFirstShelfBtn" class="btn-rose">Create Bookshelf & Add Book</button>
+                </div>
+            </div>
+        `;
+
+            // Lägg till event listener för den nya knappen
+            const createFirstShelfBtn = document.getElementById('createFirstShelfBtn');
+            const firstShelfNameInput = document.getElementById('firstShelfName');
+
+            // Enter-tangent support
+            firstShelfNameInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    createFirstShelfBtn.click();
+                }
+            });
+
+            createFirstShelfBtn.addEventListener('click', function() {
+                const shelfName = firstShelfNameInput.value.trim();
+                const shelfDescription = document.getElementById('firstShelfDescription').value.trim();
+
+                if (!shelfName) {
+                    if (typeof showError === 'function') {
+                        showError('Please enter a name for your bookshelf');
+                    } else {
+                        alert('Please enter a name for your bookshelf');
+                    }
+                    return;
+                }
+
+                createFirstBookshelfAndAddBook(shelfName, shelfDescription, workId);
+            });
+
             return;
         }
 
-        // Rensa tidigare innehåll
+        // Originalkod för att visa befintliga bokhyllor
         bookshelfListContainer.innerHTML = '';
 
         // Skapa en checkbox för varje bokhylla
@@ -580,6 +621,77 @@ document.addEventListener('DOMContentLoaded', function() {
             shelfItem.appendChild(label);
             bookshelfListContainer.appendChild(shelfItem);
         });
+    }
+
+// Ny funktion för att skapa första bokhyllan och lägga till boken automatiskt
+    function createFirstBookshelfAndAddBook(shelfName, shelfDescription, bookWorkId) {
+        // Visa laddningsindikator
+        const createBtn = document.getElementById('createFirstShelfBtn');
+        createBtn.disabled = true;
+        createBtn.textContent = 'Creating...';
+
+        // Skapa bokhyllan först
+        const body = `name=${encodeURIComponent(shelfName)}&description=${encodeURIComponent(shelfDescription)}`;
+
+        fetch('/profile/bookshelves', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: body
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.errorMessage || 'Failed to create bookshelf');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Bokhyllan skapad! Nu lägger vi till boken automatiskt
+                const newBookshelfId = data.id;
+
+                return fetch(`/profile/bookshelves/${newBookshelfId}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `workId=${encodeURIComponent(bookWorkId)}`
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.errorMessage || 'Failed to add book to bookshelf');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Framgång! Stäng modalen och visa bekräftelse
+                bookshelfModal.style.display = 'none';
+
+                if (typeof showError === 'function') {
+                    showError(`Bookshelf "${shelfName}" created and book added successfully!`);
+                } else {
+                    alert(`Bookshelf "${shelfName}" created and book added successfully!`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                if (typeof showError === 'function') {
+                    showError('Error: ' + error.message);
+                } else {
+                    alert('Error: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // Återställ knappen
+                createBtn.disabled = false;
+                createBtn.textContent = 'Create Bookshelf & Add Book';
+            });
     }
 
     // Lägg till boken i de valda bokhyllorna
