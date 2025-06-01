@@ -211,11 +211,17 @@ function removeBookFromShelf(bookshelfId, workId) {
     });
 }
 
-function updateDescription() {
+function updateDescription(event) {
+    // Förhindra standardbeteendet (formulärskickning)
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     const shelfId = document.getElementById("editShelfId").value;
     const description = document.getElementById("editShelfDescription").value;
 
-    fetch('/bookshelves/updateDescription', {
+    fetch('/profile/bookshelves/updateDescription', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -225,21 +231,66 @@ function updateDescription() {
             description: description
         })
     })
-        .then(response => response.text())
-        .then(data => {
-            alert(data); // Visa meddelande från servern
-            location.reload(); // Uppdatera sidan för att visa den nya beskrivningen
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
         })
-        .catch(error => console.error("Error:", error));
+        .then(data => {
+            // Stäng modalen
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editDescriptionModal'));
+            if (modal) {
+                modal.hide();
+            }
+
+            // Visa framgångsmeddelande
+            if (typeof showError === 'function') {
+                showError('Description updated successfully!');
+            } else {
+                alert(data);
+            }
+
+            // Uppdatera beskrivningen i DOM utan att ladda om hela sidan
+            setTimeout(() => {
+                const descriptionElement = document.querySelector(`#bookshelf-${shelfId} .shelf-description`);
+                if (descriptionElement) {
+                    descriptionElement.textContent = description || 'No description available';
+                }
+            }, 1000); // Kortare tid eftersom vi inte laddar om sidan
+        })
+        .catch(error => {
+            console.error("Error:", error);
+
+            // Visa felmeddelande
+            if (typeof showError === 'function') {
+                showError('Failed to update description: ' + error.message);
+            } else {
+                alert('Error updating description: ' + error.message);
+            }
+        });
+
+    return false; // Extra säkerhet för att förhindra formulärskickning
 }
 
 
 function showEditDescriptionModal(button) {
     const shelfId = button.getAttribute('data-shelf-id');
-    const description = button.getAttribute('data-shelf-description') || '';
+
+    // Hämta den aktuella beskrivningen direkt från DOM
+    const descriptionElement = document.querySelector(`#bookshelf-${shelfId} .shelf-description`);
+    let currentDescription = '';
+
+    if (descriptionElement) {
+        currentDescription = descriptionElement.textContent.trim();
+        // Om det visar "No description available", använd tom sträng istället
+        if (currentDescription === 'No description available') {
+            currentDescription = '';
+        }
+    }
 
     document.getElementById('editShelfId').value = shelfId;
-    document.getElementById('editShelfDescription').value = description;
+    document.getElementById('editShelfDescription').value = currentDescription;
 
     const modal = new bootstrap.Modal(document.getElementById('editDescriptionModal'));
     modal.show();
