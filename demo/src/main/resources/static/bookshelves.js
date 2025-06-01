@@ -544,10 +544,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-// Uppdaterad displayBookshelves funktion som hanterar tom bokhylle-lista
+// Uppdaterad displayBookshelves funktion med "Add to New Bookshelf" och "Add your first bookshelf" alternativ
     function displayBookshelves(bookshelves) {
         if (bookshelves.length === 0) {
-            // Visa formulär för att skapa första bokhyllan
+            // Visa formulär för att skapa första bokhyllan (samma som innan)
             bookshelfListContainer.innerHTML = `
             <div class="first-bookshelf-container">
                 <p>You don't have any bookshelves yet.</p>
@@ -561,41 +561,45 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-            // Lägg till event listener för den nya knappen
-            const createFirstShelfBtn = document.getElementById('createFirstShelfBtn');
-            const firstShelfNameInput = document.getElementById('firstShelfName');
-
-            // Enter-tangent support
-            firstShelfNameInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    createFirstShelfBtn.click();
-                }
-            });
-
-            createFirstShelfBtn.addEventListener('click', function() {
-                const shelfName = firstShelfNameInput.value.trim();
-                const shelfDescription = document.getElementById('firstShelfDescription').value.trim();
-
-                if (!shelfName) {
-                    if (typeof showError === 'function') {
-                        showError('Please enter a name for your bookshelf');
-                    } else {
-                        alert('Please enter a name for your bookshelf');
-                    }
-                    return;
-                }
-
-                createFirstBookshelfAndAddBook(shelfName, shelfDescription, workId);
-            });
-
+            setupFirstBookshelfForm();
             return;
         }
 
-        // Originalkod för att visa befintliga bokhyllor
-        bookshelfListContainer.innerHTML = '';
+        bookshelfListContainer.innerHTML = ''; // Rensa tidigare innehåll
 
-        // Skapa en checkbox för varje bokhylla
+        // Lägg till "Add to New Bookshelf" sektion först
+        const newBookshelfSection = document.createElement('div');
+        newBookshelfSection.className = 'new-bookshelf-section';
+        newBookshelfSection.innerHTML = `
+        <div class="new-bookshelf-option">
+            <button id="addToNewShelfBtn" class="btn-new-shelf">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                Add to New Bookshelf
+            </button>
+        </div>
+        
+        <div id="newBookshelfForm" class="new-bookshelf-form" style="display: none;">
+            <input type="text" id="newShelfName" placeholder="Enter bookshelf name" class="form-control mb-2">
+            <textarea id="newShelfDescription" placeholder="Description (optional)" class="form-control mb-2" rows="2"></textarea>
+            <div class="form-buttons">
+                <button id="createNewShelfBtn" class="btn-rose">Create & Add Book</button>
+                <button id="cancelNewShelfBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    `;
+
+        bookshelfListContainer.appendChild(newBookshelfSection);
+
+        // Lägg till divider
+        const divider = document.createElement('div');
+        divider.className = 'bookshelf-divider';
+        divider.innerHTML = '<hr><p class="divider-text">Or choose existing bookshelf:</p>';
+        bookshelfListContainer.appendChild(divider);
+
+        // Skapa checkboxar för befintliga bokhyllor
         bookshelves.forEach(shelf => {
             const shelfItem = document.createElement('div');
             shelfItem.className = 'bookshelf-item';
@@ -621,12 +625,116 @@ document.addEventListener('DOMContentLoaded', function() {
             shelfItem.appendChild(label);
             bookshelfListContainer.appendChild(shelfItem);
         });
+
+        // Setup event listeners för "Add to New Bookshelf"
+        setupNewBookshelfForm();
     }
 
-// Ny funktion för att skapa första bokhyllan och lägga till boken automatiskt
-    function createFirstBookshelfAndAddBook(shelfName, shelfDescription, bookWorkId) {
+// Hjälpfunktion för att sätta upp första bokhylle-formuläret
+    function setupFirstBookshelfForm() {
+        const createFirstShelfBtn = document.getElementById('createFirstShelfBtn');
+        const firstShelfNameInput = document.getElementById('firstShelfName');
+
+        // Enter-tangent support
+        firstShelfNameInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                createFirstShelfBtn.click();
+            }
+        });
+
+        createFirstShelfBtn.addEventListener('click', function() {
+            const shelfName = firstShelfNameInput.value.trim();
+            const shelfDescription = document.getElementById('firstShelfDescription').value.trim();
+
+            if (!shelfName) {
+                if (typeof showError === 'function') {
+                    showError('Please enter a name for your bookshelf');
+                } else {
+                    alert('Please enter a name for your bookshelf');
+                }
+                return;
+            }
+
+            createBookshelfAndAddBook(shelfName, shelfDescription, workId);
+        });
+    }
+
+// Hjälpfunktion för att sätta upp "Add to New Bookshelf" formuläret
+    function setupNewBookshelfForm() {
+        const addToNewShelfBtn = document.getElementById('addToNewShelfBtn');
+        const newBookshelfForm = document.getElementById('newBookshelfForm');
+        const createNewShelfBtn = document.getElementById('createNewShelfBtn');
+        const cancelNewShelfBtn = document.getElementById('cancelNewShelfBtn');
+        const newShelfNameInput = document.getElementById('newShelfName');
+
+        // Visa/dölj formuläret
+        addToNewShelfBtn.addEventListener('click', function() {
+            if (newBookshelfForm.style.display === 'none') {
+                newBookshelfForm.style.display = 'block';
+                addToNewShelfBtn.textContent = 'Hide New Bookshelf Form';
+                newShelfNameInput.focus();
+            } else {
+                newBookshelfForm.style.display = 'none';
+                addToNewShelfBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                Add to New Bookshelf
+            `;
+            }
+        });
+
+        // Enter-tangent support
+        newShelfNameInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                createNewShelfBtn.click();
+            }
+        });
+
+        // Skapa ny bokhylla
+        createNewShelfBtn.addEventListener('click', function() {
+            const shelfName = newShelfNameInput.value.trim();
+            const shelfDescription = document.getElementById('newShelfDescription').value.trim();
+
+            if (!shelfName) {
+                if (typeof showError === 'function') {
+                    showError('Please enter a name for your bookshelf');
+                } else {
+                    alert('Please enter a name for your bookshelf');
+                }
+                return;
+            }
+
+            createBookshelfAndAddBook(shelfName, shelfDescription, workId);
+        });
+
+        // Avbryt
+        cancelNewShelfBtn.addEventListener('click', function() {
+            newBookshelfForm.style.display = 'none';
+            addToNewShelfBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            Add to New Bookshelf
+        `;
+
+            // Rensa formuläret
+            newShelfNameInput.value = '';
+            document.getElementById('newShelfDescription').value = '';
+        });
+    }
+
+// Ombenämnd och generell funktion för att skapa bokhylla och lägga till bok
+    function createBookshelfAndAddBook(shelfName, shelfDescription, bookWorkId) {
+        // Hitta vilken knapp som används (första eller nya bokhylla)
+        const createBtn = document.getElementById('createFirstShelfBtn') || document.getElementById('createNewShelfBtn');
+        const originalText = createBtn.textContent;
+
         // Visa laddningsindikator
-        const createBtn = document.getElementById('createFirstShelfBtn');
         createBtn.disabled = true;
         createBtn.textContent = 'Creating...';
 
@@ -690,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .finally(() => {
                 // Återställ knappen
                 createBtn.disabled = false;
-                createBtn.textContent = 'Create Bookshelf & Add Book';
+                createBtn.textContent = originalText;
             });
     }
 

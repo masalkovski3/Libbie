@@ -342,7 +342,7 @@ hr {
 }
 .genre-button {
     background-color: #f3c1d6;
-    color: #192640;
+    color: #0d1f43;
     border: none;
     border-radius: 15px;
     padding: 5px 10px;
@@ -842,7 +842,7 @@ button.scroll-button,
     width: 40px !important;
     height: 40px !important;
     background-color: #f3c1d6 !important;
-    border: none !important;
+    border: 1px solid #e09ebd !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
@@ -2102,5 +2102,121 @@ main {
 .create-first-shelf-form .btn-rose:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Styling för "Add to New Bookshelf" funktionalitet */
+.new-bookshelf-section {
+    margin-bottom: 1rem;
+}
+
+.new-bookshelf-option {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.btn-new-shelf {
+    background-color: #8EACBF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 250px;
+}
+
+.btn-new-shelf:hover {
+    background-color: #6B8FA8;
+}
+
+.new-bookshelf-form {
+    background-color: #f8f9fa;
+    border: 1px solid #d9b5d2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.new-bookshelf-form .form-control {
+    border: 1px solid #d9b5d2;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 14px;
+    width: 100%;
+}
+
+.new-bookshelf-form .form-control:focus {
+    border-color: #e09ebd;
+    box-shadow: 0 0 0 0.2rem rgba(243, 193, 214, 0.25);
+    outline: none;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.form-buttons .btn-rose {
+    flex: 1;
+    padding: 0.6rem;
+    font-weight: 600;
+}
+
+.form-buttons .btn-secondary {
+    flex: 1;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-buttons .btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.bookshelf-divider {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.bookshelf-divider hr {
+    border: none;
+    border-top: 1px solid #e09ebd;
+    margin: 0.5rem 0;
+}
+
+.divider-text {
+    color: #5c2d91;
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0;
+    padding: 0 1rem;
+    background-color: white;
+    display: inline-block;
+    position: relative;
+    top: -10px;
+}
+
+/* Responsiv design för mindre skärmar */
+@media (max-width: 480px) {
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    .btn-new-shelf {
+        font-size: 13px;
+        padding: 0.6rem 0.8rem;
+    }
 }
 
