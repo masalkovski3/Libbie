@@ -39,18 +39,26 @@
 
                 <div>
                     <h2 th:text="${member.displayName + '’s Profile'}">Your Profile</h2>
-                    <p><strong>Friends on Libbie:</strong>
-                        <button class="btn-rose" type="button"
-                                data-bs-toggle="modal" data-bs-target="#friendModal"
-                                th:text="${member.friendCount}">0</button>
+
+                    <p>
+                        <strong>Friends on Libbie:</strong>
+                        <span th:text="${member.friendCount}" style="font-weight: bold; margin-left: 5px;">0</span>
                     </p>
+
                     <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
                     <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
 
-                    <button class="btn-rose" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                        ✏️ Edit Profile
-                    </button>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                        <button class="btn-rose" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            ✏️ Edit Profile
+                        </button>
+
+                        <button class="btn-rose" type="button" data-bs-toggle="modal" data-bs-target="#friendModal">
+                            🩷 Show friends
+                        </button>
+                    </div>
                 </div>
+
             </div>
 
             <p class="page-heading2">My Bookshelves</p>
