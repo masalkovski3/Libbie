@@ -197,7 +197,7 @@ function removeBookFromShelf(bookshelfId, workId) {
                         if (booksContainer.querySelectorAll('.book-item').length === 0) {
                             booksContainer.innerHTML = `
                             <div class="empty-shelf-message">
-                                <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
+                                <p>This bookshelf is empty. Use the "Add Book" button in the ✏️ menu to add a book! .</p>
                             </div>
                         `;
                         }
