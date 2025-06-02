@@ -76,20 +76,22 @@ public class BookService {
     }
 
     public SearchResult searchByQuery(String query, int limit, int offset) {
+        int fetchLimit = 500;
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String url = "https://openlibrary.org/search.json?q=" + encodedQuery + "&limit=" + limit + "&offset=" + offset;
+        String url = "https://openlibrary.org/search.json?q=" + encodedQuery + "&limit=" + fetchLimit;
 
-        return fetchSearchResults(url, true, query, limit);
+        return fetchSearchResults(url, true, query, limit, offset);
     }
 
     public SearchResult searchByGenre(String genre, int limit, int offset) {
+        int fetchLimit = 500;
         String encodedGenre = URLEncoder.encode(genre.toLowerCase().replace(" ", "_"), StandardCharsets.UTF_8);
-        String url = "https://openlibrary.org/subjects/" + encodedGenre + ".json?limit=" + limit + "&offset=" + offset;
+        String url = "https://openlibrary.org/subjects/" + encodedGenre + ".json?limit=" + fetchLimit;
 
-        return fetchSearchResults(url, false, genre, limit);
+        return fetchSearchResults(url, false, genre, limit, offset);
     }
 
-    private SearchResult fetchSearchResults(String url, boolean isQueryBased, String rawQuery, int limit) {
+    private SearchResult fetchSearchResults(String url, boolean isQueryBased, String rawQuery, int limit, int offset) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String response = restTemplate.getForObject(url, String.class);
@@ -101,20 +103,26 @@ public class BookService {
             List<JsonNode> filteredItems = StreamSupport.stream(items.spliterator(), false)
                     .filter(node -> {
                         String title = node.path("title").asText("").toLowerCase();
-                        String author = isQueryBased
-                                ? node.path("author_name").isArray() && node.path("author_name").size() > 0
-                                ? node.path("author_name").get(0).asText("").toLowerCase()
-                                : ""
-                                : node.path("authors").isArray() && node.path("authors").size() > 0
-                                ? node.path("authors").get(0).path("name").asText("").toLowerCase()
-                                : "";
+
+                        String author = "";
+                        if (isQueryBased && node.has("author_name") && node.path("author_name").isArray() && node.path("author_name").size() > 0) {
+                            author = node.path("author_name").get(0).asText("").toLowerCase();
+                        } else if (!isQueryBased && node.has("authors") && node.path("authors").isArray() && node.path("authors").size() > 0) {
+                            author = node.path("authors").get(0).path("name").asText("").toLowerCase();
+                        }
 
                         return title.contains(lowerCaseQuery) || author.contains(lowerCaseQuery);
                     })
+                    .collect(Collectors.toList());
+
+            int totalCount = filteredItems.size();
+
+            List<JsonNode> pagedItems = filteredItems.stream()
+                    .skip(offset)
                     .limit(limit)
                     .collect(Collectors.toList());
 
-            List<CompletableFuture<Book>> futures = filteredItems.stream()
+            List<CompletableFuture<Book>> futures = pagedItems.stream()
                     .map(node -> CompletableFuture.supplyAsync(() -> {
                         try {
                             String title = node.path("title").asText("Untitled");
@@ -163,7 +171,7 @@ public class BookService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            int totalCount = 123; //isQueryBased ? root.path("numFound").asInt() : root.path("work_count").asInt();
+            //int totalCount = isQueryBased ? root.path("numFound").asInt() : root.path("work_count").asInt();
             System.out.println(totalCount);
             return new SearchResult(books, totalCount);
 
