@@ -2388,3 +2388,13 @@ main {
     color: #0d1f43;
 }
 
+.results-for-message {
+    color: black;
+    font-family: Georgia;
+    font-size: 24px;
+    text-align: center;
+    margin: 0 auto;
+    width: max-content;
+    font-weight: bold;
+}
+
