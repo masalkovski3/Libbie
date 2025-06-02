@@ -77,7 +77,10 @@
                 <!-- Show number of results and active filters if any -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <span class="text-muted">Found <span th:text="${books.size()}">0</span> books</span>
+                        <span class="text-muted">
+                            Showing <span th:text="${books.size()}">0</span> of
+                            <span th:text="${totalCount}">0</span> books
+                        </span>
                     </div>
                     <div>
                         <!-- Active filters would show here (future feature) -->

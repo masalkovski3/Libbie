@@ -98,7 +98,6 @@ public class BookService {
             JsonNode items = isQueryBased ? root.path("docs") : root.path("works");
             String lowerCaseQuery = rawQuery.toLowerCase();
 
-            // Filtrera på titel/författare och begränsa till `limit`
             List<JsonNode> filteredItems = StreamSupport.stream(items.spliterator(), false)
                     .filter(node -> {
                         String title = node.path("title").asText("").toLowerCase();
@@ -115,7 +114,6 @@ public class BookService {
                     .limit(limit)
                     .collect(Collectors.toList());
 
-            // Parallell bearbetning av filtrerade böcker
             List<CompletableFuture<Book>> futures = filteredItems.stream()
                     .map(node -> CompletableFuture.supplyAsync(() -> {
                         try {
@@ -132,7 +130,6 @@ public class BookService {
                             String workId = node.path("key").asText("/works/undefined");
                             String cleanId = workId.replace("/works/", "");
 
-                            // Försök hämta coverId direkt från sökresultatet
                             Integer coverId = null;
                             if (node.has("cover_id") && node.get("cover_id").isInt()) {
                                 coverId = node.get("cover_id").asInt();
@@ -140,7 +137,6 @@ public class BookService {
                                 coverId = node.get("cover_i").asInt();
                             }
 
-                            // Försök använda coverId direkt, annars hämta från editions.json
                             String coverUrl;
                             if (coverId != null) {
                                 coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
@@ -162,15 +158,13 @@ public class BookService {
                     }, executor))
                     .collect(Collectors.toList());
 
-            // Vänta in alla böcker och samla upp
             List<Book> books = futures.stream()
                     .map(CompletableFuture::join)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            // Du kan välja att returnera originalantal (för paginering) eller bara books.size()
-            int totalCount = isQueryBased ? root.path("numFound").asInt() : root.path("work_count").asInt();
-
+            int totalCount = 123; //isQueryBased ? root.path("numFound").asInt() : root.path("work_count").asInt();
+            System.out.println(totalCount);
             return new SearchResult(books, totalCount);
 
         } catch (Exception e) {

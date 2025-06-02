@@ -80,12 +80,12 @@ public class SearchController {
         SearchResult result;
         if (genre != null && !genre.isBlank()) {
             result = bookService.searchByGenre(genre, limit, offset);
-            model.addAttribute("genre", genre);
         } else {
             result = bookService.searchByQuery(query, limit, offset);
-            model.addAttribute("query", query);
         }
 
+        model.addAttribute("genre", genre);
+        model.addAttribute("query", query);
         model.addAttribute("books", result.getBooks());
         model.addAttribute("selectedSort", sort);
         model.addAttribute("totalCount", result.getTotalCount());
