@@ -236,13 +236,11 @@ public class BookService {
     public static String cleanDescription(String raw) {
         if (raw == null) return "";
 
-        // Lista över meta-start-ord där vi vill klippa bort resten
         String[] markers = {
                 "\\(source\\)", "See also:", "Preceded by:", "Followed by:",
                 "Contains:", "\\[\\d+\\]:", "Source"
         };
 
-        // Skapa ett regex som matchar första förekomst av något av dessa
         String patternString = String.join("|", markers);
         Pattern pattern = Pattern.compile("(?i)(" + patternString + ")");
         Matcher matcher = pattern.matcher(raw);
@@ -252,7 +250,6 @@ public class BookService {
             trimmed = raw.substring(0, matcher.start());
         }
 
-        // Rensa kvarvarande markdown
         return trimmed
                 .replaceAll("\\[(.*?)\\]\\[\\d+\\]", "$1")            // [text][1] → text
                 .replaceAll("\\[(.*?)\\]\\((https?://.*?)\\)", "$1")  // [text](url) → text
