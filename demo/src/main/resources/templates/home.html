@@ -8,91 +8,11 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 </head>
+
 <body>
 <div class="layout">
-    <!-- Hamburgarikon för att öppna menyn -->
-    <div class="menu-toggle" id="menuToggle">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-
-    <!-- Sidebar med 'sidebar-hidden' klass som default -->
-    <aside class="sidebar sidebar-hidden" id="sidebar">
-        <div class="container">
-            <header id="sidebar-header">
-                <img class="logo" src="images/pink-logo.jpeg" alt="Libie Logo">
-                <h2>Menu</h2>
-                <nav>
-                    <ul>
-                        <li class="button">
-                            <a href="/">Home</a>
-                        </li>
-                        <li class="button">
-                            <a href="/search">Search</a>
-                        </li>
-                        <li class="button">
-                            <a href="/profile">Profile</a>
-                        </li>
-                        <li class="button">
-                            <a href="/about">About Libbie</a>
-                        </li>
-                    </ul>
-                </nav>
-            </header>
-        </div>
-    </aside>
-
-    <main class="content">
-        <!-- Ny header för Libbie -->
-        <header class="main-header">
-            <div class="logo-container">
-                <img class="main-logo" src="images/blue-logo.jpeg" alt="Libbie Logo">
-                <h1>Libbie</h1>
-            </div>
-            <div class="auth-buttons">
-                <th:block th:if="${session.currentMember != null}">
-                    <a href="/profile" class="button-header">Profile</a>
-                    <a href="/logout" class="button-header">Logout</a>
-                </th:block>
-                <th:block th:unless="${session.currentMember != null}">
-                    <a href="/logIn" class="button-header">Login</a>
-                    <a href="/signUp" class="button-header">Sign Up</a>
-                </th:block>
-            </div>
-        </header>
-
-        <!-- navigationsrad för genrer -->
-        <!-- Uppdaterad Genre Navigation med ett förstoringsglas till vänster -->
-        <nav class="genre-nav">
-            <div class="genre-nav-container">
-                <!-- Förstoringsglas-knapp som länkar till search-sidan -->
-                <a href="/search" class="search-icon-button" title="Go to search page">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                </a>
-
-                <!-- Genre-lista -->
-                <ul class="genre-list">
-                    <li class="genre-item"><a href="/search?genre=Fantasy" class="genre-button">Fantasy</a></li>
-                    <li class="genre-item"><a href="/search?genre=Science+Fiction" class="genre-button">Science Fiction</a></li>
-                    <li class="genre-item"><a href="/search?genre=Mystery" class="genre-button">Mystery</a></li>
-                    <li class="genre-item"><a href="/search?genre=Romance" class="genre-button">Romance</a></li>
-                    <li class="genre-item"><a href="/search?genre=Drama" class="genre-button">Drama</a></li>
-                    <li class="genre-item"><a href="/search?genre=Thriller" class="genre-button">Thriller</a></li>
-                    <li class="genre-item"><a href="/search?genre=Horror" class="genre-button">Horror</a></li>
-                    <li class="genre-item"><a href="/search?genre=Detective" class="genre-button">Detective</a></li>
-                    <li class="genre-item"><a href="/search?genre=Biography" class="genre-button">Biography</a></li>
-                    <li class="genre-item"><a href="/search?genre=History" class="genre-button">History</a></li>
-                    <li class="genre-item"><a href="/search?genre=Self-Help" class="genre-button">Self-Help</a></li>
-                    <li class="genre-item"><a href="/search?genre=Poetry" class="genre-button">Poetry</a></li>
-                </ul>
-            </div>
-        </nav>
-
+    <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+        <div th:fragment="pageContent">
         <div class="page-content">
             <p class="home-headings">Welcome to your digital library</p>
 
@@ -169,12 +89,10 @@
             </div>
 
             <hr>
-
-            <footer>
-                <h5>Latest Update: 2025-03-27</h5>
-            </footer>
         </div>
-    </main>
+        </div>
+    </div>
+
 </div>
 
 <!-- JavaScript-koppling -->
