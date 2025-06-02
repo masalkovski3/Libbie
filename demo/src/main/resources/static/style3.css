@@ -566,6 +566,13 @@ hr {
     gap: 40px;
     padding: 50px;
     align-items: flex-start;
+    font-family: Georgia, 'Times New Roman', Times, serif !important;
+}
+
+.home-heading{
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
 }
 
 .left-column {
