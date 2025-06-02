@@ -17,7 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Component
+@Tag(name = "Bookshelf Management", description = "Operations for managing bookshelves in the database")
 public class BookshelfDAO {
 
     private DatabaseConnection databaseConnection;
@@ -40,6 +46,12 @@ public class BookshelfDAO {
      * @return the generated ID of the newly created bookshelf
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Save a new bookshelf",
+            description = "Creates a new bookshelf for the specified member and returns its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf created successfully with returned ID"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public Long saveBookshelf(Long memberId, String name, String description, boolean isPublic) throws SQLException {
         String sql = "INSERT INTO bookshelf (name, member_id, description, is_public) VALUES (?, ?, ?, ?) RETURNING id";
 
@@ -67,6 +79,12 @@ public class BookshelfDAO {
      * @return true if a bookshelf with the same name exists, false otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Check bookshelf existence",
+            description = "Verifies if a bookshelf with the given name exists for the member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully checked existence"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean existsByNameAndMemberId(String name, Long memberId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookshelf WHERE name = ? AND member_id = ?";
 
@@ -91,6 +109,12 @@ public class BookshelfDAO {
      * @return a list of maps, each representing a bookshelf's properties
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Get all bookshelves by member",
+            description = "Fetches all bookshelves for a member, sorted by creation time descending")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved bookshelves"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public List<Map<String, Object>> findByMemberId(Long memberId) throws SQLException {
         List<Map<String, Object>> bookshelves = new ArrayList<>();
         String sql = "SELECT id, name, description, is_public, position FROM bookshelf WHERE member_id = ? ORDER BY created_at DESC";
@@ -114,10 +138,6 @@ public class BookshelfDAO {
         return bookshelves;
     }
 
-
-
-
-
     /**
      * Retrieves a bookshelf by its ID.
      *
@@ -125,6 +145,13 @@ public class BookshelfDAO {
      * @return an Optional containing the bookshelf map if found, or empty otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Get bookshelf by ID",
+            description = "Fetches a bookshelf by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf found and returned"),
+            @ApiResponse(responseCode = "404", description = "Bookshelf not found"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public Optional<Map<String, Object>> findById(Long id) throws SQLException {
         String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
 
@@ -154,6 +181,13 @@ public class BookshelfDAO {
      * @return an Optional containing the bookshelf map if found, or empty otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Get bookshelf by ID as object",
+            description = "Fetches a bookshelf by its unique identifier as a Bookshelf object")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf found and returned"),
+            @ApiResponse(responseCode = "404", description = "Bookshelf not found"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public Bookshelf findByIdReturnBookshelf(Long id) throws SQLException {
         String sql = "SELECT id, name, member_id, description, is_public, position FROM bookshelf WHERE id = ?";
 
@@ -183,6 +217,12 @@ public class BookshelfDAO {
      * @param openLibraryId the Open Library ID of the book
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Add book to bookshelf",
+            description = "Adds a book to the specified bookshelf, fetching it from Open Library if not in database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book successfully added to bookshelf"),
+            @ApiResponse(responseCode = "500", description = "Database or API access error occurred")
+    })
     public void addBookToShelf(Long bookshelfId, String openLibraryId) throws SQLException {
         // Först kontrollera om boken redan finns i databasen, annars måste vi lägga till den
         ensureBookExists(openLibraryId);
@@ -330,6 +370,12 @@ public class BookshelfDAO {
      * @return true if the book was successfully removed, false otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Remove book from bookshelf",
+            description = "Removes a book from the specified bookshelf and reorders remaining books")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book successfully removed from bookshelf"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean removeBookFromShelf(Long bookshelfId, String openLibraryId) throws SQLException {
         // SQL-sats för att ta bort boken från bookshelf_book-tabellen
         String sql = "DELETE FROM bookshelf_book WHERE bookshelf_id = ? AND (book_id = ? OR book_id = '/works/' || ?)";
@@ -353,7 +399,6 @@ public class BookshelfDAO {
             return rowsAffected > 0;
         }
     }
-
 
     /**
      * Reorders the positions of books on a bookshelf after one is removed.
@@ -380,7 +425,6 @@ public class BookshelfDAO {
         }
     }
 
-
     /**
      * Retrieves all books on a specific bookshelf.
      *
@@ -388,6 +432,12 @@ public class BookshelfDAO {
      * @return a list of maps, each representing a book and its properties
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Get books by bookshelf ID",
+            description = "Fetches all books on a specific bookshelf, sorted by position")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Books successfully retrieved"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public List<Map<String, Object>> findBooksByBookshelfId(Long bookshelfId) throws SQLException {
         List<Map<String, Object>> books = new ArrayList<>();
         String sql = "SELECT b.open_library_id, b.title, b.authors, b.published_year, b.cover_url, bb.position " +
@@ -423,6 +473,12 @@ public class BookshelfDAO {
      * @return true if the bookshelf was deleted, false otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Delete bookshelf",
+            description = "Removes a bookshelf and its associated books from the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf successfully deleted"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean deleteBookshelf(Long bookshelfId) throws SQLException {
         String sql = "DELETE FROM bookshelf WHERE id = ?";
 
@@ -443,6 +499,13 @@ public class BookshelfDAO {
      * @return true if the update was successful, false otherwise
      * @throws SQLException if a database access error occurs or if the new name already exists
      */
+    @Operation(summary = "Update bookshelf name",
+            description = "Updates the name of a bookshelf, ensuring uniqueness for the member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf name updated successfully"),
+            @ApiResponse(responseCode = "400", description = "New name already exists for the member"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean updateBookshelfName(Long bookshelfId, String newName) throws SQLException {
         // Först hämta bokhyllan för att få medlems-ID
         Optional<Map<String, Object>> bookshelfOpt = findById(bookshelfId);
@@ -477,6 +540,12 @@ public class BookshelfDAO {
      * @return true if the update was successful, false otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Update bookshelf description",
+            description = "Updates the description of a specified bookshelf")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf description updated successfully"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean updateBookshelfDescription(Long bookshelfId, String description) throws SQLException {
         String sql = "UPDATE bookshelf SET description = ? WHERE id = ?";
         System.out.println("In BookshelfDAO");
@@ -503,6 +572,12 @@ public class BookshelfDAO {
      * @return true if the update was successful, false otherwise
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Update bookshelf visibility",
+            description = "Toggles the visibility of a bookshelf between public and private")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf visibility updated successfully"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public boolean updateBookshelfVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
         String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
 
@@ -526,6 +601,12 @@ public class BookshelfDAO {
      * @return a list of maps, each representing a public bookshelf and its database fields
      * @throws SQLException if a database access error occurs
      */
+    @Operation(summary = "Get public bookshelves by member",
+            description = "Fetches all public bookshelves for a specific member, sorted by creation time descending")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Public bookshelves retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public List<Map<String, Object>> findPublicByMemberId(Long memberId) throws SQLException {
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = true ORDER BY created_at DESC";
         return jdbcTemplate.queryForList(sql, memberId);
@@ -538,6 +619,12 @@ public class BookshelfDAO {
      * @return A list of {@link Bookshelf} objects that are marked as public.
      * @throws SQLException if a database access error occurs.
      */
+    @Operation(summary = "Get public bookshelves by member as objects",
+            description = "Fetches all public bookshelves for a member as Bookshelf objects")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Public bookshelves retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public List<Bookshelf> getPublicBookshelvesByMemberId(Long memberId) throws SQLException {
         List<Bookshelf> bookshelves = new ArrayList<>();
         String sql = "SELECT * FROM bookshelf WHERE member_id = ? AND is_public = TRUE";
@@ -564,6 +651,19 @@ public class BookshelfDAO {
         return bookshelves;
     }
 
+    /**
+     * Sets the visibility of a bookshelf.
+     *
+     * @param bookshelfId the ID of the bookshelf
+     * @param isPublic the new visibility setting
+     * @throws SQLException if a database access error occurs
+     */
+    @Operation(summary = "Set bookshelf visibility",
+            description = "Sets the visibility of a bookshelf to public or private")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookshelf visibility set successfully"),
+            @ApiResponse(responseCode = "500", description = "Database access error occurred")
+    })
     public void setVisibility(Long bookshelfId, boolean isPublic) throws SQLException {
         String sql = "UPDATE bookshelf SET is_public = ? WHERE id = ?";
         try (Connection conn = databaseConnection.getConnection();
@@ -573,6 +673,4 @@ public class BookshelfDAO {
             stmt.executeUpdate();
         }
     }
-
-
 }
