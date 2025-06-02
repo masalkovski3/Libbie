@@ -856,8 +856,8 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .books-container {
     display: flex;
     overflow-x: auto;
-    border: 2px solid #deacdf5d;
-    border-radius: 15px;
+    border: 1px solid #d088a3;
+    border-radius: 5px;
     padding: 15px;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
@@ -1496,13 +1496,13 @@ button.scroll-button,
     background-color: rgba(0, 0, 0, 0.4);
 }
 .shelf-description-box {
-    border: 1px solid #8EACBF; /* eller en annan accentfärg */
+    border: 1px solid #d088a3; /* eller en annan accentfärg */
     padding: 0.5rem 1rem;
     margin-top : 1rem;
     margin-bottom: 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 5px;
     font-size: 0.9rem;
-    color: #444;
+    color: #0d1f43;
     min-height: 50px;
     max-height: 50px;
     display: flex;
