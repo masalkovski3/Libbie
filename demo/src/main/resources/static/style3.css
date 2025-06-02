@@ -856,8 +856,8 @@ input[type="range"]:focus::-webkit-slider-thumb {
 .books-container {
     display: flex;
     overflow-x: auto;
-    border: 2px solid #deacdf5d;
-    border-radius: 15px;
+    border: 1px solid #d088a3;
+    border-radius: 10px;
     padding: 15px;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
@@ -998,7 +998,7 @@ button.scroll-button,
     height: 0;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-right: 12px solid #5c2d91;
+    border-right: 12px solid #0d1f43;
     display: block;
 }
 
@@ -1008,7 +1008,7 @@ button.scroll-button,
     height: 0;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-left: 12px solid #5c2d91;
+    border-left: 12px solid #0d1f43;
     display: block;
 }
 
@@ -1018,11 +1018,11 @@ button.scroll-button,
 }
 
 .scroll-left:hover::before {
-    border-right-color: #4a1f73 !important;
+    border-right-color: #0d1f43 !important;
 }
 
 .scroll-right:hover::before {
-    border-left-color: #4a1f73 !important;
+    border-left-color: #0d1f43 !important;
 }
 
 .scroll-left {
@@ -1039,7 +1039,7 @@ button.scroll-button,
     text-align: center;
     background-color: transparent;
     border-radius: 5px;
-    color: #5c2d91;
+    color: #0d1f43;
 }
 
 /* Knapp för att lägga till bokhylla */
@@ -1496,13 +1496,13 @@ button.scroll-button,
     background-color: rgba(0, 0, 0, 0.4);
 }
 .shelf-description-box {
-    border: 1px solid #8EACBF; /* eller en annan accentfärg */
+    border: 1px solid #d088a3; /* eller en annan accentfärg */
     padding: 0.5rem 1rem;
     margin-top : 1rem;
     margin-bottom: 0.5rem;
     border-radius: 0.5rem;
     font-size: 0.9rem;
-    color: #444;
+    color: #0d1f43;
     min-height: 50px;
     max-height: 50px;
     display: flex;
@@ -1545,7 +1545,7 @@ button.scroll-button,
 .friend-list a {
     text-decoration: none;
     font-weight: 500;
-    color: #5c2d91;
+    color: #0d1f43;
 }
 .friend-list a:hover {
     text-decoration: underline;
@@ -1553,7 +1553,7 @@ button.scroll-button,
 
 .btn-rose {
     background-color: #f3c1d6; /* Rosa grundton */
-    color: #5c2d91; /* Mörklila text (matchar resten) */
+    color: #0d1f43;
     border: none;
     border-radius: 8px;
     padding: 6px 12px;
@@ -1877,6 +1877,14 @@ button.scroll-button,
     font-weight: bold;
 }
 
+.home-heading {
+    align-items: center;
+    padding-left: 30px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+}
+
 .slick-prev,
 .slick-next {
     width: 60px;
@@ -2058,6 +2066,8 @@ main {
     transform: translateX(-50%); /* Centrera trots 100vw */
     padding: 40px 0;            /* Lodrät padding för luft */
     box-sizing: border-box;
+    border-top: 3px solid #d088a3;
+    border-bottom: 3px solid #d088a3;
 }
 
 .carousel-wrapper {
@@ -2095,13 +2105,15 @@ main {
 /* BOOKSHELF EDIT BUTTON STYLING */
 /* Bookshelf actions container - använder bara inline-block för att undvika layout-problem */
 .bookshelf-actions {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Dropdown knapp styling */
 .bookshelf-dropdown-btn {
     background-color: #f3c1d6 !important;
-    color: #5c2d91 !important;
+    color: #0d1f43 !important;
     border: 1px solid #e09ebd !important;
     border-radius: 8px !important;
     padding: 8px 12px !important;
@@ -2117,7 +2129,7 @@ main {
 .bookshelf-dropdown-btn:hover {
     background-color: #e09ebd !important;
     border-color: #d088a3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
 }
 
 .bookshelf-dropdown-btn:focus {
@@ -2149,7 +2161,7 @@ main {
 /* Dropdown items */
 .bookshelf-dropdown-menu .dropdown-item {
     padding: 10px 16px !important;
-    color: #5c2d91 !important;
+    color: #0d1f43 !important;
     font-size: 14px !important;
     border: none !important;
     background: none !important;
@@ -2163,12 +2175,12 @@ main {
 
 .bookshelf-dropdown-menu .dropdown-item:hover {
     background-color: #f8f0f3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
 }
 
 .bookshelf-dropdown-menu .dropdown-item:focus {
     background-color: #f8f0f3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
     outline: none !important;
 }
 
@@ -2225,7 +2237,7 @@ main {
 
 .first-bookshelf-container p {
     margin-bottom: 1rem;
-    color: #5c2d91;
+    color: #0d1f43;
     font-weight: 500;
 }
 
@@ -2352,7 +2364,7 @@ main {
 }
 
 .divider-text {
-    color: #5c2d91;
+    color: #0d1f43;
     font-weight: 500;
     font-size: 14px;
     margin: 0;
@@ -2375,5 +2387,19 @@ main {
         font-size: 13px;
         padding: 0.6rem 0.8rem;
     }
+}
+
+#empty-bookshelf-message {
+    color: #0d1f43;
+}
+
+.eye-button {
+    background-color: #f3c1d6;
+    border: 1px solid #e09ebd;
+    border-radius: 7px;
+    height:38px;
+    width: 40px;
+    font-size: 20px;
+    text-align: center;
 }
 

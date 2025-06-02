@@ -84,6 +84,9 @@
                     <div class="bookshelf-header">
                         <h3 class="bookshelf-title" th:text="${shelf.name}">Bookshelf Name</h3>
                         <div class="bookshelf-actions">
+                            <div th:if="${shelf['visibility']}">👁️</div>
+                            <div th:unless="${shelf['visibility']}">👁️‍🗨️</div>
+
                             <!-- Dropdown container -->
                             <div class="dropdown">
                                 <button class="btn btn-sm bookshelf-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
