@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openlibrary.demo.DAO.ReviewDAO;
+import com.openlibrary.demo.external.OpenLibraryBook;
 import com.openlibrary.demo.model.Member;
 import com.openlibrary.demo.model.Review;
+import com.openlibrary.demo.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,9 +39,11 @@ import java.util.List;
 public class BookController {
 
     private final ReviewDAO reviewDAO;
+    private final BookService bookService;
 
     @Autowired
-    public BookController(ReviewDAO reviewDAO) {
+    public BookController(ReviewDAO reviewDAO, BookService bookService) {
+        this.bookService = bookService;
         this.reviewDAO = reviewDAO;
     }
 
@@ -72,6 +76,52 @@ public class BookController {
                         Model model,
                         HttpSession session) throws JsonProcessingException {
 
+        OpenLibraryBook book = bookService.getBookByWorkId(workId);
+
+        if(book == null){
+            model.addAttribute("errorMessage", "Book not found in Open Library");
+            model.addAttribute("showError", true);
+            return "book";
+        }
+
+        model.addAttribute("title", book.getTitle());
+        model.addAttribute("author", book.getAuthorName() != null && !book.getAuthorName().isEmpty()
+                ? String.join(", ", book.getAuthorName())
+                : "Unknown author");
+        model.addAttribute("description",
+                book.getDescription() != null && !book.getDescription().isEmpty()
+                        ? book.getDescription()
+                        : "No description available.");
+        model.addAttribute("coverUrl", book.getCoverUrl());
+        model.addAttribute("workId", workId);
+
+        List<Review> reviews = Collections.emptyList();
+        double averageScore = 0.0;
+        Review userReview = null;
+
+        try {
+            reviews = reviewDAO.getReviewsByBookId(workId);
+            averageScore = reviewDAO.getAverageReviewScore(workId);
+
+            Member currentMember = (Member) session.getAttribute("currentMember");
+            if (currentMember != null) {
+                userReview = reviewDAO.getMemberReview(currentMember.getId(), workId);
+                model.addAttribute("canReview", true);
+            } else {
+                model.addAttribute("canReview", false);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Failed to load reviews: " + e.getMessage());
+        }
+
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("averageScore", averageScore);
+        model.addAttribute("userReview", userReview);
+
+        return "book";
+
+        /*
         String cleanId = workId.replace("/works/", "");
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper mapper = new ObjectMapper();
@@ -142,6 +192,8 @@ public class BookController {
         model.addAttribute("userReview", userReview);
 
         return "book";
+
+         */
     }
 
     /**
@@ -275,6 +327,19 @@ public class BookController {
      */
     @Operation(summary = "Determine best cover URL based on coverId or edition data")
     public String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+        String coverUrl;
+        if (coverId != null) {
+            coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
+        } else {
+            try {
+                coverUrl = bookService.getCoverUrl(null, cleanId, restTemplate, mapper);
+            } catch (Exception e) {
+                e.printStackTrace();
+                coverUrl = "/images/blue-logo.jpeg";
+            }
+        }
+        return coverUrl;
+        /*
         String coverUrl = "";
         if (coverId !=null){
             coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
@@ -297,6 +362,8 @@ public class BookController {
             }
         }
         return coverUrl;
+
+         */
     }
 
     /**
