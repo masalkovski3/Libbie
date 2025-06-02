@@ -316,7 +316,7 @@ hr {
     align-items: center;
 }
 
-
+/*STYLING FÖR GENRE-KNAPPAR*/
 .genre-nav {
     background-color: #e8edf3;
     width: 100vw;
@@ -327,6 +327,42 @@ hr {
     box-sizing: border-box;
 }
 
+.genre-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Avstånd mellan search-ikonen och genre-knapparna */
+    padding: 0 20px;
+}
+
+/* Search-ikon knapp */
+.search-icon-button {
+    background-color: #f3c1d6;
+    color: #0d1f43;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Förhindrar att ikonen krymper */
+}
+
+.search-icon-button:hover {
+    background-color: #e09ebd;
+    transform: scale(1.1);
+    color: #0d1f43;
+    text-decoration: none;
+}
+
+.search-icon-button i {
+    font-size: 16px;
+}
+
 .genre-list {
     display: flex;
     justify-content: center;
@@ -334,6 +370,8 @@ hr {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    overflow-x: auto; /* Tillåt horisontell scrollning på små skärmar */
+    flex: 1;
 }
 
 .genre-item {
@@ -364,6 +402,40 @@ hr {
     text-decoration: none; /* Behåll ingen understrykning även vid hover */
     /* Behåll samma typsnitt vid hover */
     font-family: Georgia, 'Times New Roman', Times, serif !important;
+}
+
+/* Responsiv design */
+@media (max-width: 768px) {
+    .genre-nav-container {
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .search-icon-button {
+        width: 30px;
+        height: 30px;
+    }
+
+    .search-icon-button i {
+        font-size: 14px;
+    }
+
+    .genre-button {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .genre-nav-container {
+        gap: 8px;
+        padding: 0 5px;
+    }
+
+    .genre-list {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* RESPONSIVA STILAR */
