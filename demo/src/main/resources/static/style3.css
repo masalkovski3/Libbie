@@ -352,12 +352,18 @@ hr {
     white-space: nowrap;
     display: inline-block;
     text-decoration: none; /* Ta bort understrykningar från länkar */
+
+    /* Forcera Georgia typsnitt även när Bootstrap är aktivt */
+    font-family: Georgia, 'Times New Roman', Times, serif !important;
+    font-weight: normal !important; /* Bootstrap kan ändra font-weight */
 }
 
 .genre-button:hover {
     background-color: #e09ebd;
     transform: translateY(-2px);
     text-decoration: none; /* Behåll ingen understrykning även vid hover */
+    /* Behåll samma typsnitt vid hover */
+    font-family: Georgia, 'Times New Roman', Times, serif !important;
 }
 
 /* RESPONSIVA STILAR */
