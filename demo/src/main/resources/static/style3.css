@@ -998,7 +998,7 @@ button.scroll-button,
     height: 0;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-right: 12px solid #5c2d91;
+    border-right: 12px solid #0d1f43;
     display: block;
 }
 
@@ -1008,7 +1008,7 @@ button.scroll-button,
     height: 0;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-left: 12px solid #5c2d91;
+    border-left: 12px solid #0d1f43;
     display: block;
 }
 
@@ -1018,11 +1018,11 @@ button.scroll-button,
 }
 
 .scroll-left:hover::before {
-    border-right-color: #4a1f73 !important;
+    border-right-color: #0d1f43 !important;
 }
 
 .scroll-right:hover::before {
-    border-left-color: #4a1f73 !important;
+    border-left-color: #0d1f43 !important;
 }
 
 .scroll-left {
@@ -1039,7 +1039,7 @@ button.scroll-button,
     text-align: center;
     background-color: transparent;
     border-radius: 5px;
-    color: #5c2d91;
+    color: #0d1f43;
 }
 
 /* Knapp för att lägga till bokhylla */
@@ -2226,7 +2226,7 @@ main {
 
 .first-bookshelf-container p {
     margin-bottom: 1rem;
-    color: #5c2d91;
+    color: #0d1f43;
     font-weight: 500;
 }
 
@@ -2358,7 +2358,7 @@ main {
 }
 
 .divider-text {
-    color: #5c2d91;
+    color: #0d1f43;
     font-weight: 500;
     font-size: 14px;
     margin: 0;
