@@ -75,7 +75,7 @@
             <div id="bookshelves-container">
                 <!-- If no bookshelves exist -->
                 <div th:if="${bookshelves == null || bookshelves.isEmpty()}" class="empty-shelf-message">
-                    <p>You don't have any bookshelves yet. Click "Create New Bookshelf" to get started!</p>
+                    <p> You don't have any bookshelves yet. Click "Create New Bookshelf" to get started!</p>
                 </div>
 
                 <!-- Iterate over all bookshelves -->
@@ -176,7 +176,7 @@
                         <div class="books-container" th:id="'books-' + ${shelf.id}">
                             <!-- If no books exist -->
                             <div th:if="${booksByShelf[shelf.id] == null || booksByShelf[shelf.id].isEmpty()}" class="empty-shelf-message">
-                                <p>This bookshelf is empty. Use the "Add Book" button above to add books.</p>
+                                <p>This bookshelf is empty. Use the button "Add Book" in the ✏️ menu to add a book!</p>
                             </div>
 
                             <!-- Iterate over the books on the shelf -->

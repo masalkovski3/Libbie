@@ -1553,7 +1553,7 @@ button.scroll-button,
 
 .btn-rose {
     background-color: #f3c1d6; /* Rosa grundton */
-    color: #5c2d91; /* Mörklila text (matchar resten) */
+    color: #0d1f43 !important;
     border: none;
     border-radius: 8px;
     padding: 6px 12px;
@@ -2058,6 +2058,7 @@ main {
     transform: translateX(-50%); /* Centrera trots 100vw */
     padding: 40px 0;            /* Lodrät padding för luft */
     box-sizing: border-box;
+    border: 2px solid #0d1f43;
 }
 
 .carousel-wrapper {
@@ -2101,7 +2102,7 @@ main {
 /* Dropdown knapp styling */
 .bookshelf-dropdown-btn {
     background-color: #f3c1d6 !important;
-    color: #5c2d91 !important;
+    color: #0d1f43 !important;
     border: 1px solid #e09ebd !important;
     border-radius: 8px !important;
     padding: 8px 12px !important;
@@ -2117,7 +2118,7 @@ main {
 .bookshelf-dropdown-btn:hover {
     background-color: #e09ebd !important;
     border-color: #d088a3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
 }
 
 .bookshelf-dropdown-btn:focus {
@@ -2149,7 +2150,7 @@ main {
 /* Dropdown items */
 .bookshelf-dropdown-menu .dropdown-item {
     padding: 10px 16px !important;
-    color: #5c2d91 !important;
+    color: #0d1f43 !important;
     font-size: 14px !important;
     border: none !important;
     background: none !important;
@@ -2163,12 +2164,12 @@ main {
 
 .bookshelf-dropdown-menu .dropdown-item:hover {
     background-color: #f8f0f3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
 }
 
 .bookshelf-dropdown-menu .dropdown-item:focus {
     background-color: #f8f0f3 !important;
-    color: #4a1f73 !important;
+    color: #0d1f43 !important;
     outline: none !important;
 }
 
@@ -2252,6 +2253,11 @@ main {
     padding: 0.75rem;
     font-weight: 600;
     margin-top: 0.5rem;
+    color: #0d1f43;
+}
+
+#friends-on-libbie {
+    color: #0d1f43 !important;
 }
 
 .create-first-shelf-form .btn-rose:disabled {
@@ -2375,5 +2381,10 @@ main {
         font-size: 13px;
         padding: 0.6rem 0.8rem;
     }
+}
+
+#no-bookshelves-message {
+    font-size: 14px;
+    color: #0d1f43;
 }
 
