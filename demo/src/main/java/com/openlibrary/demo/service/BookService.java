@@ -101,16 +101,23 @@ public class BookService {
 
             List<JsonNode> filteredItems = StreamSupport.stream(items.spliterator(), false)
                     .filter(node -> {
-                        String title = node.path("title").asText("").toLowerCase();
-
-                        String author = "";
-                        if (isQueryBased && node.has("author_name") && node.path("author_name").isArray() && node.path("author_name").size() > 0) {
-                            author = node.path("author_name").get(0).asText("").toLowerCase();
-                        } else if (!isQueryBased && node.has("authors") && node.path("authors").isArray() && node.path("authors").size() > 0) {
-                            author = node.path("authors").get(0).path("name").asText("").toLowerCase();
+                        if (isQueryBased) {
+                            // Existing filtering for query-based search (title or author)
+                            String title = node.path("title").asText("").toLowerCase();
+                            String author = "";
+                            if (node.has("author_name") && node.path("author_name").isArray() && node.path("author_name").size() > 0) {
+                                author = node.path("author_name").get(0).asText("").toLowerCase();
+                            }
+                            return title.contains(lowerCaseQuery) || author.contains(lowerCaseQuery);
+                        } else {
+                            // Filter by genre (subject) for top lists
+                            JsonNode subjects = node.path("subject");
+                            if (subjects.isArray()) {
+                                return StreamSupport.stream(subjects.spliterator(), false)
+                                        .anyMatch(subject -> subject.asText("").toLowerCase().contains(lowerCaseQuery));
+                            }
+                            return false; // No match if no subjects or empty subjects
                         }
-
-                        return title.contains(lowerCaseQuery) || author.contains(lowerCaseQuery);
                     })
                     .collect(Collectors.toList());
 
