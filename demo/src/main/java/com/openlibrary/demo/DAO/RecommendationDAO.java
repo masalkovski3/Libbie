@@ -41,6 +41,7 @@ public class RecommendationDAO {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM book WHERE review_score IS NOT NULL ORDER BY review_score DESC LIMIT ?";
 
+
         try (Connection conn = connection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -51,7 +52,7 @@ public class RecommendationDAO {
                     Book book = new Book(
                             rs.getString("open_library_id"),
                             rs.getString("title"),
-                            rs.getString("authors"),
+                            getTrimmedAuthors(rs.getString("open_library_id")), // Separate query for authors
                             rs.getString("cover_url"),
                             rs.getDouble("review_score")
                     );
@@ -64,7 +65,6 @@ public class RecommendationDAO {
 
     public List<Book> getRecommendedBooksForUser(long memberId, int limit) throws SQLException {
         List<Book> books = new ArrayList<>();
-
 
         String sql =
                 "WITH high_rated_by_user AS ( " +
@@ -88,14 +88,14 @@ public class RecommendationDAO {
                         "      AND br3.open_library_id NOT IN (SELECT open_library_id FROM high_rated_by_user) " +
                         "    GROUP BY br3.open_library_id " +
                         ") " +
-                        "SELECT b.open_library_id, b.title, array_to_string(b.authors, ', ') AS authors, b.cover_url, rb.avg_score AS review_score " +
+                        "SELECT b.open_library_id, b.title, TRIM(BOTH '{}' FROM array_to_string(b.authors, ', ')) AS authors, b.cover_url, rb.avg_score AS review_score " +
                         "FROM recommended_books rb " +
                         "JOIN book b ON b.open_library_id = rb.open_library_id " +
                         "ORDER BY rb.avg_score DESC " +
                         "LIMIT ?";
+
         try (Connection conn = connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
 
             // Set parameters (memberId used twice)
             stmt.setLong(1, memberId);
@@ -108,7 +108,7 @@ public class RecommendationDAO {
                 Book book = new Book();
                 book.setWorkId(rs.getString("open_library_id"));
                 book.setTitle(rs.getString("title"));
-                book.setAuthor(rs.getString("authors"));
+                book.setAuthor(rs.getString("authors")); // Now without {}
                 book.setCoverUrl(rs.getString("cover_url"));
                 book.setReviewScore(rs.getDouble("review_score"));
 
@@ -118,5 +118,23 @@ public class RecommendationDAO {
         }
         System.out.println("2 Lista:" + books);
         return books;
+    }
+
+    public String getTrimmedAuthors(String openLibraryId) throws SQLException {
+        String sql = "SELECT TRIM(BOTH '{}' FROM array_to_string(authors, ', ')) AS authors FROM book WHERE open_library_id = ?";
+        String authors = "";
+
+        try (Connection conn = connection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, openLibraryId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    authors = rs.getString("authors");
+                }
+            }
+        }
+        return authors;
     }
 }
