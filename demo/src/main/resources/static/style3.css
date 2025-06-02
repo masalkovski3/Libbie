@@ -1680,6 +1680,11 @@ button.scroll-button,
     width: 100%;
 }
 
+.input-container {
+
+
+}
+
 /* Se till att alla input-fält har samma bredd */
 .wrapper form input {
     flex: 1;
@@ -1691,6 +1696,7 @@ button.scroll-button,
     right: -40px;
     top: 50%;
     transform: translateY(-50%);
+
 }
 
 /* Frågetecken-ikonen */
@@ -1707,6 +1713,7 @@ button.scroll-button,
     font-weight: bold;
     cursor: help;
     transition: background-color 0.3s;
+
 }
 
 .password-help-icon:hover {
@@ -1728,6 +1735,7 @@ button.scroll-button,
     z-index: 1000;
     font-size: 14px;
     color: #333;
+
 }
 
 /* Visa tooltip vid hovring */
@@ -1790,7 +1798,15 @@ button.scroll-button,
     height: 34px !important;
     padding: 1px 2px !important;
     font-family: Arial, sans-serif !important;
-    font-size: 13.3333px !important;  /* Matchar webbläsarens standard för lösenordsfält */
+    font-size: 11px !important;  /* Matchar webbläsarens standard för lösenordsfält */
+    box-sizing: content-box !important;
+}
+
+#username-input {
+    height: 34px !important;
+    padding: 1px 2px !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 11px !important;  /* Matchar webbläsarens standard för lösenordsfält */
     box-sizing: content-box !important;
 }
 
@@ -2346,6 +2362,8 @@ main {
     position: relative;
     top: -10px;
 }
+
+
 
 /* Responsiv design för mindre skärmar */
 @media (max-width: 480px) {
