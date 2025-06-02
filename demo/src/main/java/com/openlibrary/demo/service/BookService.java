@@ -8,6 +8,7 @@ import com.openlibrary.demo.external.*;
 import com.openlibrary.demo.model.Book;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -28,6 +31,8 @@ public class BookService {
 
     private static final String BASE_URL = "https://openlibrary.org/search.json";
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
@@ -35,25 +40,19 @@ public class BookService {
      * Searches Open Library with pagination.
      *
      * @param query  the search string (title, author, etc.)
-     * @param limit  max number of books to return
-     * @param offset number of books to skip (used for pagination)
      * @return a SearchResult containing list of books and total result count
      */
-    public SearchResult searchBooks(String query, int limit, int offset) {
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String url = BASE_URL + "?q=" + encodedQuery + "&limit=" + limit + "&offset=" + offset;
+    public List<OpenLibraryBook> searchBooks(String query) {
+        String url = "https://openlibrary.org/search.json?q=" + UriUtils.encodeQuery(query, StandardCharsets.UTF_8);
+        String response = restTemplate.getForObject(url, String.class);
 
-        OpenLibraryResponse response = restTemplate.getForObject(url, OpenLibraryResponse.class);
-
-        if (response == null || response.getDocs() == null) {
-            return new SearchResult(List.of(), 0);
+        try {
+            OpenLibraryResponse olResponse = objectMapper.readValue(response, OpenLibraryResponse.class);
+            return olResponse.getDocs();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
-
-        List<Book> books = response.getDocs().stream()
-                .map(this::mapToBook)
-                .collect(Collectors.toList());
-
-        return new SearchResult(books, response.getNumFound());
     }
 
     /**
@@ -171,8 +170,6 @@ public class BookService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            //int totalCount = isQueryBased ? root.path("numFound").asInt() : root.path("work_count").asInt();
-            System.out.println(totalCount);
             return new SearchResult(books, totalCount);
 
         } catch (Exception e) {
@@ -181,7 +178,7 @@ public class BookService {
         }
     }
 
-    private String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
+    public String getCoverUrl(Integer coverId, String cleanId, RestTemplate restTemplate, ObjectMapper mapper) throws JsonProcessingException {
         String coverUrl = "";
         if (coverId != null) {
             coverUrl = "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg";
@@ -204,5 +201,69 @@ public class BookService {
         }
         return coverUrl;
     }
+
+    public OpenLibraryBook getBookByWorkId(String workId) {
+        List<OpenLibraryBook> books = searchBooks(workId);
+
+        for (OpenLibraryBook book : books) {
+            if (book.getKey() != null && book.getKey().contains(workId)) {
+                try {
+                    String url = "https://openlibrary.org/works/" + workId + ".json";
+                    String json = restTemplate.getForObject(url, String.class);
+                    JsonNode root = objectMapper.readTree(json);
+                    JsonNode descNode = root.path("description");
+
+                    if (descNode.isTextual()) {
+                        book.setDescription(cleanDescription(descNode.asText()));
+                    } else if (descNode.has("value")) {
+                        book.setDescription(cleanDescription(descNode.path("value").asText()));
+                    } else {
+                        book.setDescription("No description available.");
+                    }
+
+                } catch (Exception e) {
+                    book.setDescription("No description available.");
+                    e.printStackTrace();
+                }
+
+                return book;
+            }
+        }
+
+        return null;
+    }
+
+    public static String cleanDescription(String raw) {
+        if (raw == null) return "";
+
+        // Lista över meta-start-ord där vi vill klippa bort resten
+        String[] markers = {
+                "\\(source\\)", "See also:", "Preceded by:", "Followed by:",
+                "Contains:", "\\[\\d+\\]:", "Source"
+        };
+
+        // Skapa ett regex som matchar första förekomst av något av dessa
+        String patternString = String.join("|", markers);
+        Pattern pattern = Pattern.compile("(?i)(" + patternString + ")");
+        Matcher matcher = pattern.matcher(raw);
+
+        String trimmed = raw;
+        if (matcher.find()) {
+            trimmed = raw.substring(0, matcher.start());
+        }
+
+        // Rensa kvarvarande markdown
+        return trimmed
+                .replaceAll("\\[(.*?)\\]\\[\\d+\\]", "$1")            // [text][1] → text
+                .replaceAll("\\[(.*?)\\]\\((https?://.*?)\\)", "$1")  // [text](url) → text
+                .replaceAll("-{3,}", "")                              // ---- → bort
+                .replaceAll("\\s{2,}", " ")                           // dubbla mellanrum → ett
+                .trim()
+                .replaceAll("\\([\\[]?$", "")     // rensa ( eller ([ i slutet av strängen
+                .replaceAll("\\[$", "");          // ensamt [ på slutet
+
+    }
+
+
 }
 

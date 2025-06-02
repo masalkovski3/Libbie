@@ -1,5 +1,6 @@
 package com.openlibrary.demo.external;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
  * Represents a single book result from Open Library's search API response.
  * This is a DTO that mirrors the structure of JSON in the "docs" array.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenLibraryBook {
 
     private String title;
@@ -25,6 +27,8 @@ public class OpenLibraryBook {
      */
     @JsonProperty("cover_i")
     private Integer coverId;
+
+    private String description;
 
     public String getTitle() {
         return title;
@@ -56,5 +60,19 @@ public class OpenLibraryBook {
 
     public void setCoverId(Integer coverId) {
         this.coverId = coverId;
+    }
+
+    public String getCoverUrl() {
+        return (coverId != null)
+                ? "https://covers.openlibrary.org/b/id/" + coverId + "-L.jpg"
+                : "/images/blue-logo.jpeg";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
