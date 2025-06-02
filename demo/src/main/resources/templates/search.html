@@ -71,7 +71,7 @@
             <!-- Flytta upp resultatet direkt efter formuläret -->
             <!-- Ny del med Bootstrap, filter och bokomslag -->
             <div th:if="${books}" class="container mb-5">
-                <h2 class="text-center mb-4">
+                <h2 class="results-for-message">
                     Results for "<span th:text="${query != null and !query.isEmpty() ? query : genre}"></span>"</h2>
 
                 <!-- Show number of results and active filters if any -->
@@ -188,16 +188,6 @@
                     </nav>
                 </div>
             </div>
-
-
-            <!-- Nu visas bilden efteråt -->
-            <div class="img-flex">
-                <div class="img-container">
-                    <img src="/images/bookshelf.jpg" alt="Bookshelf">
-                    <p class="caption">Find your next read</p>
-                </div>
-            </div>
-
             <hr>
         </div>
     </div>

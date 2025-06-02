@@ -857,7 +857,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
     display: flex;
     overflow-x: auto;
     border: 1px solid #d088a3;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 15px;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
@@ -1500,7 +1500,7 @@ button.scroll-button,
     padding: 0.5rem 1rem;
     margin-top : 1rem;
     margin-bottom: 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 5px;
     font-size: 0.9rem;
     color: #0d1f43;
     min-height: 50px;
@@ -1553,7 +1553,7 @@ button.scroll-button,
 
 .btn-rose {
     background-color: #f3c1d6; /* Rosa grundton */
-    color: #0d1f43;
+    color: #0d1f43 !important;
     border: none;
     border-radius: 8px;
     padding: 6px 12px;
@@ -1875,14 +1875,6 @@ button.scroll-button,
     padding-left: 30px;
     font-size: 34px;
     font-weight: bold;
-}
-
-.home-heading {
-    align-items: center;
-    padding-left: 30px;
-    font-size: 40px;
-    font-weight: bold;
-    text-align: center;
 }
 
 .slick-prev,
@@ -2264,6 +2256,11 @@ main {
     padding: 0.75rem;
     font-weight: 600;
     margin-top: 0.5rem;
+    color: #0d1f43;
+}
+
+#friends-on-libbie {
+    color: #0d1f43 !important;
 }
 
 .create-first-shelf-form .btn-rose:disabled {
@@ -2389,17 +2386,18 @@ main {
     }
 }
 
-#empty-bookshelf-message {
+#no-bookshelves-message {
+    font-size: 14px;
     color: #0d1f43;
 }
 
-.eye-button {
-    background-color: #f3c1d6;
-    border: 1px solid #e09ebd;
-    border-radius: 7px;
-    height:38px;
-    width: 40px;
-    font-size: 20px;
+.results-for-message {
+    color: black;
+    font-family: Georgia;
+    font-size: 24px;
     text-align: center;
+    margin: 0 auto;
+    width: max-content;
+    font-weight: bold;
 }
 
