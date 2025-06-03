@@ -1425,16 +1425,18 @@ button.scroll-button,
 
 .review-form button {
     padding: 0.5rem 1rem;
-    background-color: #4CAF50;
+    background-color: #1f3366;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    transition: 0.3s;
 }
 
 .review-form button:hover {
-    background-color: #45a049;
+    background-color: #192640;
+    transition: 0.3s;
 }
 
 .review-actions {
@@ -1443,31 +1445,35 @@ button.scroll-button,
 }
 
 .btn-delete {
+    background-color: #e09ebd;
     padding: 0.25rem 0.5rem;
-    background-color: #f44336;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8rem;
+    transition: 0.3s;
 }
 
 .btn-delete:hover {
-    background-color: #d32f2f;
+    background-color: palevioletred;
+    transition: 0.3s;
 }
 
 .btn-edit {
     padding: 0.25rem 0.5rem;
-    background-color: #2196F3;
+    background-color: #8EACBF;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8rem;
+    transition: 0.3s;
 }
 
 .btn-edit:hover {
-    background-color: #0b7dda;
+    background-color: #4f6082;
+    transition: 0.3s;
 }
 
 .review-count {
