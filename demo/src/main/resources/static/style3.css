@@ -987,8 +987,8 @@ button.scroll-button,
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 35px !important;
+    height: 35px !important;
     background-color: #f3c1d6 !important;
     border: 1px solid #e09ebd !important;
     border-radius: 50% !important;
@@ -2380,8 +2380,6 @@ main {
     top: -10px;
 }
 
-
-
 /* Responsiv design för mindre skärmar */
 @media (max-width: 480px) {
     .form-buttons {
@@ -2408,4 +2406,37 @@ main {
     width: max-content;
     font-weight: bold;
 }
+
+/* CSS för synlighetsikonerna */
+.visibility-icon {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.visibility-icon div {
+    display: flex;
+    align-items: center;
+}
+
+/* SVG-styling för låsikonerna */
+.visibility-icon svg.bi-unlock {
+    color: #d088a3; /* för öppet lås/public */
+}
+
+.visibility-icon svg.bi-lock {
+    color: #d088a3; /* för stängt lås/private */
+}
+
+/* Hover-effekt för SVG */
+.visibility-icon:hover svg {
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+/* Tooltip styling för ikonerna */
+.visibility-icon svg[title] {
+    cursor: help;
+}
+
 

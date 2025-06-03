@@ -879,11 +879,18 @@ function handleToggleClick(event) {
     fetch(`/profile/bookshelves/${shelfId}/toggle-visibility`, {
         method: "POST"
     }).then(response => {
-        if (response.ok) {
-            const newIsPublic = !isCurrentlyPublic;
+        console.log("Toggle response status:", response.status);
+        return response.json();
+    }).then(data => {
+        console.log("Toggle response data:", data);
+        if (data.success) {
+            // Använd den faktiska statusen från servern istället för att bara invertera
+            const newIsPublic = data.isPublic;
             button.dataset.shelfPublic = newIsPublic.toString();
 
-            // Uppdatera ikonen och texten
+            console.log("Updated visibility to:", newIsPublic);
+
+            // Uppdatera ikonen och texten i dropdown-menyn
             const icon = button.querySelector('svg');
             const text = button.querySelector('span');
 
@@ -902,6 +909,30 @@ function handleToggleClick(event) {
                 text.textContent = 'Make Public';
             }
 
+            // NYTT: Uppdatera huvudsymbolen bredvid bokhyllans titel
+            const visibilityIcon = document.getElementById(`visibility-icon-${shelfId}`);
+            if (visibilityIcon) {
+                if (newIsPublic) {
+                    // Öppet lås för public
+                    visibilityIcon.innerHTML = `
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16" title="Public bookshelf">
+                                <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2M3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1z"/>
+                            </svg>
+                        </div>
+                    `;
+                } else {
+                    // Stängt lås för private
+                    visibilityIcon.innerHTML = `
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16" title="Private bookshelf">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                            </svg>
+                        </div>
+                    `;
+                }
+            }
+
             // Stäng dropdown
             const dropdown = button.closest('.dropdown');
             const dropdownBtn = dropdown.querySelector('[data-bs-toggle="dropdown"]');
@@ -913,11 +944,11 @@ function handleToggleClick(event) {
             }
 
         } else {
-            console.error("Failed to toggle visibility. Status: " + response.status);
+            console.error("Failed to toggle visibility:", data);
             if (typeof showError === 'function') {
-                showError("Failed to toggle bookshelf visibility");
+                showError(data.errorMessage || "Failed to toggle bookshelf visibility");
             } else {
-                alert("Failed to toggle visibility. Status: " + response.status);
+                alert(data.errorMessage || "Failed to toggle visibility");
             }
         }
     }).catch(error => {

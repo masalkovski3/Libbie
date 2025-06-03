@@ -92,11 +92,25 @@
                     <div class="bookshelf-header">
                         <h3 class="bookshelf-title" th:text="${shelf.name}">Bookshelf Name</h3>
                         <div class="bookshelf-actions">
-                            <div th:if="${shelf['visibility']}">👁️</div>
-                            <div th:unless="${shelf['visibility']}">👁️‍🗨️</div>
+                            <!-- Lägg till ID för att kunna uppdatera symbolen enkelt -->
+                            <div th:id="'visibility-icon-' + ${shelf.id}" class="visibility-icon">
+                                <!-- Öppet lås för public -->
+                                <div th:if="${shelf['isPublic']}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16" title="Public bookshelf">
+                                        <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2M3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1z"/>
+                                    </svg>
+                                </div>
+                                <!-- Stängt lås för private -->
+                                <div th:unless="${shelf['isPublic']}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16" title="Private bookshelf">
+                                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                                    </svg>
+                                </div>
+                            </div>
 
                             <!-- Dropdown container -->
                             <div class="dropdown">
+                                <!-- Resten av dropdown-koden förblir densamma -->
                                 <button class="btn btn-sm bookshelf-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     ✏️
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down dropdown-arrow" viewBox="0 0 16 16">
@@ -143,17 +157,18 @@
                                     <li>
                                         <button class="dropdown-item toggle-visibility-btn"
                                                 th:data-shelf-id="${shelf.id}"
-                                                th:data-shelf-public="${shelf['visibility']}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye me-2" viewBox="0 0 16 16" th:if="${shelf['visibility']}">
+                                                th:data-shelf-public="${shelf['isPublic']}">
+                                            <!-- SVG ikoner baserat på isPublic istället för visibility -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye me-2" viewBox="0 0 16 16" th:if="${shelf['isPublic']}">
                                                 <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
                                                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
                                             </svg>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash me-2" viewBox="0 0 16 16" th:unless="${shelf['visibility']}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash me-2" viewBox="0 0 16 16" th:unless="${shelf['isPublic']}">
                                                 <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
                                                 <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
                                                 <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
                                             </svg>
-                                            <span th:text="${shelf['visibility']} ? 'Make Private' : 'Make Public'">Toggle Visibility</span>
+                                            <span th:text="${shelf['isPublic']} ? 'Make Private' : 'Make Public'">Toggle Visibility</span>
                                         </button>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>

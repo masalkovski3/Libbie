@@ -944,26 +944,45 @@ public class ProfileController {
     }
 
     @PostMapping("/bookshelves/{id}/toggle-visibility")
-    public String toggleBookshelfVisibility(@PathVariable Long id,
-                                            HttpSession session,
-                                            RedirectAttributes redirectAttributes) throws SQLException {
+    @ResponseBody
+    public ResponseEntity<?> toggleBookshelfVisibility(@PathVariable Long id,
+                                                       HttpSession session) throws SQLException {
         System.out.println("Trying to toggle visibility of bookshelves: " + id);
         Member currentMember = (Member) session.getAttribute("currentMember");
 
-        Bookshelf shelf = bookshelfDAO.findByIdReturnBookshelf(id);
-        if (shelf == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Bookshelf not found");
+        if (currentMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("errorMessage", "You are not currently logged in"));
         }
 
-        Long shelfOwnerId = shelf.getMemberId();
+        try {
+            Bookshelf shelf = bookshelfDAO.findByIdReturnBookshelf(id);
+            if (shelf == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("errorMessage", "Bookshelf not found"));
+            }
 
-        if (!shelfOwnerId.equals(currentMember.getId())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "This bookshelf does not belong to your profile");
+            Long shelfOwnerId = shelf.getMemberId();
+            if (!shelfOwnerId.equals(currentMember.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("errorMessage", "This bookshelf does not belong to your profile"));
+            }
+
+            boolean isCurrentlyPublic = shelf.isVisibility();
+            boolean newVisibility = !isCurrentlyPublic;
+
+            bookshelfDAO.setVisibility(id, newVisibility);
+
+            // Returnera den nya statusen
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "isPublic", newVisibility,
+                    "message", newVisibility ? "Bookshelf is now public" : "Bookshelf is now private"
+            ));
+
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("errorMessage", "Database error: " + e.getMessage()));
         }
-
-        boolean isCurrentlyPublic = shelf.isVisibility();
-        bookshelfDAO.setVisibility(id, !isCurrentlyPublic);
-
-        return "redirect:/profile";
     }
 }
