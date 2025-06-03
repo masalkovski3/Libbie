@@ -968,8 +968,26 @@ input[type="range"]:focus::-webkit-slider-thumb {
     background-color: #f0f0f0;
 }
 
+.book-title-wrapper {
+    background-color: #d088a3;
+    border-radius: 7px;
+    padding: 10px;
+    transition: 0.3s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.book-title-wrapper:hover {
+    background-color: #e09ebd;
+    border-radius: 7px;
+    padding: 10px;
+    transition: 0.3s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .book-title {
+    text-decoration: none !important;
     font-size: 0.8rem;
+    color: #0d1f43;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -977,6 +995,11 @@ input[type="range"]:focus::-webkit-slider-thumb {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     min-height: 3em;
+}
+
+
+a {
+    text-decoration: none !important;
 }
 
 /* Scrollknappar */
@@ -1089,6 +1112,7 @@ button.scroll-button,
     max-height: 400px;
     overflow-y: auto;
     margin-top: 15px;
+
 }
 
 .book-result-item {
@@ -1660,7 +1684,7 @@ button.scroll-button,
 
 .btn-done {
     background-color: #f3c1d6;
-    color: #5c2d91;
+    color: #0d1f43;
     border: none;
     border-radius: 5px;
     padding: 0.6rem 1.2rem;
@@ -2192,12 +2216,12 @@ main {
 
 /* Röd färg för delete-knappen */
 .bookshelf-dropdown-menu .dropdown-item.text-danger {
-    color: #dc3545 !important;
+    color: #e09ebd !important;
 }
 
 .bookshelf-dropdown-menu .dropdown-item.text-danger:hover {
     background-color: #fdf2f2 !important;
-    color: #b02a37 !important;
+    color: palevioletred !important;
 }
 
 /* Divider mellan items */
@@ -2404,7 +2428,7 @@ main {
 }
 
 .results-for-message {
-    color: black;
+    color: #0d1f43;
     font-family: Georgia;
     font-size: 24px;
     text-align: center;
@@ -2445,4 +2469,91 @@ main {
     cursor: help;
 }
 
+#view-details-search {
+    background-color: #d088a3;
+    color: white;
+    border: none
+}
 
+#view-details-search:hover {
+    background-color: #e09ebd;
+    color: white;
+    border: none;
+}
+
+.more-by-the-author-wrapper {
+    background-color: #d088a3;
+    color: white;
+    border: none;
+    transition: 0.3s;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-radius: 7px;
+    max-width: 180px;
+    padding: 7px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 50px;
+}
+
+#login {
+    color: black;
+}
+
+.login {
+    background-color: #d088a3;
+    color: white;
+    border: none;
+    transition: 0.3s;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-radius: 7px;
+    max-width: 50px;
+    height: 25px;
+}
+
+.login:hover {
+    background-color: #e09ebd;
+    color: white;
+    border: none;
+    transition: 0.3s;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-radius: 7px;
+    cursor: pointer;
+    height: 25px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center; /* Vertikal centrering */
+    gap: 8px; /* lite mellanrum mellan login och texten */
+}
+
+.write-review-text {
+    /* Styla texten om du vill, t.ex.: */
+    font-size: 16px;
+    color: black;
+}
+
+
+.more-by-the-author-wrapper:hover {
+    background-color: #e09ebd;
+    color: white;
+    border: none;
+    transition: 0.3s;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-radius: 7px;
+    max-width: 180px;
+    padding: 7px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.more-by-author-link {
+    color: white;
+    font-size: 18px;
+}

@@ -106,7 +106,7 @@
                                     <span th:text="${book.author}">Author</span>
                                 </p>
                                 <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}"
-                                   class="btn btn-outline-primary stretched-link">View Details</a>
+                                   id="view-details-search" class="btn btn-outline-primary stretched-link">View Details</a>
                             </div>
                         </div>
                     </div>

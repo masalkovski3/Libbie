@@ -84,10 +84,17 @@ public class BookController {
             return "book";
         }
 
+        RestTemplate restTemplate = new RestTemplate();
+        ObjectMapper mapper = new ObjectMapper();
+        String url = "https://openlibrary.org/works/" + workId + ".json";
+        String jsonResponse = restTemplate.getForObject(url, String.class);
+        JsonNode root = mapper.readTree(jsonResponse);
+
         model.addAttribute("title", book.getTitle());
         model.addAttribute("author", book.getAuthorName() != null && !book.getAuthorName().isEmpty()
                 ? String.join(", ", book.getAuthorName())
                 : "Unknown author");
+        model.addAttribute("authorKey", getAuthorKey(root));
         model.addAttribute("description",
                 book.getDescription() != null && !book.getDescription().isEmpty()
                         ? book.getDescription()

@@ -234,7 +234,9 @@
                                 <a th:href="@{'/books/' + ${#strings.replace(book.workId, '/works/', '')}}">
                                     <img th:if="${!#strings.isEmpty(book.coverUrl)}" th:src="${book.coverUrl}" alt="Book cover" class="book-cover">
                                     <img th:if="${#strings.isEmpty(book.coverUrl)}" src="/images/blue-logo.jpeg" alt="No cover" class="book-cover">
-                                    <p class="book-title" th:text="${book.title}">Book title</p>
+                                    <div class="book-title-wrapper">
+                                        <p class="book-title" th:text="${book.title}">Book title</p>
+                                    </div>
                                 </a>
                             </div>
                         </div>
