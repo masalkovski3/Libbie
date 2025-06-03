@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="layout">
-    <div th:replace="fragments/layout :: libbieLayout(~{::pageContent})">
+    <div th:replace="~{fragments/layout :: libbieLayout(~{::pageContent})}">
         <div th:fragment="pageContent">
             <p class="page-heading">Your Profile</p>
 
@@ -364,14 +364,9 @@
 <!-- JavaScript-koppling -->
 <script src="bookshelves.js"></script>
 
-<!--fragment för felmeddelande-->
-<div th:replace="fragments/modal :: errorModal"></div>
-
-<!-- fragment för session-timeout-warning-->
-<div th:replace="fragments/modal :: sessionWarningModal"></div>
-
-<!--fragment för bekräftelsedialog-->
-<div th:replace="fragments/modal :: confirmModal"></div>
+<div th:replace="~{fragments/modal :: errorModal}"></div>
+<div th:replace="~{fragments/modal :: sessionWarningModal}"></div>
+<div th:replace="~{fragments/modal :: confirmModal}"></div>
 
 <!-- Modal for editing profile -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">

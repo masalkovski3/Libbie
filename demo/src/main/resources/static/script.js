@@ -33,6 +33,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault(); // Förhindrar form submission om lösenorden inte matchar
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('sidebar-hidden');
+                    menuToggle.classList.toggle('active');
+                });
+            }
+
+            // Add friend search event listener
+            const searchFriendButton = document.getElementById('searchFriendButton');
+            if (searchFriendButton) {
+                searchFriendButton.addEventListener('click', function () {
+                    searchFriends();
+                });
+            } else {
+                console.error('Search friend button not found in DOM.');
+            }
+        });
+
+// ... (rest of your existing code, including searchFriends())
     }
 });
 
@@ -245,19 +269,16 @@ function searchFriends() {
 
     if (!query.trim()) {
         console.log("⚠️ [JS DEBUG] No input provided.");
-
         resultsDiv.innerHTML = "<p>Please enter a search term.</p>";
         return;
     }
-    const url = `/profile/searchMembers?query=${encodeURIComponent(query)}`;
+    const url = `/profile/searchMembers?query=${encodeURIComponent(query)}`; // Corrected URL
     console.log("🌐 [JS DEBUG] Sending fetch to:", url);
 
-
-    fetch(`/profile/search-members?query=${encodeURIComponent(query)}`)
+    fetch(url)
         .then(response => {
             console.log("📡 [JS DEBUG] Fetch response status:", response.status);
-
-            if (!response.ok) throw new Error("Failed to fetch results");
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
@@ -305,8 +326,7 @@ function searchFriends() {
                 form.appendChild(input);
                 form.appendChild(button);
 
-                userCard.appendChild(nameSpan);
-                userCard.appendChild(form);
+                userCard.appendChild(form); // Note: nameSpan was incorrectly appended twice; fixed here
                 resultsDiv.appendChild(userCard);
             });
         })
