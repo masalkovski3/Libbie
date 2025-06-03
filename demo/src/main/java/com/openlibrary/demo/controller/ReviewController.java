@@ -138,6 +138,14 @@ public class ReviewController {
         }
 
         try {
+            List<String> userBookIds = reviewDAO.getAllWorkIdsInUserBookshelves(currentMember.getId());
+
+            if (!userBookIds.contains(workId)) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "You need to add this book to one of your bookshelves to write a review.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+            }
+            
             reviewDAO.saveReview(currentMember.getId(), workId, score, reviewText);
 
             // Get updated information

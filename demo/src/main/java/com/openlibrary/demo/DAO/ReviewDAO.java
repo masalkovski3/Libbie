@@ -17,11 +17,11 @@ import java.util.List;
 @Component
 public class ReviewDAO {
 
-    private DatabaseConnection sqlHandler;
+    private DatabaseConnection databaseConnection;
 
     @Autowired
-    public ReviewDAO(DatabaseConnection sqlHandler, JdbcTemplate jdbcTemplate) {
-        this.sqlHandler = sqlHandler;
+    public ReviewDAO(DatabaseConnection databaseConnection, JdbcTemplate jdbcTemplate) {
+        this.databaseConnection = databaseConnection;
     }
 
     /**
@@ -44,7 +44,7 @@ public class ReviewDAO {
                 "ON CONFLICT (member_id, open_library_id) DO UPDATE " +
                 "SET review_score = EXCLUDED.review_score, review_text = EXCLUDED.review_text";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
             preparedStatement.setString(2, cleanId);
@@ -54,6 +54,29 @@ public class ReviewDAO {
             preparedStatement.executeUpdate();
         }
     }
+
+    public List<String> getAllWorkIdsInUserBookshelves(long memberId) throws SQLException {
+        List<String> workIds = new ArrayList<>();
+
+        String sql = """
+        SELECT bb.book_id
+        FROM bookshelf b
+        JOIN bookshelf_book bb ON b.id = bb.bookshelf_id
+        WHERE b.member_id = ?
+    """;
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                workIds.add(rs.getString("book_id")); // samma som workId
+            }
+        }
+
+        return workIds;
+    }
+
 
     /**
      * Retrieves all reviews for a specific book.
@@ -74,7 +97,7 @@ public class ReviewDAO {
                 "WHERE br.open_library_id = ? " +
                 "ORDER BY br.review_date DESC";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, cleanId);
 
@@ -107,7 +130,7 @@ public class ReviewDAO {
 
         String sql = "SELECT review_score FROM book WHERE open_library_id = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, cleanId);
 
@@ -137,7 +160,7 @@ public class ReviewDAO {
                 "FROM book_review " +
                 "WHERE member_id = ? AND open_library_id = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
             preparedStatement.setString(2, cleanId);
@@ -169,7 +192,7 @@ public class ReviewDAO {
 
         String sql = "DELETE FROM book_review WHERE member_id = ? AND open_library_id = ?";
 
-        try (Connection conn = sqlHandler.getConnection();
+        try (Connection conn = databaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setLong(1, memberId);
             preparedStatement.setString(2, cleanId);
