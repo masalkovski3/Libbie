@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,17 +33,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * Controller som hanterar användarprofilsidan och tillhörande API-funktioner
  * såsom hantering av bokhyllor och sökning av böcker via OpenLibrary API.
  */
-//TODO: Ändra så att demo-användare inte används vid inlogg
 @Controller
 @RequestMapping("/profile")
 @Tag(name = "User Profile", description = "User profile management and bookshelf operations")
@@ -102,7 +102,6 @@ public class ProfileController {
 
             model.addAttribute("friends", friendProfiles);
 
-            model.addAttribute("member", memberOpt.get());
             model.addAttribute("member", memberData);
 
             // Hämta användarens bokhyllor
@@ -396,7 +395,6 @@ public class ProfileController {
      * @param bookshelfId ID för bokhyllan.
      * @param name Det nya namnet.
      * @return ResponseEntity med resultatet av uppdateringen.
-     *
      */
     @Operation(summary = "Update bookshelf name",
             description = "Change the name of an existing bookshelf")
@@ -448,7 +446,6 @@ public class ProfileController {
         }
     }
 
-
     /**
      * Uppdaterar beskrivningen för en bokhylla.
      *
@@ -471,7 +468,6 @@ public class ProfileController {
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             System.out.println("Member not logged in");
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
 
@@ -481,7 +477,6 @@ public class ProfileController {
             Optional<Map<String, Object>> bookshelfOpt = bookshelfDAO.findById(shelfId);
             if (bookshelfOpt.isEmpty() || !bookshelfOpt.get().get("memberId").equals(memberId)) {
                 System.out.println("Access denied");
-
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
             }
 
@@ -497,7 +492,6 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
-
 
     /**
      * Uppdaterar synligheten (publik/privat) för en bokhylla.
@@ -661,7 +655,7 @@ public class ProfileController {
             return "redirect:/logIn";
         }
 
-        if(displayName == null || displayName.trim().isEmpty()) {
+        if (displayName == null || displayName.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Display name is required");
             redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/profile";
@@ -670,21 +664,13 @@ public class ProfileController {
         currentMember.setName(displayName.trim());
         currentMember.setBio(bio != null ? bio.trim() : "");
 
-        if(profileImage != null && !profileImage.isEmpty()) {
-            try{
-                String imageUrl = saveProfileImage(profileImage, currentMember.getId());
-                currentMember.setProfileImage(imageUrl);
-                memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
-            } catch (IOException e){
-                redirectAttributes.addFlashAttribute("errorMessage", "Could not save profile image");
-                redirectAttributes.addFlashAttribute("showError", true);
-                return "redirect:/profile";
-            }
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String imageUrl = saveProfileImage(profileImage, currentMember.getId());
+            currentMember.setProfileImage(imageUrl);
+            memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
         }
 
-        System.out.println("PROFILE IMAGE PATH TO SAVE: " + currentMember.getProfileImage());
-        memberDAO.updateProfileInfo(currentMember); // Skapa denna metod i DAO
-
+        memberDAO.updateProfileInfo(currentMember);
         redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
         return "redirect:/profile";
     }
@@ -699,7 +685,6 @@ public class ProfileController {
     public String uploadProfileImage(@RequestParam("image") MultipartFile image,
                                      HttpSession session,
                                      RedirectAttributes redirectAttributes) {
-
         Member currentMember = (Member) session.getAttribute("currentMember");
         if (currentMember == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "You are not currently logged in");
@@ -707,35 +692,21 @@ public class ProfileController {
             return "redirect:/logIn";
         }
 
-        if(image.isEmpty()){
+        if (image.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Please select an image to upload");
             redirectAttributes.addFlashAttribute("showError", true);
             return "redirect:/profile";
         }
 
-        try{
-            // --- EN ENDA KATALOG FÖR ALLA PROFILBILDER ---
-            String uploadDirectory = "profileImages/";
-            Path uploadPath = Paths.get(uploadDirectory);
-            if (Files.notExists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // --- BYGG FILNAMN OCH SPARA ---
-            String filename = currentMember.getId() + "_" + image.getOriginalFilename();
-            Path filePath = uploadPath.resolve(filename);
-            image.transferTo(filePath);
-
-            // --- UPPDATERA DAO MED DEN URL MALL VI KOMMER SERVA VIA ResourceHandler ---
-            String servedPath = "/profileImages/" + filename;
-            memberDAO.updateProfilePicture(currentMember.getId(), servedPath);
-
+        try {
+            String imageUrl = saveProfileImage(image, currentMember.getId());
+            currentMember.setProfileImage(imageUrl);
+            memberDAO.updateProfilePicture(currentMember.getId(), imageUrl);
             redirectAttributes.addFlashAttribute("updateSuccess", "Your profile has been updated.");
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload image: " + e.getMessage());
             redirectAttributes.addFlashAttribute("showError", true);
         }
-
         return "redirect:/profile";
     }
 
@@ -745,17 +716,26 @@ public class ProfileController {
     @Operation(summary = "Save profile image",
             description = "Save uploaded image file to server directory")
     private String saveProfileImage(MultipartFile image, Long memberId) throws IOException {
-        // 1. Rensa bort farliga tecken
-        String original = StringUtils.cleanPath(image.getOriginalFilename());
+        // Validate file type
+        String[] allowedExtensions = {"jpg", "jpeg", "png"};
+        String originalFilename = image.getOriginalFilename();
+        String extension = FilenameUtils.getExtension(originalFilename).toLowerCase();
+        if (!Arrays.asList(allowedExtensions).contains(extension)) {
+            throw new IOException("Only JPG, JPEG, and PNG files are allowed.");
+        }
 
-        // 2. Plocka ut basnamn och extension
-        String baseName = FilenameUtils.getBaseName(original).toLowerCase();     // gemena
-        String ext      = FilenameUtils.getExtension(original).toLowerCase();    // "png"
+        // Validate file size (e.g., max 5MB)
+        if (image.getSize() > 5 * 1024 * 1024) {
+            throw new IOException("File size exceeds 5MB limit.");
+        }
 
-        // 3. Sätt ihop nytt, gemenerat filnamn
-        String filename = memberId + "_" + baseName + "." + ext;
+        // Rensa bort farliga tecken
+        String baseName = FilenameUtils.getBaseName(originalFilename).toLowerCase();
 
-        // 4. Spara filen
+        // Sätt ihop nytt, gemenerat filnamn
+        String filename = memberId + "_" + baseName + "." + extension;
+
+        // Spara filen
         Path uploadDir = Paths.get("profileImages");
         if (Files.notExists(uploadDir)) {
             Files.createDirectories(uploadDir);
@@ -765,7 +745,7 @@ public class ProfileController {
             Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        // 5. Returnera mappad URL
+        // Returnera mappad URL
         return "/profileImages/" + filename;
     }
 
@@ -918,11 +898,9 @@ public class ProfileController {
 
         System.out.println("👤 [DEBUG] User ID: " + currentUser.getId() + ", Display Name: " + currentUser.getName());
 
-
         try {
             List<Member> results = memberDAO.searchMembersByName(query, currentUser.getId());
             System.out.println("✅ [DEBUG] DAO returned " + results.size() + " members");
-
 
             List<Map<String, Object>> responseList = results.stream().map(member -> {
                 System.out.println("🧾 [DEBUG] Member: ID=" + member.getId() + ", Name=" + member.getName());
