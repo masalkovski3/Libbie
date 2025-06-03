@@ -1,10 +1,10 @@
-# Byggsteget: använder en Maven-bild för att bygga projektet
+# Byggsteget: använder Maven för att bygga din Spring Boot-app
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Körsteget: kör den färdiga .jar-filen med en smal JDK
+# Körsteget: kör den färdiga jar-filen
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
