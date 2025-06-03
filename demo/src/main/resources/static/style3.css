@@ -969,7 +969,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 .book-title-wrapper {
-    background-color: #d088a3;
     border-radius: 7px;
     padding: 10px;
     transition: 0.3s;
