@@ -48,14 +48,22 @@
                     <p><strong>Bio:</strong> <em th:text="${member.bio}">Reader and dreamer.</em></p>
                     <p><strong>Member since:</strong> <span th:text="${#dates.format(member.createdAt, 'yyyy-MM-dd')}">2025-01-01</span></p>
 
-                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
-                        <button class="btn-rose" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                            ✏️ Edit Profile
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;"><button class="btn-rose" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16" style="vertical-align: middle; margin-right: 6px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.688-4.5L16.862 3.487z" />
+                        </svg>
+                        Edit Profile
+                    </button>
+
+
+                        <button class="btn-rose" style="display: flex; align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor"
+                                 stroke-width="1.5" class="bi bi-heart" viewBox="0 0 16 16" style="margin-right: 6px;">
+                                <path d="M8 6.236l-.684-.723C5.408 3.313 2.5 4.54 2.5 7.053c0 1.292.614 2.322 1.534 3.178C5.457 11.898 6.997 13.06 8 13.942c1.003-.882 2.543-2.044 3.966-3.711.92-.856 1.534-1.886 1.534-3.178 0-2.513-2.908-3.74-4.816-1.54L8 6.236z"/>
+                            </svg>
+                            Show friends
                         </button>
 
-                        <button class="btn-rose" type="button" data-bs-toggle="modal" data-bs-target="#friendModal">
-                            🩷 Show friends
-                        </button>
                     </div>
                 </div>
 
@@ -112,11 +120,14 @@
                             <div class="dropdown">
                                 <!-- Resten av dropdown-koden förblir densamma -->
                                 <button class="btn btn-sm bookshelf-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    ✏️
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16" style="margin-right: 4px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.688-4.5L16.862 3.487z" />
+                                    </svg>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down dropdown-arrow" viewBox="0 0 16 16">
                                         <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                                     </svg>
                                 </button>
+
                                 <ul class="dropdown-menu bookshelf-dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li>
                                         <button class="dropdown-item"
