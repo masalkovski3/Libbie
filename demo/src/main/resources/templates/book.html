@@ -62,8 +62,8 @@
 
 
                         <!-- Review form -->
-                        <div th:if="${canReview}" class="review-form" id="reviewForm">
-                            <h4 id="reviewFormTitle">Add Your Review</h4>
+                        <div th:if="${canReview}" class="review-form" id="reviewForm" th:data-work-id="${workId}">
+                        <h4 id="reviewFormTitle">Add Your Review</h4>
                             <div class="star-rating" id="ratingStars">
                                 <span class="star" data-rating="1">☆</span>
                                 <span class="star" data-rating="2">☆</span>
@@ -73,7 +73,7 @@
                             </div>
                             <textarea id="reviewText" placeholder="Write your review here..."></textarea>
                             <div>
-                                <button id="submitReview">Submit Review</button>
+                                <button id="submitReview" type="button">Submit Review</button>
                                 <button id="cancelEdit" style="display: none; background-color: #f44336;">Cancel</button>
                             </div>
                         </div>
@@ -154,6 +154,10 @@
         }
     });
 </script>
+<script>
+
+</script>
+
 
 
 <!-- JS: review context -->

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
@@ -121,6 +122,7 @@ public class ReviewController {
             @PathVariable String workId,
             @RequestParam int score,
             @RequestParam String reviewText,
+            Model model,
             HttpSession session) {
 
         Member currentMember = (Member) session.getAttribute("currentMember");
@@ -129,6 +131,8 @@ public class ReviewController {
             error.put("error", "You must be logged in to submit a review");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
+
+        model.addAttribute("workId", workId);
 
         // Validate the score (1-5 stars)
         if (score < 1 || score > 5) {

@@ -55,6 +55,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
+        // Rensa textarea om värdet är placeholder-texten vid fokus
+        if (reviewText) {
+            reviewText.addEventListener('focus', function() {
+                if (this.value === 'Write your review here...') {
+                    this.value = '';
+                }
+            });
+        }
+
         // Om användaren redan har en recension, fyll i formuläret
         if (userReview) {
             populateUserReview(userReview);
@@ -146,7 +155,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Återställ formuläret
                 resetForm();
-                populateUserReview(window.reviewData.userReview);
+                reviewText.value = 'Write your review here...';
+                if (window.reviewData.userReview && isEditing) {
+                    populateUserReview(window.reviewData.userReview);
+                }
             })
             .catch(error => {
                 if (typeof showError === 'function') {
